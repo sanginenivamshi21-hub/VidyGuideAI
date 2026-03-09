@@ -871,6 +871,5 @@ st.divider()
 st.markdown("""
 <div style="text-align:center;color:#3A4A5E;font-size:0.8rem;padding:12px 0">
     Built with ❤️ by VidyGuide &nbsp;·&nbsp; Powered by AI &nbsp;·&nbsp; 
-    <span style="color:#3DDC84">Always free for students</span>
-</div>
+    <span style="color:#3DDC84">Always free for students</span></div>
 """, unsafe_allow_html=True)
