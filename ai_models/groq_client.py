@@ -1,7 +1,7 @@
 import os
 from groq import Groq
 
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+client = Groq(api_key=os.getenv("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"))
 
 def chat_groq(prompt: str, system: str = "You are a helpful career assistant.", model: str = "llama3-8b-8192") -> str:
     """Send a prompt to Groq (fast LLaMA inference) and return the text response."""
