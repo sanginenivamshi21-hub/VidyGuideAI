@@ -1,7 +1,7 @@
 import os
 import requests
 
-HF_API_KEY = os.getenv("HUGGINGFACE_API_KEY")
+HF_API_KEY = os.getenv("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")
 HF_API_URL = "https://api-inference.huggingface.co/models"
 HEADERS = {"Authorization": f"Bearer {HF_API_KEY}"}
 
