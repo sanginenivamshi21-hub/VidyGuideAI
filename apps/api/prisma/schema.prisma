@@ -1,0 +1,90 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            Int             @id @default(autoincrement())
+  username      String          @unique
+  email         String          @unique
+  passwordHash  String
+  fullName      String          @default("")
+  isVerified    Boolean         @default(false)
+  createdAt     DateTime        @default(now())
+  lastLogin     DateTime?
+  sessions      Session[]
+  historyLogs   History[]
+  careerHistories CareerHistory[]
+  resumeHistories ResumeHistory[]
+
+  @@index([email])
+}
+
+model OTP {
+  id        Int      @id @default(autoincrement())
+  email     String
+  code      String
+  purpose   String   // 'register' or 'login' or 'password-reset'
+  expiresAt DateTime
+  isUsed    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([email, code])
+}
+
+model Session {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model History {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  actionType String
+  title      String
+  payload    Json
+  result     String
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+}
+
+model CareerHistory {
+  id              Int      @id @default(autoincrement())
+  userId          Int
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  education       String
+  skills          String
+  interests       String
+  goal            String
+  recommendations String
+  createdAt       DateTime @default(now())
+
+  @@index([userId])
+}
+
+model ResumeHistory {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name          String
+  email         String
+  targetRole    String
+  targetCompany String
+  content       String
+  pdfUrl        String?
+  createdAt     DateTime @default(now())
+
+  @@index([userId])
+}
