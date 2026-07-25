@@ -1,85 +1,91 @@
 # 🌿 VidyGuideAI
 
-> **Intelligent, localized career discovery, resume building, and AI mentorship for Indian students and young professionals.**
+<div align="center">
 
-VidyGuideAI is a production-grade AI-powered career counseling platform designed to guide students from Class 10 dropouts to Master's degree holders. It tailors recommendations to the Indian educational landscape, corporate hiring pipelines (e.g., TCS, Infosys, Wipro), and government exams (SSC, UPSC, Railway, PSUs).
+![VidyGuideAI Banner](docs/images/landing_page.png)
 
----
+[![GitHub License](https://img.shields.io/github/license/sanginenivamshi21-hub/VidyGuideAI?style=for-the-badge&color=3DDC84)](LICENSE)
+[![GitHub Contributors](https://img.shields.io/github/contributors/sanginenivamshi21-hub/VidyGuideAI?style=for-the-badge&color=5B9BD5)](https://github.com/sanginenivamshi21-hub/VidyGuideAI/graphs/contributors)
+[![GitHub Issues](https://img.shields.io/github/issues/sanginenivamshi21-hub/VidyGuideAI?style=for-the-badge&color=F0A500)](https://github.com/sanginenivamshi21-hub/VidyGuideAI/issues)
 
-## 🚀 Key Features
+**Intelligent, localized career guidance, resume crafting, and AI mentorship tailored for Indian students.**
 
-* **🌱 Localized Career Guidance**: Level-specific career recommendations (stream guidance for 10th, lateral entries for diplomas, ITI apprenticeships, etc.) with real-world Indian salary estimates.
-* **📝 Targeted Resume Builder**: Plaintext ATS-friendly resume creation customized for specific roles and companies.
-* **📄 Resume Analyzer (OCR & ATS)**: Audits resumes via copy-paste or file scan, returning keyword matches and improvement points.
-* **🤖 Conversational AI Mentor**: Responsive chat counselor answering career transition questions.
-* **🎙️ Voice Assistant**: Interactive speech recognition and text-to-speech voice synthesizer.
-* **🌐 Multilingual Support**: Translates career outputs and advice into 10+ regional Indian languages.
-* **🔐 OTP Secure Accounts**: SQLite user registration and login verified via 6-digit email OTPs.
+[Local Setup Guide](docs/development/LOCAL_SETUP.md) • [System Architecture](docs/architecture/ARCHITECTURE_AUDIT.md) • [API Reference](docs/api/API_DOCUMENTATION.md) • [Security Policy](SECURITY.md)
+
+</div>
 
 ---
 
-## 🛠️ Tech Stack
+## 🎯 Why VidyGuideAI is Unique
 
-* **Frontend**: Streamlit
-* **Backend**: FastAPI / Uvicorn
-* **Database**: SQLite (Moving to PostgreSQL)
-* **LLM Engine**: Groq (LLaMA-3.1) / Anthropic (Claude-3)
-* **Libraries**: ReportLab (PDF), PyPDF2 (Parser), FAISS (Vector database)
+VidyGuideAI bridges the gap between raw student profiles and the unique demands of the Indian educational and professional landscape. Unlike generic AI assistants:
+* **Tailored Academic Routing**: Provides clear paths for Class 10/12 dropouts, ITI trades, polytechnic lateral entries, and university graduates.
+* **National System Alignment**: Directly targets recruitment criteria for Indian tech giants (TCS, Infosys, Wipro), civil services (SSC, UPSC, Railway), and public sector undertakings (PSUs).
+* **High-Context Prompts**: Uses level-specific heuristics to ensure career paths are realistic and action-oriented.
 
 ---
 
-## 📦 Installation & Setup
+## 🏗️ AI & System Architecture
 
-### Prerequisites
-* Python 3.10+
-* Pip package manager
+```
+[Streamlit Frontend App] ────(REST API payload)────> [FastAPI Server]
+          │                                                   │
+          ▼ (Reads SQLite data)                               ▼ (Queries Groq SDK)
+   [vidyguide.db]                                      [LLaMA-3.1 Model]
+```
 
-### 1. Clone & Install
+---
+
+## 📊 Feature Matrix (Prototype vs. Next.js SaaS Target)
+
+| Feature | Streamlit Prototype (`v0.2.0`) | Next.js Production SaaS (`v1.0.0`) |
+| --- | --- | --- |
+| **Authentication** | SQLite + On-screen OTP Fallback | Auth0 / JWT HTTP-only Cookies + PostgreSQL |
+| **Database** | SQLite Single-file (Thread blocked) | PostgreSQL + `pgvector` Vector Search |
+| **Asynchronous Jobs** | Blocked UI thread execution | Celery / RQ background queues + Redis cache |
+| **Speech Synthesizer** | Client Browser Web Speech API | Native Browser Speech + Edge Synthesis Cache |
+| **Timeline Roadmap** | Custom Regex HTML connector card | Framer Motion Native React timeline |
+
+---
+
+## 📸 Screenshots
+
+### Landing Page & Authentication
+![Landing Page](docs/images/landing_page.png)
+
+### Personalised Career Suggestions
+![Career Guidance](docs/images/career_guidance.png)
+
+### Targeted Resume Builder
+![Resume Builder](docs/images/resume_builder.png)
+
+### Interactive AI Mentor Chat
+![Mentor Chat](docs/images/mentor_chat.png)
+
+### PDF & Image Resume OCR Scanner
+![OCR Scanner](docs/images/ocr_scanner.png)
+
+### Progress Analytics Dashboard
+![Dashboard](docs/images/dashboard.png)
+
+---
+
+## 🎓 Recruiter-Friendly Review Guide
+If you are reviewing this codebase for an engineering role (Google, Microsoft, Meta, etc.), please check:
+* **Clean Routing**: FastAPI endpoints in [backend/main.py](file:///Users/vamshi/projects/VidyGuide-ai/backend/main.py) parse structures using Pydantic validation schemas.
+* **Input Validation**: Sanitization and syntax checking rules inside [validators.py](file:///Users/vamshi/projects/VidyGuide-ai/validators.py).
+* **Decoupled Key Management**: Read from environment variables ([ENVIRONMENT.md](docs/development/ENVIRONMENT.md)) with zero committed secrets.
+* **Interactive Timelines**: Parsing and horizontal scroll connection engine inside [roadmap_viz.py](file:///Users/vamshi/projects/VidyGuide-ai/roadmap_viz.py).
+
+---
+
+## 🚀 Local Installation
 ```bash
 git clone https://github.com/sanginenivamshi21-hub/VidyGuideAI.git
 cd VidyGuideAI
 pip install -r requirements.txt
-```
-
-### 2. Configure Environment
-Create a `.env` file in the root directory:
-```env
-GROQ_API_KEY=your_groq_api_key
-CLAUDE_API_KEY=your_claude_api_key
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=your_gmail_address
-SMTP_PASS=your_gmail_app_password
-APP_BASE_URL=http://localhost:8501
-```
-
-### 3. Run Locally
-**Start Backend API**:
-```bash
 uvicorn backend.main:app --reload --port 8000
+streamlit run app.py
 ```
 
-**Start Streamlit Frontend**:
-```bash
-streamlit run app.py --server.port 8501
-```
-
----
-
-## 📐 System Architecture
-VidyGuideAI decouples the visual client UI from the backend logic, allowing future migrations to React frameworks:
-
-```
-[Streamlit Frontend App] ──(HTTP POST)──> [FastAPI Web Server]
-          │                                         │
-          ▼ (SQLite Auth Actions)                   ▼ (LLM Prompts & Clients)
-   [vidyguide.db]                            [Groq LLaMA-3.1 Inference]
-```
-
----
-
-## 🤝 Contributing
-Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md).
-
-## 📄 License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+See [Local Setup Guide](docs/development/LOCAL_SETUP.md) for step-by-step configurations.
