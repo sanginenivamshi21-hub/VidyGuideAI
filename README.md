@@ -1,95 +1,85 @@
-# 🎓 VidyaGuideAI — Intelligent Multilingual Career Guidance Platform
+# 🌿 VidyGuideAI
 
-An open-source, web-based intelligent career guidance platform designed to bridge the accessibility gap for career counseling by combining modern generative AI with localized multilingual scripts.
+> **Intelligent, localized career discovery, resume building, and AI mentorship for Indian students and young professionals.**
+
+VidyGuideAI is a production-grade AI-powered career counseling platform designed to guide students from Class 10 dropouts to Master's degree holders. It tailors recommendations to the Indian educational landscape, corporate hiring pipelines (e.g., TCS, Infosys, Wipro), and government exams (SSC, UPSC, Railway, PSUs).
 
 ---
 
 ## 🚀 Key Features
 
-*   **AI Career Guidance Engine:** Synthesizes custom career roadmaps, job tracks, and study guides based on academic and demographic profiles.
-*   **ATS-Compliant Resume Builder:** Formats user inputs into clean, standard ATS-readable resume structures.
-*   **OCR Resume Analyzer:** Provides 8-dimensional feedback (grammar, format, keywords, spacing, etc.) using Pytesseract OCR extraction.
-*   **AI Mentor Chat:** A multi-turn conversational agent powered by Meta's LLaMA models.
-*   **Voice-Native Mentoring:** Integrates browser-based voice inputs using Groq Whisper Speech-to-Text and voice outputs.
-*   **ISO Code Script Injection:** Uses localized prompt-injections to force native-script outputs in **12 regional Indian languages** (Telugu, Hindi, Bengali, Tamil, Kannada, Malayalam, Marathi, Gujarati, Punjabi, Odia, Urdu, and English) at sub-second inference speeds.
-*   **User Dashboard:** Features SQLite-backed session history and personalized learning analytics.
+* **🌱 Localized Career Guidance**: Level-specific career recommendations (stream guidance for 10th, lateral entries for diplomas, ITI apprenticeships, etc.) with real-world Indian salary estimates.
+* **📝 Targeted Resume Builder**: Plaintext ATS-friendly resume creation customized for specific roles and companies.
+* **📄 Resume Analyzer (OCR & ATS)**: Audits resumes via copy-paste or file scan, returning keyword matches and improvement points.
+* **🤖 Conversational AI Mentor**: Responsive chat counselor answering career transition questions.
+* **🎙️ Voice Assistant**: Interactive speech recognition and text-to-speech voice synthesizer.
+* **🌐 Multilingual Support**: Translates career outputs and advice into 10+ regional Indian languages.
+* **🔐 OTP Secure Accounts**: SQLite user registration and login verified via 6-digit email OTPs.
 
 ---
 
-## 🛠 Tech Stack
+## 🛠️ Tech Stack
 
-*   **Frontend:** Streamlit (Python)
-*   **Backend Middleware:** FastAPI (Python, Asynchronous API design)
-*   **Database:** SQLite (Lightweight SQL data store)
-*   **AI Inference API:** Groq (LLaMA-3.1-8b-instant & LLaMA-3.3-70b-versatile)
-*   **OCR Parsing:** Pytesseract
-*   **PDF Compilation:** ReportLab (Python PDF library)
-*   **Notification Dispatch:** SMTP
+* **Frontend**: Streamlit
+* **Backend**: FastAPI / Uvicorn
+* **Database**: SQLite (Moving to PostgreSQL)
+* **LLM Engine**: Groq (LLaMA-3.1) / Anthropic (Claude-3)
+* **Libraries**: ReportLab (PDF), PyPDF2 (Parser), FAISS (Vector database)
 
 ---
 
-## 📁 System Architecture
-
-```
-VidyGuide-ai/
-├── app.py              # Main Streamlit user interface & navigation
-├── auth.py             # User authorization & session logic
-├── resume_pdf.py       # ReportLab script compiling raw text into PDF templates
-├── resume_scanner.py   # OCR image extraction & analysis scoring engine
-├── voice_mentor.py     # Voice recording pipelines & Groq Whisper interface
-├── roadmap_viz.py      # Network graph visualizations for career roadmaps
-├── database/           # SQLite schema declarations & migrations
-├── backend/            # FastAPI router endpoints & service controllers
-└── requirements.txt    # Library dependencies
-```
-
----
-
-## ⚙️ Local Setup & Installation
+## 📦 Installation & Setup
 
 ### Prerequisites
+* Python 3.10+
+* Pip package manager
 
-*   Python 3.10 or higher
-*   Tesseract OCR engine installed on your local system:
-    *   **macOS:** `brew install tesseract`
-    *   **Linux/Ubuntu:** `sudo apt-get install tesseract-ocr`
-
-### 1. Clone the Repository
+### 1. Clone & Install
 ```bash
-git clone https://github.com/sanginenivamshi21-hub/VidyGuide-ai.git
-cd VidyGuide-ai
-```
-
-### 2. Setup Virtual Environment
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-```
-
-### 3. Install Dependencies
-```bash
+git clone https://github.com/sanginenivamshi21-hub/VidyGuideAI.git
+cd VidyGuideAI
 pip install -r requirements.txt
 ```
 
-### 4. Configure Environment Variables
+### 2. Configure Environment
 Create a `.env` file in the root directory:
 ```env
-GROQ_API_KEY=gsk_your_groq_key_here
-SMTP_SERVER=smtp.gmail.com
-SMTP_PORT=465
-SMTP_EMAIL=your_email@gmail.com
-SMTP_PASSWORD=your_app_password_here
-DATABASE_URL=sqlite:///vidyguide.db
+GROQ_API_KEY=your_groq_api_key
+CLAUDE_API_KEY=your_claude_api_key
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your_gmail_address
+SMTP_PASS=your_gmail_app_password
+APP_BASE_URL=http://localhost:8501
 ```
 
-### 5. Initialize the Database & Run
-Launch the FastAPI backend service:
+### 3. Run Locally
+**Start Backend API**:
 ```bash
-uvicorn backend.main:app --port 8000 --reload
+uvicorn backend.main:app --reload --port 8000
 ```
 
-In a separate terminal, launch the Streamlit frontend:
+**Start Streamlit Frontend**:
 ```bash
-streamlit run app.py
+streamlit run app.py --server.port 8501
 ```
-Open `http://localhost:8501` to use the platform.
+
+---
+
+## 📐 System Architecture
+VidyGuideAI decouples the visual client UI from the backend logic, allowing future migrations to React frameworks:
+
+```
+[Streamlit Frontend App] ──(HTTP POST)──> [FastAPI Web Server]
+          │                                         │
+          ▼ (SQLite Auth Actions)                   ▼ (LLM Prompts & Clients)
+   [vidyguide.db]                            [Groq LLaMA-3.1 Inference]
+```
+
+---
+
+## 🤝 Contributing
+Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md).
+
+## 📄 License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
