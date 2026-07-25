@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: vidyguide_postgres
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: dev
+      POSTGRES_DB: vidyguide
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: vidyguide_redis
+    ports:
+      - "6379:6379"
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    container_name: vidyguide_api
+    environment:
+      - PORT=8000
+      - DATABASE_URL=postgresql://dev:dev@postgres:5432/vidyguide?schema=public
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=development-secret-key-token-generation
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.web
+    container_name: vidyguide_web
+    environment:
+      - PORT=3000
+      - CLIENT_URL=http://localhost:3000
+      - API_URL=http://api:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+
+volumes:
+  pgdata:
