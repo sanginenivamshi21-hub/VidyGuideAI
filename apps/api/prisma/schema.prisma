@@ -8,20 +8,87 @@ generator client {
 }
 
 model User {
-  id            Int             @id @default(autoincrement())
-  username      String          @unique
-  email         String          @unique
-  passwordHash  String
-  fullName      String          @default("")
-  isVerified    Boolean         @default(false)
-  createdAt     DateTime        @default(now())
-  lastLogin     DateTime?
-  sessions      Session[]
-  historyLogs   History[]
+  id              Int             @id @default(autoincrement())
+  username        String          @unique
+  email           String          @unique
+  passwordHash    String
+  fullName        String          @default("")
+  profilePicture  String          @default("")
+  isVerified      Boolean         @default(false)
+  createdAt       DateTime        @default(now())
+  lastLogin       DateTime?
+  sessions        Session[]
+  historyLogs     History[]
   careerHistories CareerHistory[]
   resumeHistories ResumeHistory[]
+  conversations   Conversation[]
+  settings        UserSettings?
+  notifications   Notification[]
 
   @@index([email])
+}
+
+model Notification {
+  id             Int      @id @default(autoincrement())
+  userId         Int
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type           String
+  title          String
+  message        String
+  read           Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  @@index([userId])
+}
+
+model UserSettings {
+  id                Int      @id @default(autoincrement())
+  userId            Int      @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  theme             String   @default("dark")
+  language          String   @default("en")
+  accentColor       String   @default("emerald")
+  speechRate        Float    @default(1.0)
+  speechPitch       Float    @default(1.0)
+  voiceName         String   @default("")
+  model             String   @default("llama-3.3-70b-versatile")
+  temperature       Float    @default(0.7)
+  maxTokens         Int      @default(2048)
+  autoSpeak         Boolean  @default(false)
+  autoTranslate     Boolean  @default(false)
+  notifications     Boolean  @default(true)
+  animations        Boolean  @default(true)
+  sidebarCollapsed  Boolean  @default(false)
+  defaultResumeStyle String  @default("professional")
+  chatHistory       Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Conversation {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  pinned    Boolean   @default(false)
+  messages  Message[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+model Message {
+  id             Int           @id @default(autoincrement())
+  conversationId Int
+  conversation   Conversation  @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role           String        // 'user' or 'assistant'
+  content        String
+  createdAt      DateTime      @default(now())
+
+  @@index([conversationId])
 }
 
 model OTP {

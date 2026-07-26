@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import Sidebar from '../components/Sidebar';
 import SoftAurora from '../components/SoftAurora';
+import ThemeInit from '../components/ThemeInit';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -17,17 +18,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full dark">
+    <html lang="en" className="h-full">
       <body className={`${inter.className} min-h-full bg-slate-950 text-slate-200 flex overflow-hidden`}>
-        {/* Left Side: Sidebar Panel */}
+        <ThemeInit />
         <Sidebar />
-
-        {/* Right Side: Main Content viewport */}
         <main className="flex-1 h-screen overflow-y-auto relative flex flex-col">
-          {/* Subtle Background Aurora */}
           <SoftAurora speed={0.4} scale={1.2} brightness={0.8} />
-          
-          {/* Main page content wrapper */}
           <div className="flex-1 p-8 z-10">
             {children}
           </div>

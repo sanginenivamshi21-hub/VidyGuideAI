@@ -13,25 +13,27 @@ import { MentorModule } from './mentor/mentor.module';
 import { TranslatorModule } from './translator/translator.module';
 import { HistoryModule } from './history/history.module';
 import { UsersModule } from './users/users.module';
-import { VoiceModule } from './voice/voice.module';
+import { SettingsModule } from './settings/settings.module';
+import { ConversationsModule } from './conversations/conversations.module';
 
 @Module({
-  imports: [
-    ThrottlerModule.forRoot([{ ttl: 60000, limit: 60 }]),
-    DatabaseModule,
-    AuthModule,
-    MailModule,
-    AiModule,
-    CareerModule,
-    ResumeModule,
-    OcrModule,
-    MentorModule,
-    TranslatorModule,
-    HistoryModule,
-    UsersModule,
-    VoiceModule,
-  ],
-  controllers: [AppController],
-  providers: [AppService],
+    imports: [
+        ThrottlerModule.forRoot([{ ttl: 60000, limit: 60 }]),
+        DatabaseModule,
+        AuthModule,
+        MailModule,
+        AiModule,
+        CareerModule,
+        ResumeModule,
+        OcrModule,
+        MentorModule,
+        TranslatorModule,
+        HistoryModule,
+        UsersModule,
+        SettingsModule,
+        ConversationsModule,
+    ],
+    controllers: [AppController],
+    providers: [AppService],
 })
 export class AppModule {}

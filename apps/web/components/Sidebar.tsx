@@ -13,7 +13,6 @@ import {
   FileEdit,
   ScanLine,
   Bot,
-  Mic,
   Languages,
   Briefcase,
   Clock,
@@ -23,6 +22,7 @@ import {
   Menu,
   ChevronLeft,
 } from 'lucide-react';
+import { API_BASE } from '@/lib/api';
 import { ROUTES, SIDEBAR_ITEMS } from '@/lib/routes';
 
 interface SidebarItem {
@@ -40,7 +40,6 @@ const ICON_MAP: Record<string, LucideIcon> = {
   FileEdit,
   ScanLine,
   Bot,
-  Mic,
   Languages,
   Briefcase,
   Clock,
@@ -52,7 +51,10 @@ const ICON_MAP: Record<string, LucideIcon> = {
 };
 
 export default function Sidebar() {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    return localStorage.getItem('vidyguide_sidebar') !== 'collapsed';
+  });
   const pathname = usePathname();
   const router = useRouter();
 
@@ -63,7 +65,7 @@ export default function Sidebar() {
 
   const handleLogout = async () => {
     try {
-      await fetch('http://localhost:8000/auth/logout', {
+      await fetch(`${API_BASE}/auth/logout`, {
         method: 'POST',
         credentials: 'include',
       });
@@ -102,7 +104,16 @@ export default function Sidebar() {
             </div>
           )}
           <button
-            onClick={() => setIsOpen(!isOpen)}
+            onClick={() => {
+              const next = !isOpen;
+              setIsOpen(next);
+              localStorage.setItem('vidyguide_sidebar', next ? 'expanded' : 'collapsed');
+              fetch(`${API_BASE}/settings`, {
+                method: 'PUT', credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sidebarCollapsed: !next }),
+              }).catch(() => {});
+            }}
             className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-400 absolute -right-3 top-5 border border-slate-700 z-50 transition-all duration-200"
           >
             {isOpen ? <ChevronLeft size={16} /> : <Menu size={16} />}
@@ -160,7 +171,7 @@ export default function Sidebar() {
 
         {isOpen && (
           <div className="text-[10px] text-slate-650 text-center font-mono">
-            VidyGuideAI v3.0.0
+            VidyGuideAI v3.1.1
           </div>
         )}
       </div>

@@ -5,7 +5,8 @@
 - Node.js >= 18
 - pnpm >= 9
 - PostgreSQL 16+
-- Redis (optional, for session caching)
+- Groq API key ([get one free](https://console.groq.com/))
+- SMTP credentials for email delivery
 
 ## Environment Setup
 
@@ -13,53 +14,98 @@
 cp .env.example .env
 ```
 
-Required variables:
-```
-DATABASE_URL=postgresql://user:pass@localhost:5432/vidyguide?schema=public
-JWT_SECRET=<min-16-characters>
-GROQ_API_KEY=<groq-api-key>
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=<email>
-SMTP_PASS=<app-password>
+### Required Variables
+
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_URL` | PostgreSQL connection string |
+| `JWT_SECRET` | JWT signing secret (min 16 characters) |
+| `GROQ_API_KEY` | Groq AI API key |
+| `SMTP_HOST` | SMTP server host (e.g. `smtp.gmail.com`) |
+| `SMTP_USER` | SMTP email address |
+| `SMTP_PASS` | SMTP app password |
+
+### Optional Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `PORT` | `8000` | API server port |
+| `NEXT_PUBLIC_API_URL` | `http://localhost:8000` | Frontend API base URL |
+| `APP_BASE_URL` | `http://localhost:3000` | Base URL for email links |
+| `CLOUDINARY_URL` | - | Cloudinary for file uploads |
+| `REDIS_URL` | - | Redis connection string |
+
+## Local Development
+
+```bash
+# Install dependencies
+pnpm install
+
+# Database setup
+cd apps/api
+npx prisma generate
+npx prisma migrate deploy
+cd ../..
+
+# Start development servers
+pnpm dev
+# API: http://localhost:8000
+# Web: http://localhost:3000
 ```
 
-## Build & Deploy
+## Production Build
 
 ```bash
 # Install
 pnpm install
 
-# Database
+# Database migrations
 cd apps/api
 npx prisma generate
 npx prisma migrate deploy
 cd ../..
 
 # Build
-pnpm --filter api build
-pnpm --filter web build
+pnpm build
 
-# Production start
+# Start production servers
 cd apps/api && node dist/main.js &
-cd apps/web && npx next start -p 3001 &
+cd apps/web && npx next start -p 3000 &
 ```
 
-## Docker
+## Docker Deployment
 
 ```bash
+# Build and run all services
 docker compose up --build
+
+# Individual services
+docker compose up -d postgres redis
+docker compose up api
+docker compose up web
 ```
 
-## CI/CD
+> **Note:** Set required environment variables before running Docker.
+
+## CI/CD Pipeline
 
 GitHub Actions workflow at `.github/workflows/ci.yml`:
-- Runs on push/PR to main
+- Triggered on push/PR to `main`
 - Installs dependencies
 - Runs lint
 - Runs build
 
 ## Health Check
 
-- API: `http://localhost:8000` → `200 OK`
-- Web: `http://localhost:3001` → `200 OK`
+- **API:** `http://localhost:8000` → `{"status":"UP"}`
+- **Web:** `http://localhost:3000` → HTTP 200
+
+## Architecture Overview
+
+```
+Web (Next.js :3000) ←→ API (NestJS :8000) ←→ PostgreSQL
+                               ↕
+                          Groq AI (LLaMA 3)
+```
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed architecture documentation.

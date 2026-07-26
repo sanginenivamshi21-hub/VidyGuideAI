@@ -1,0 +1,33 @@
+* text=auto
+
+# TypeScript/JavaScript
+*.ts text eol=lf
+*.tsx text eol=lf
+*.js text eol=lf
+*.jsx text eol=lf
+*.json text eol=lf
+*.css text eol=lf
+*.html text eol=lf
+
+# Shell
+*.sh text eol=lf
+
+# Python
+*.py text eol=lf
+
+# Markdown
+*.md text eol=lf
+
+# YAML
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# Docker
+Dockerfile* text eol=lf
+
+# Binaries
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ico binary
+*.lock binary

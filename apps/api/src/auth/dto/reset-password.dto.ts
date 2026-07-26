@@ -1,14 +1,14 @@
 import { IsEmail, IsString, Length, MinLength } from 'class-validator';
 
 export class ResetPasswordDto {
-  @IsEmail()
-  email: string;
+    @IsEmail()
+    email: string;
 
-  @IsString()
-  @Length(6, 6)
-  code: string;
+    @IsString()
+    @Length(6, 6)
+    code: string;
 
-  @IsString()
-  @MinLength(6)
-  password: string;
+    @IsString()
+    @MinLength(6)
+    password: string;
 }

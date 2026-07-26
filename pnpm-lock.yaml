@@ -31,9 +31,6 @@ importers:
       '@prisma/client':
         specifier: ^5.21.1
         version: 5.22.0(prisma@5.22.0)
-      '@types/nodemailer':
-        specifier: ^8.0.1
-        version: 8.0.1
       bcryptjs:
         specifier: ^2.4.3
         version: 2.4.3
@@ -101,9 +98,15 @@ importers:
       '@types/jest':
         specifier: ^30.0.0
         version: 30.0.0
+      '@types/multer':
+        specifier: ^2.2.0
+        version: 2.2.0
       '@types/node':
         specifier: ^24.0.0
         version: 24.13.3
+      '@types/nodemailer':
+        specifier: ^8.0.1
+        version: 8.0.1
       '@types/passport-jwt':
         specifier: ^4.0.1
         version: 4.0.1
@@ -125,6 +128,9 @@ importers:
       jest:
         specifier: ^30.0.0
         version: 30.4.2(@types/node@24.13.3)(supports-color@8.1.1)(ts-node@10.9.2(@types/node@24.13.3)(typescript@5.9.3))
+      multer:
+        specifier: ^2.2.0
+        version: 2.2.0
       prettier:
         specifier: ^3.4.2
         version: 3.9.6
@@ -1291,6 +1297,9 @@ packages:
 
   '@types/ms@2.1.0':
     resolution: {integrity: sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA==}
+
+  '@types/multer@2.2.0':
+    resolution: {integrity: sha512-3U1troeqGV8Ntp7Q3klwf4zr23VEoqYVocYXaswm9+8z3O9UHDYAqLxjJ/h550iRADTjKdOdhhasXw6gD6kYtg==}
 
   '@types/node-fetch@2.6.13':
     resolution: {integrity: sha512-QGpRVpzSaUs30JBSGPjOg4Uveu384erbHBoT1zeONvyCfwQxIkUshLAOqN/k9EjGviPRmWTTe6aH2qySWKTVSw==}
@@ -5610,6 +5619,10 @@ snapshots:
   '@types/methods@1.1.4': {}
 
   '@types/ms@2.1.0': {}
+
+  '@types/multer@2.2.0':
+    dependencies:
+      '@types/express': 5.0.6
 
   '@types/node-fetch@2.6.13':
     dependencies:

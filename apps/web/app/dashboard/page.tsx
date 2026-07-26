@@ -10,20 +10,12 @@ import {
   FileEdit,
   ScanLine,
   Bot,
-  Mic,
   Languages,
   Briefcase,
-  Clock,
-  User,
   ArrowRight,
   TrendingUp,
-  LayoutDashboard,
-  Settings,
-  LogOut,
-  Menu,
-  ChevronLeft,
 } from 'lucide-react';
-import { ROUTES, DASHBOARD_CARDS, SIDEBAR_ITEMS } from '@/lib/routes';
+import { ROUTES, DASHBOARD_CARDS } from '@/lib/routes';
 import { API_BASE } from '@/lib/api';
 
 interface Stats {
@@ -118,7 +110,6 @@ export default function DashboardPage() {
               FileEdit,
               ScanLine,
               Bot,
-              Mic,
               Languages,
               Briefcase,
             };
