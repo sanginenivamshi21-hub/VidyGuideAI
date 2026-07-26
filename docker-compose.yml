@@ -29,6 +29,10 @@ services:
       - DATABASE_URL=postgresql://dev:dev@postgres:5432/vidyguide?schema=public
       - REDIS_URL=redis://redis:6379
       - JWT_SECRET=development-secret-key-token-generation
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
     ports:
       - "8000:8000"
     depends_on:
@@ -42,8 +46,7 @@ services:
     container_name: vidyguide_web
     environment:
       - PORT=3000
-      - CLIENT_URL=http://localhost:3000
-      - API_URL=http://api:8000
+      - NEXT_PUBLIC_API_URL=http://api:8000
     ports:
       - "3000:3000"
     depends_on:

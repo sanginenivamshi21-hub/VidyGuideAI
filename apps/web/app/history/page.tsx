@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Clock, Search, Trash2, ChevronRight, Eye, Calendar, AlertCircle } from 'lucide-react';
+import { API_BASE } from '@/lib/api';
 import { ROUTES } from '@/lib/routes';
 
 interface HistoryItem {
@@ -28,7 +29,7 @@ export default function HistoryPage() {
     setLoading(true);
 
     try {
-      const resp = await fetch('http://localhost:8000/history', {
+      const resp = await fetch(`${API_BASE}/history`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -75,7 +76,7 @@ export default function HistoryPage() {
     if (!confirm('Are you sure you want to delete this log?')) return;
 
     try {
-      const resp = await fetch(`http://localhost:8000/history/${id}`, {
+      const resp = await fetch(`${API_BASE}/history/${id}`, {
         method: 'DELETE',
         credentials: 'include',
       });
@@ -97,7 +98,7 @@ export default function HistoryPage() {
     if (!confirm('Are you sure you want to clear your entire history? This cannot be undone.')) return;
 
     try {
-      const resp = await fetch('http://localhost:8000/history', {
+      const resp = await fetch(`${API_BASE}/history`, {
         method: 'DELETE',
         credentials: 'include',
       });

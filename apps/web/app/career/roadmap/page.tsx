@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { API_BASE } from '@/lib/api';
 import { Map, ArrowRight, Sparkles, RefreshCw, AlertCircle } from 'lucide-react';
 
 export default function CareerRoadmapPage() {
@@ -22,7 +23,7 @@ export default function CareerRoadmapPage() {
     setMilestones([]);
 
     try {
-      const resp = await fetch('http://localhost:8000/career/roadmap', {
+      const resp = await fetch(`${API_BASE}/career/roadmap`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

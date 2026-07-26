@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ScanLine, RefreshCw, Upload, Copy, Check, ArrowRight, Trash2 } from 'lucide-react';
+import { API_BASE } from '@/lib/api';
 import { ROUTES } from '@/lib/routes';
 
 export default function OcrScannerPage() {
@@ -26,7 +27,7 @@ export default function OcrScannerPage() {
     formData.append('file', selectedFile);
 
     try {
-      const resp = await fetch('http://localhost:8000/ocr/scan', {
+      const resp = await fetch(`${API_BASE}/ocr/scan`, {
         method: 'POST',
         credentials: 'include',
         body: formData,

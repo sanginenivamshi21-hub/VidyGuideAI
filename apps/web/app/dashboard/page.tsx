@@ -24,6 +24,7 @@ import {
   ChevronLeft,
 } from 'lucide-react';
 import { ROUTES, DASHBOARD_CARDS, SIDEBAR_ITEMS } from '@/lib/routes';
+import { API_BASE } from '@/lib/api';
 
 interface Stats {
   career_count: number;
@@ -51,7 +52,7 @@ export default function DashboardPage() {
       setIsGuest(true);
       setLoading(false);
     } else {
-      fetch('http://localhost:8000/users/profile', {
+      fetch(`${API_BASE}/users/profile`, {
         credentials: 'include',
       })
         .then((r) => {

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { API_BASE } from '@/lib/api';
 import { FileText, Sparkles, Download, RefreshCw, Trash2, ChevronDown, Check } from 'lucide-react';
 
 const QUALIFICATIONS = {
@@ -96,7 +97,7 @@ export default function ResumeBuilderPage() {
     const compiledProjects = projects || (activeLevel === 'diploma' || activeLevel === 'other' ? projects : '');
 
     try {
-      const resp = await fetch('http://localhost:8000/resume', {
+      const resp = await fetch(`${API_BASE}/resume`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -130,7 +131,7 @@ export default function ResumeBuilderPage() {
       if (user) {
         const parsedUser = JSON.parse(user);
         if (parsedUser.id !== null) {
-          await fetch('http://localhost:8000/history', {
+          await fetch(`${API_BASE}/history`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -157,7 +158,7 @@ export default function ResumeBuilderPage() {
 
   const handleDownloadPdf = async () => {
     try {
-      const resp = await fetch('http://localhost:8000/resume/pdf', {
+      const resp = await fetch(`${API_BASE}/resume/pdf`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

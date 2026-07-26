@@ -11,8 +11,7 @@ Closes #[Issue Number]
 - [ ] Documentation update
 
 ## Quality Check
-- [ ] Code compiles locally without errors or warnings.
-- [ ] Formatted with `ruff` or equivalent formatter.
-- [ ] Types validate with `mypy`.
-- [ ] Local tests pass.
-- [ ] Verified that credentials are NOT present in `.env` or history.
+- [ ] Both `pnpm --filter api build` and `pnpm --filter web build` pass without errors
+- [ ] No hardcoded secrets or credentials in the codebase
+- [ ] Changes follow existing code style and conventions
+- [ ] Updated documentation (README, API docs) if applicable

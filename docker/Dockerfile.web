@@ -13,4 +13,4 @@ FROM base AS runner
 WORKDIR /usr/src/app
 COPY --from=build /usr/src/app /usr/src/app
 EXPOSE 3000
-CMD ["pnpm", "--filter", "web", "start"]
+CMD ["pnpm", "--filter", "web", "run", "start"]

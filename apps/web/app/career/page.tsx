@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { API_BASE } from '@/lib/api';
 import { 
   Compass, 
   Sparkles, 
@@ -228,7 +229,7 @@ export default function CareerPage() {
     setCompletedMilestones([]);
 
     try {
-      const resp = await fetch('http://localhost:8000/career', {
+      const resp = await fetch(`${API_BASE}/career`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -270,7 +271,7 @@ export default function CareerPage() {
       setResult(data.career_suggestions);
 
       // Parse milestones
-      const roadmapResp = await fetch('http://localhost:8000/career/roadmap', {
+      const roadmapResp = await fetch(`${API_BASE}/career/roadmap`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -288,7 +289,7 @@ export default function CareerPage() {
       if (user) {
         const parsedUser = JSON.parse(user);
         if (parsedUser.id !== null) {
-          await fetch('http://localhost:8000/history', {
+          await fetch(`${API_BASE}/history`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',

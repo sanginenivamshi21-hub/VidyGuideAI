@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { API_BASE } from '@/lib/api';
 import { 
   Settings, 
   Check, 
@@ -87,7 +88,7 @@ export default function SettingsPage() {
       if (!user) throw new Error('No active user logged in.');
       const parsedUser = JSON.parse(user);
       
-      const resp = await fetch('http://localhost:8000/auth/reset-password', {
+      const resp = await fetch(`${API_BASE}/auth/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

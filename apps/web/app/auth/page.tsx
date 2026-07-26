@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { RefreshCw, Lock, Mail, User as UserIcon, ShieldAlert } from 'lucide-react';
 import { ROUTES } from '@/lib/routes';
+import { API_BASE } from '@/lib/api';
 
 export default function AuthPage() {
   const router = useRouter();
@@ -36,7 +37,7 @@ export default function AuthPage() {
     setLoading(true);
 
     try {
-      const resp = await fetch('http://localhost:8000/auth/login', {
+      const resp = await fetch(`${API_BASE}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -70,7 +71,7 @@ export default function AuthPage() {
     setLoading(true);
 
     try {
-      const resp = await fetch('http://localhost:8000/auth/register', {
+      const resp = await fetch(`${API_BASE}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -99,7 +100,7 @@ export default function AuthPage() {
     setLoading(true);
 
     try {
-      const resp = await fetch('http://localhost:8000/auth/verify-otp', {
+      const resp = await fetch(`${API_BASE}/auth/verify-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -135,7 +136,7 @@ export default function AuthPage() {
     setLoading(true);
 
     try {
-      const resp = await fetch('http://localhost:8000/auth/forgot-password', {
+      const resp = await fetch(`${API_BASE}/auth/forgot-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -164,7 +165,7 @@ export default function AuthPage() {
     setLoading(true);
 
     try {
-      const resp = await fetch('http://localhost:8000/auth/reset-password', {
+      const resp = await fetch(`${API_BASE}/auth/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

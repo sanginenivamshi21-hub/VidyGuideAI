@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { API_BASE } from '@/lib/api';
 import { Mic, Info } from 'lucide-react';
 
 export default function VoiceMentorPage() {
@@ -29,7 +30,7 @@ export default function VoiceMentorPage() {
       {/* Voice widget iframe container */}
       <div className="flex-1 w-full bg-slate-950 border border-slate-850 rounded-2xl overflow-hidden shadow-inner relative flex items-center justify-center">
         <iframe
-          src="http://localhost:8000/voice/widget"
+          src={`${API_BASE}/voice/widget`}
           className="w-full h-full border-none"
           title="Voice Mentor Widget"
           allow="microphone"

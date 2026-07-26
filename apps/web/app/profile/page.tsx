@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { User, ShieldAlert, Sparkles, RefreshCw, Award, BookOpen, MessageSquare, Save } from 'lucide-react';
+import { API_BASE } from '@/lib/api';
 import { ROUTES } from '@/lib/routes';
 
 interface UserProfile {
@@ -37,7 +38,7 @@ export default function ProfilePage() {
     setLoading(true);
 
     try {
-      const resp = await fetch('http://localhost:8000/users/profile', {
+      const resp = await fetch(`${API_BASE}/users/profile`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -93,7 +94,7 @@ export default function ProfilePage() {
     setSaving(true);
 
     try {
-      const resp = await fetch('http://localhost:8000/users/profile', {
+      const resp = await fetch(`${API_BASE}/users/profile`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

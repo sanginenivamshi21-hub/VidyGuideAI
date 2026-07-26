@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Bot, RefreshCw, Send, Trash2, ArrowRight } from 'lucide-react';
+import { API_BASE } from '@/lib/api';
 import MarkdownRenderer from '../../components/MarkdownRenderer';
 
 interface Message {
@@ -52,7 +53,7 @@ export default function MentorPage() {
     setLoading(true);
 
     try {
-      const resp = await fetch('http://localhost:8000/mentor', {
+      const resp = await fetch(`${API_BASE}/mentor`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -74,7 +75,7 @@ export default function MentorPage() {
       if (user) {
         const parsedUser = JSON.parse(user);
         if (parsedUser.id !== null) {
-          await fetch('http://localhost:8000/history', {
+          await fetch(`${API_BASE}/history`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',

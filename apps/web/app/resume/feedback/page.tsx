@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { API_BASE } from '@/lib/api';
 import { 
   ShieldAlert, 
   Sparkles, 
@@ -56,7 +57,7 @@ export default function ResumeFeedbackPage() {
 
     try {
       setScanMessage(`Scanning and extracting text from ${selectedFile.name}...`);
-      const resp = await fetch('http://localhost:8000/ocr/scan', {
+      const resp = await fetch(`${API_BASE}/ocr/scan`, {
         method: 'POST',
         credentials: 'include',
         body: formData,
@@ -85,7 +86,7 @@ export default function ResumeFeedbackPage() {
     setLoading(true);
 
     try {
-      const resp = await fetch('http://localhost:8000/resume/feedback', {
+      const resp = await fetch(`${API_BASE}/resume/feedback`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -108,7 +109,7 @@ export default function ResumeFeedbackPage() {
       if (user) {
         const parsedUser = JSON.parse(user);
         if (parsedUser.id !== null) {
-          await fetch('http://localhost:8000/history', {
+          await fetch(`${API_BASE}/history`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -184,7 +185,7 @@ export default function ResumeFeedbackPage() {
       const lines = improvedResume.split('\n').map(l => l.trim()).filter(Boolean);
       const candidateName = lines[0] || 'Candidate';
 
-      const resp = await fetch('http://localhost:8000/resume/pdf', {
+      const resp = await fetch(`${API_BASE}/resume/pdf`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

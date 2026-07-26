@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { API_BASE } from '@/lib/api';
 import { Languages, RefreshCw, Copy, Check, Trash2 } from 'lucide-react';
 
 const SUPPORTED_LANGUAGES = {
@@ -38,7 +39,7 @@ export default function TranslatorPage() {
     setTranslatedText('');
 
     try {
-      const resp = await fetch('http://localhost:8000/translator', {
+      const resp = await fetch(`${API_BASE}/translator`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

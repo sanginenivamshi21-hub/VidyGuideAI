@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { API_BASE } from '@/lib/api';
 import { 
   Briefcase, 
   Sparkles, 
@@ -69,7 +70,7 @@ export default function InterviewPrepPage() {
     setCurrentAnswer('');
 
     try {
-      const resp = await fetch('http://localhost:8000/mentor/interview', {
+      const resp = await fetch(`${API_BASE}/mentor/interview`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -112,7 +113,7 @@ export default function InterviewPrepPage() {
 
     try {
       const currentQuestion = questions[currentIndex];
-      const resp = await fetch('http://localhost:8000/mentor/interview/feedback', {
+      const resp = await fetch(`${API_BASE}/mentor/interview/feedback`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -167,7 +168,7 @@ export default function InterviewPrepPage() {
           // Average score calculation
           const avgScore = feedbacks.reduce((acc, f) => acc + f.score, 0) / feedbacks.length;
           
-          await fetch('http://localhost:8000/history', {
+          await fetch(`${API_BASE}/history`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
