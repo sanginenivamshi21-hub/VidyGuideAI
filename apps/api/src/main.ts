@@ -18,9 +18,13 @@ async function bootstrap() {
         defaultSrc: ["'self'"],
         scriptSrc: ["'self'", "'unsafe-inline'"],
         styleSrc: ["'self'", "'unsafe-inline'"],
+        connectSrc: ["'self'"],
         frameAncestors: [process.env.CLIENT_URL || 'http://localhost:3000', "'self'"],
       },
     },
+    crossOriginOpenerPolicy: false,
+    crossOriginResourcePolicy: false,
+    xFrameOptions: false,
   }));
 
   app.useGlobalPipes(
