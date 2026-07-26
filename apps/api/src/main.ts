@@ -55,8 +55,8 @@ async function bootstrap() {
         credentials: true,
     });
 
-    const port = process.env.PORT || 8000;
-    await app.listen(port);
-    logger.log(`VidyGuideAI NestJS API running on: http://localhost:${port}`);
+    const port = Number(process.env.PORT) || 8000;
+    await app.listen(port, '0.0.0.0');
+    logger.log(`VidyGuideAI API running on port ${port}`);
 }
 bootstrap();

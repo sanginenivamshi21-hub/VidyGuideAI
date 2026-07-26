@@ -6,7 +6,17 @@ export class AppController {
     constructor(private readonly appService: AppService) {}
 
     @Get()
+    getRoot() {
+        return {
+            status: 'ok',
+            service: 'VidyGuideAI API',
+        };
+    }
+
+    @Get('health')
     getHealth() {
-        return this.appService.getHealth();
+        return {
+            status: 'healthy',
+        };
     }
 }
