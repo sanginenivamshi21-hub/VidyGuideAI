@@ -1,8 +1,9 @@
 {
   "name": "vidyguide-monorepo",
   "private": true,
+  "packageManager":"pnpm@10.0.0",
   "engines": {
-    "node": ">=18.0.0"
+    "node": "22.x"
   },
   "scripts": {
     "dev": "pnpm --filter web dev & pnpm --filter api start:dev",
