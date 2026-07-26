@@ -41,6 +41,7 @@ export default function TranslatorPage() {
       const resp = await fetch('http://localhost:8000/translator', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           text,
           source_lang: SUPPORTED_LANGUAGES[sourceLang as keyof typeof SUPPORTED_LANGUAGES] || 'en',

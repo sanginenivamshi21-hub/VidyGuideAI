@@ -46,7 +46,9 @@ export default function DashboardPage() {
       setLoading(false);
     } else {
       // Fetch profile stats
-      fetch('http://localhost:8000/users/profile')
+      fetch('http://localhost:8000/users/profile', {
+        credentials: 'include',
+      })
         .then((r) => {
           if (r.status === 401) {
             setIsGuest(true);

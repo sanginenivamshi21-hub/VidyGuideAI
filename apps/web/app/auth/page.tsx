@@ -33,6 +33,7 @@ export default function AuthPage() {
       const resp = await fetch('http://localhost:8000/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email, password }),
       });
 
@@ -66,6 +67,7 @@ export default function AuthPage() {
       const resp = await fetch('http://localhost:8000/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ username, email, password, fullName }),
       });
 
@@ -94,6 +96,7 @@ export default function AuthPage() {
       const resp = await fetch('http://localhost:8000/auth/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email, code: otpCode, purpose: otpPurpose }),
       });
 

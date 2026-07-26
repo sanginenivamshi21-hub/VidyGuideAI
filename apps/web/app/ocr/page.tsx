@@ -27,6 +27,7 @@ export default function OcrScannerPage() {
     try {
       const resp = await fetch('http://localhost:8000/ocr/scan', {
         method: 'POST',
+        credentials: 'include',
         body: formData,
       });
 

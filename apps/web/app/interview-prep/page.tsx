@@ -29,6 +29,7 @@ export default function InterviewPrepPage() {
       const resp = await fetch('http://localhost:8000/mentor/interview', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ role, company }),
       });
 
@@ -65,6 +66,7 @@ export default function InterviewPrepPage() {
       const resp = await fetch('http://localhost:8000/mentor/interview/feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ items }),
       });
 
@@ -83,6 +85,7 @@ export default function InterviewPrepPage() {
           await fetch('http://localhost:8000/history', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify({
               actionType: 'interview',
               title: `Interview Prep - ${role} at ${company || 'General'}`,

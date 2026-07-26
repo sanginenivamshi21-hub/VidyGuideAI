@@ -30,7 +30,7 @@ export class AiService {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         const response = await this.groqClient.chat.completions.create({
-          model: 'llama3-70b-8192',
+          model: 'llama-3.3-70b-versatile',
           messages: [
             { role: 'system', content: systemPrompt },
             { role: 'user', content: userPrompt },
@@ -69,7 +69,7 @@ export class AiService {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         const response = await this.groqClient.chat.completions.create({
-          model: 'llama3-8b-8192',
+          model: 'llama-3.1-8b-instant',
           messages: [
             { role: 'system', content: systemPrompt + '\nEnsure output is strictly JSON.' },
             { role: 'user', content: userPrompt },

@@ -30,6 +30,7 @@ export default function HistoryPage() {
       const resp = await fetch('http://localhost:8000/history', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
       });
 
       if (resp.status === 401) {
@@ -75,6 +76,7 @@ export default function HistoryPage() {
     try {
       const resp = await fetch(`http://localhost:8000/history/${id}`, {
         method: 'DELETE',
+        credentials: 'include',
       });
 
       if (resp.ok) {
@@ -96,6 +98,7 @@ export default function HistoryPage() {
     try {
       const resp = await fetch('http://localhost:8000/history', {
         method: 'DELETE',
+        credentials: 'include',
       });
 
       if (resp.ok) {

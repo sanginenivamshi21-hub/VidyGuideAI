@@ -99,6 +99,7 @@ export default function ResumeBuilderPage() {
       const resp = await fetch('http://localhost:8000/resume', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           name,
           target_role: targetRole,
@@ -132,6 +133,7 @@ export default function ResumeBuilderPage() {
           await fetch('http://localhost:8000/history', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify({
               actionType: 'resume',
               title: `Resume - ${targetRole} (${targetCompany || 'General'})`,
@@ -158,6 +160,7 @@ export default function ResumeBuilderPage() {
       const resp = await fetch('http://localhost:8000/resume/pdf', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           resume_text: resumeResult,
           name,

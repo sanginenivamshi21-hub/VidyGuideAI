@@ -40,6 +40,7 @@ export default function ResumeFeedbackPage() {
     try {
       const resp = await fetch('http://localhost:8000/ocr/scan', {
         method: 'POST',
+        credentials: 'include',
         body: formData,
       });
 
@@ -71,6 +72,7 @@ export default function ResumeFeedbackPage() {
       const resp = await fetch('http://localhost:8000/resume/feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           resume: resumeText,
           reply_language: SUPPORTED_LANGUAGES[language as keyof typeof SUPPORTED_LANGUAGES] || 'en',
@@ -92,6 +94,7 @@ export default function ResumeFeedbackPage() {
           await fetch('http://localhost:8000/history', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify({
               actionType: 'analysis',
               title: `ATS Feedback - ${file ? file.name.substring(0, 30) : 'Text Input'}`,

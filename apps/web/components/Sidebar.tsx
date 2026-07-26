@@ -55,7 +55,10 @@ export default function Sidebar() {
   const handleLogout = async () => {
     // Clear cookies & local storage
     try {
-      await fetch('http://localhost:8000/auth/logout', { method: 'POST' });
+      await fetch('http://localhost:8000/auth/logout', { 
+        method: 'POST',
+        credentials: 'include'
+      });
     } catch (e) {
       console.error(e);
     }

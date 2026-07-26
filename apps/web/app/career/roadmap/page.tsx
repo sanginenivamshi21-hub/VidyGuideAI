@@ -25,6 +25,7 @@ export default function CareerRoadmapPage() {
       const resp = await fetch('http://localhost:8000/career/roadmap', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ text }),
       });
 

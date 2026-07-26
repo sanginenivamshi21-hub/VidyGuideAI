@@ -195,6 +195,7 @@ export default function CareerPage() {
       const resp = await fetch('http://localhost:8000/career', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           skills,
           interests,
@@ -219,6 +220,7 @@ export default function CareerPage() {
       const roadmapResp = await fetch('http://localhost:8000/career/roadmap', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ text: data.career_suggestions }),
       });
 
@@ -235,6 +237,7 @@ export default function CareerPage() {
           await fetch('http://localhost:8000/history', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify({
               actionType: 'career',
               title: `Career Guidance (${eduKey.split(' ', 2)[1] || eduKey})`,

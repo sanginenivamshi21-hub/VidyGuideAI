@@ -39,6 +39,7 @@ export default function ProfilePage() {
       const resp = await fetch('http://localhost:8000/users/profile', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
       });
 
       if (resp.status === 401) {
@@ -94,6 +95,7 @@ export default function ProfilePage() {
       const resp = await fetch('http://localhost:8000/users/profile', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           fullName,
           ...(password ? { password } : {}),

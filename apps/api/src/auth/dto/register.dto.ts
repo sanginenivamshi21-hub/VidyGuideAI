@@ -1,4 +1,4 @@
-import { IsEmail, IsString, MinLength, Matches } from 'class-validator';
+import { IsEmail, IsString, MinLength } from 'class-validator';
 
 export class RegisterDto {
   @IsString()
@@ -9,9 +9,10 @@ export class RegisterDto {
   email: string;
 
   @IsString()
-  @MinLength(8)
-  @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-    message: 'Password is too weak. Must contain uppercase, lowercase, numbers, or symbols.',
-  })
+  @MinLength(6)
   password: string;
+
+  @IsString()
+  @MinLength(3)
+  fullName: string;
 }

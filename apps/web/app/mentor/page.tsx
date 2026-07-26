@@ -54,6 +54,7 @@ export default function MentorPage() {
       const resp = await fetch('http://localhost:8000/mentor', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           question: text,
           reply_language: SUPPORTED_LANGUAGES[language as keyof typeof SUPPORTED_LANGUAGES] || 'en',
@@ -75,6 +76,7 @@ export default function MentorPage() {
           await fetch('http://localhost:8000/history', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify({
               actionType: 'mentor',
               title: `Mentor - ${text.substring(0, 45)}...`,
