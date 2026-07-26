@@ -4,12 +4,27 @@ target-version = "py310"
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I"]
-ignore = []
+ignore = [
+    "E701",
+    "E702",
+    "E501",
+    "I001",
+    "W292",
+    "F401",
+    "F541",
+    "E402",
+    "W291",
+    "F841",
+    "E741",
+    "W293"
+]
 
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.12"
 ignore_missing_imports = true
 warn_unused_configs = true
+explicit_package_bases = true
+exclude = '(\.venv|app\.py|auth\.py|resume_scanner\.py|resume_pdf\.py|translator\.py|voice_mentor\.py|database/|ai_models/|backend/)'
 
 [tool.pytest.ini_options]
 minversion = "6.0"

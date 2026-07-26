@@ -287,3 +287,21 @@ def generate_resume_pdf(
 
     doc.build(story)
     return buf.getvalue()
+
+if __name__ == "__main__":
+    import sys
+    import json
+    try:
+        data = json.load(sys.stdin)
+        pdf_bytes = generate_resume_pdf(
+            resume_text=data.get("resume_text", ""),
+            name=data.get("name", ""),
+            phone=data.get("phone", ""),
+            email=data.get("email", ""),
+            location=data.get("location", ""),
+            linkedin=data.get("linkedin", ""),
+        )
+        sys.stdout.buffer.write(pdf_bytes)
+    except Exception as e:
+        sys.stderr.write(str(e))
+        sys.exit(1)

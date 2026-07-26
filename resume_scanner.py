@@ -174,3 +174,31 @@ def scan_resume_file(uploaded_file) -> tuple[bool, str]:
             return False, "Could not read text file."
     else:
         return False, f"Unsupported file type: {filename.split('.')[-1].upper()}. Upload PDF, JPG, PNG, or TXT."
+
+if __name__ == "__main__":
+    import sys
+    import json
+    try:
+        if len(sys.argv) < 2:
+            sys.stderr.write("Usage: python resume_scanner.py <file_path>\n")
+            sys.exit(1)
+        file_path = sys.argv[1]
+        
+        with open(file_path, "rb") as f:
+            class MockFile:
+                def __init__(self, name, data):
+                    self.name = name
+                    self.data = data
+                def read(self):
+                    return self.data
+            
+            uploaded_file = MockFile(os.path.basename(file_path), f.read())
+            success, text = scan_resume_file(uploaded_file)
+            
+            if success:
+                print(json.dumps({"success": True, "text": text}))
+            else:
+                print(json.dumps({"success": False, "error": text}))
+    except Exception as e:
+        sys.stderr.write(str(e))
+        sys.exit(1)
