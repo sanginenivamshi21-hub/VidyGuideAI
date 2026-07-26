@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Clock, Search, Trash2, ChevronRight, Eye, Calendar, AlertCircle } from 'lucide-react';
+import { ROUTES } from '@/lib/routes';
 
 interface HistoryItem {
   id: number;
@@ -57,7 +58,7 @@ export default function HistoryPage() {
     // Check if user object exists in localStorage
     const userStr = localStorage.getItem('user');
     if (!userStr) {
-      router.push('/auth');
+      router.push(ROUTES.AUTH);
       return;
     }
 
@@ -131,7 +132,7 @@ export default function HistoryPage() {
         <button
           onClick={() => {
             localStorage.removeItem('user');
-            router.push('/auth');
+            router.push(ROUTES.AUTH);
           }}
           className="mt-2 px-5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-lg transition-all"
         >

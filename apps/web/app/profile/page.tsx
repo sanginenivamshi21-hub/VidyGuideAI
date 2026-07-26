@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { User, ShieldAlert, Sparkles, RefreshCw, Award, BookOpen, MessageSquare, Save } from 'lucide-react';
+import { ROUTES } from '@/lib/routes';
 
 interface UserProfile {
   id: number;
@@ -66,7 +67,7 @@ export default function ProfilePage() {
   useEffect(() => {
     const userStr = localStorage.getItem('user');
     if (!userStr) {
-      router.push('/auth');
+      router.push(ROUTES.AUTH);
       return;
     }
 
@@ -137,7 +138,7 @@ export default function ProfilePage() {
         <button
           onClick={() => {
             localStorage.removeItem('user');
-            router.push('/auth');
+            router.push(ROUTES.AUTH);
           }}
           className="mt-2 px-5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-lg transition-all"
         >

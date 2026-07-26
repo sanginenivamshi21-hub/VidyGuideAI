@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ScanLine, RefreshCw, Upload, Copy, Check, ArrowRight, Trash2 } from 'lucide-react';
+import { ROUTES } from '@/lib/routes';
 
 export default function OcrScannerPage() {
   const router = useRouter();
@@ -53,7 +54,7 @@ export default function OcrScannerPage() {
   const handleSendToFeedback = () => {
     // Save to session or local storage temporarily and redirect
     localStorage.setItem('temp_ocr_text', extractedText);
-    router.push('/resume/feedback');
+    router.push(ROUTES.RESUME_FEEDBACK);
   };
 
   const handleClear = () => {

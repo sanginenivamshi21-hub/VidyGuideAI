@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Compass, FileText, MessageSquare, ShieldAlert, Sparkles, ArrowRight } from 'lucide-react';
+import { ROUTES } from '@/lib/routes';
 
 export default function Home() {
   const router = useRouter();
@@ -23,34 +24,33 @@ export default function Home() {
       desc: 'Discover streams, diplomas, government options, and corporate routes customized for Indian students.',
       icon: Compass,
       color: 'text-blue-400',
-      href: '/career',
+      href: ROUTES.CAREER,
     },
     {
       title: 'Resume Builder',
       desc: 'Create ATS-compliant plaintext resumes and export print-ready ReportLab PDFs.',
       icon: FileText,
       color: 'text-purple-400',
-      href: '/resume',
+      href: ROUTES.RESUME,
     },
     {
       title: 'AI Mentor Chat',
       desc: 'Converse with our localized academic advisor about college switches and exam preparations.',
       icon: MessageSquare,
       color: 'text-emerald-400',
-      href: '/mentor',
+      href: ROUTES.MENTOR,
     },
     {
       title: 'OCR Resume Scanner',
       desc: 'Scan PDF or image resumes to calculate ATS keyword matching scores and improvements.',
       icon: ShieldAlert,
       color: 'text-amber-400',
-      href: '/ocr',
+      href: ROUTES.OCR,
     },
   ];
 
   return (
     <div className="max-w-6xl mx-auto flex flex-col gap-12 mt-10">
-      {/* Hero Welcome Intro */}
       <div className="flex flex-col gap-5">
         <div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full w-fit text-emerald-400 text-sm">
           <Sparkles size={14} />
@@ -66,7 +66,7 @@ export default function Home() {
         <div className="mt-2">
           {isLoggedIn ? (
             <Link
-              href="/dashboard"
+              href={ROUTES.DASHBOARD}
               className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm rounded-lg shadow-lg shadow-emerald-500/20 transition-all active:scale-[0.98]"
             >
               Go to Candidate Dashboard
@@ -74,7 +74,7 @@ export default function Home() {
             </Link>
           ) : (
             <Link
-              href="/auth"
+              href={ROUTES.AUTH}
               className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm rounded-lg shadow-lg shadow-emerald-500/20 transition-all active:scale-[0.98]"
             >
               Get Started / Sign In
@@ -84,13 +84,12 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Services Grid layout */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {cards.map((card, idx) => {
           const Icon = card.icon;
           return (
             <motion.div
-              key={card.title}
+              key={card.href}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.1, duration: 0.4 }}

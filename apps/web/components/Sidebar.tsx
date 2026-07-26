@@ -19,10 +19,11 @@ import {
   User,
   Settings,
   LogOut,
-  LogIn,
+  Login,
   Menu,
-  ChevronLeft
+  ChevronLeft,
 } from 'lucide-react';
+import { ROUTES, SIDEBAR_ITEMS } from '@/lib/routes';
 
 interface SidebarItem {
   icon: any;
@@ -31,37 +32,47 @@ interface SidebarItem {
   color: string;
 }
 
+const ICON_MAP: Record<string, any> = {
+  LayoutDashboard,
+  Compass,
+  Map,
+  FileText,
+  FileEdit,
+  ScanLine,
+  Bot,
+  Mic,
+  Languages,
+  Briefcase,
+  Clock,
+  User,
+  Settings,
+  LogOut,
+  Login,
+  Menu,
+  ChevronLeft,
+};
+
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(true);
   const pathname = usePathname();
   const router = useRouter();
 
-  const menuItems: SidebarItem[] = [
-    { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard', color: 'text-blue-400' },
-    { icon: Compass, label: 'Career Guidance', href: '/career', color: 'text-emerald-400' },
-    { icon: FileText, label: 'Resume Builder', href: '/resume', color: 'text-indigo-400' },
-    { icon: FileEdit, label: 'Resume Feedback', href: '/resume/feedback', color: 'text-pink-400' },
-    { icon: Bot, label: 'AI Mentor', href: '/mentor', color: 'text-cyan-400' },
-    { icon: Mic, label: 'Voice Mentor', href: '/voice-mentor', color: 'text-red-400' },
-    { icon: Languages, label: 'Translator', href: '/translator', color: 'text-orange-400' },
-    { icon: Briefcase, label: 'Interview Prep', href: '/interview-prep', color: 'text-violet-400' },
-    { icon: Clock, label: 'History', href: '/history', color: 'text-teal-400' },
-    { icon: User, label: 'Profile', href: '/profile', color: 'text-yellow-400' },
-    { icon: Settings, label: 'Settings', href: '/settings', color: 'text-slate-400' },
-  ];
+  const menuItems: SidebarItem[] = SIDEBAR_ITEMS.map((item) => ({
+    ...item,
+    icon: ICON_MAP[item.icon],
+  }));
 
   const handleLogout = async () => {
-    // Clear cookies & local storage
     try {
-      await fetch('http://localhost:8000/auth/logout', { 
+      await fetch('http://localhost:8000/auth/logout', {
         method: 'POST',
-        credentials: 'include'
+        credentials: 'include',
       });
     } catch (e) {
       console.error(e);
     }
     localStorage.removeItem('user');
-    router.push('/auth');
+    router.push(ROUTES.AUTH);
   };
 
   const isLoggedIn = typeof window !== 'undefined' && localStorage.getItem('user');
@@ -73,14 +84,13 @@ export default function Sidebar() {
       className="h-screen bg-slate-900 border-r border-slate-800 text-slate-200 flex flex-col justify-between p-4 relative select-none shrink-0"
     >
       <div className="flex flex-col gap-6 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-800">
-        {/* Header Title / Logo */}
         <div className="flex items-center justify-between h-10 px-2">
           {isOpen ? (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="flex items-center gap-2 cursor-pointer"
-              onClick={() => router.push('/')}
+              onClick={() => router.push(ROUTES.HOME)}
             >
               <span className="text-xl">🌿</span>
               <h1 className="text-md font-bold text-emerald-400 tracking-wider">
@@ -88,7 +98,7 @@ export default function Sidebar() {
               </h1>
             </motion.div>
           ) : (
-            <div className="w-8 h-8 rounded bg-emerald-500 mx-auto flex items-center justify-center cursor-pointer" onClick={() => router.push('/')}>
+            <div className="w-8 h-8 rounded bg-emerald-500 mx-auto flex items-center justify-center cursor-pointer" onClick={() => router.push(ROUTES.HOME)}>
               <span className="text-sm">🌿</span>
             </div>
           )}
@@ -100,7 +110,6 @@ export default function Sidebar() {
           </button>
         </div>
 
-        {/* Navigation Items */}
         <nav className="flex flex-col gap-1">
           {menuItems.map((item) => {
             const Icon = item.icon;
@@ -131,7 +140,6 @@ export default function Sidebar() {
         </nav>
       </div>
 
-      {/* Footer metadata & Auth control */}
       <div className="flex flex-col gap-3 pt-3 border-t border-slate-800">
         {isOpen ? (
           <button
@@ -150,7 +158,7 @@ export default function Sidebar() {
             <LogOut size={18} />
           </button>
         )}
-        
+
         {isOpen && (
           <div className="text-[10px] text-slate-650 text-center font-mono">
             VidyGuideAI v3.0.0

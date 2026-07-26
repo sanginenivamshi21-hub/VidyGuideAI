@@ -1,7 +1,7 @@
 import { Controller, Post, UseInterceptors, UploadedFile, HttpException, HttpStatus } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { spawn } from 'child_process';
-import { join } from 'path';
+import { resolve } from 'path';
 import { existsSync, writeFileSync, unlinkSync } from 'fs';
 import * as os from 'os';
 
@@ -14,20 +14,19 @@ export class OcrController {
       throw new HttpException('No file uploaded.', HttpStatus.BAD_REQUEST);
     }
 
-    let pythonPath = join(process.cwd(), '.venv/bin/python');
-    let scriptPath = join(process.cwd(), 'resume_scanner.py');
-    if (!existsSync(pythonPath)) {
-      pythonPath = join(process.cwd(), '../../.venv/bin/python');
-      scriptPath = join(process.cwd(), '../../resume_scanner.py');
-    }
+    const projectRoot = resolve(process.cwd(), '..', '..');
+    const venvPython = resolve(projectRoot, '.venv', 'bin', 'python');
+    const scriptPath = resolve(projectRoot, 'resume_scanner.py');
 
-    // Save buffer to temporary file
+    const pythonPath = existsSync(venvPython) ? venvPython : 'python3';
+    const script = existsSync(scriptPath) ? scriptPath : resolve(process.cwd(), 'resume_scanner.py');
+
     const tempDir = os.tmpdir();
-    const tempFilePath = join(tempDir, `resume_${Date.now()}_${file.originalname}`);
+    const tempFilePath = resolve(tempDir, `resume_${Date.now()}_${file.originalname}`);
     writeFileSync(tempFilePath, file.buffer);
 
     return new Promise((resolve, reject) => {
-      const pyProcess = spawn(pythonPath, [scriptPath, tempFilePath]);
+      const pyProcess = spawn(pythonPath, [script, tempFilePath]);
       let stdoutData = '';
       let stderrData = '';
 
@@ -40,7 +39,6 @@ export class OcrController {
       });
 
       pyProcess.on('close', (code) => {
-        // Clean up temp file
         try {
           if (existsSync(tempFilePath)) {
             unlinkSync(tempFilePath);
@@ -51,7 +49,7 @@ export class OcrController {
 
         if (code !== 0) {
           console.error('Python scanner failed:', stderrData);
-          reject(new HttpException(`OCR failed: ${stderrData}`, HttpStatus.INTERNAL_SERVER_ERROR));
+          reject(new HttpException(`OCR failed`, HttpStatus.INTERNAL_SERVER_ERROR));
           return;
         }
 

@@ -37,9 +37,8 @@ export class AuthService {
       },
     });
 
-    // Generate and send registration OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10m
+    const otp = this._generateOtp();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
     await this.prisma.oTP.create({
       data: {
@@ -77,35 +76,35 @@ export class AuthService {
     }
 
     if (!user.isVerified) {
-      throw new UnauthorizedException('Account not verified. Please complete OTP verification.');
+      const otp = this._generateOtp();
+      const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+      await this.prisma.oTP.create({
+        data: {
+          email: dto.email,
+          code: otp,
+          purpose: 'login',
+          expiresAt,
+        },
+      });
+
+      await this.mailService.sendEmail(
+        dto.email,
+        'VidyGuideAI - Login Verification OTP',
+        `<p>Your login verification OTP is: <strong>${otp}</strong>. It will expire in 10 minutes.</p>`
+      );
+
+      return {
+        message: 'Account not verified. OTP sent to your email for verification.',
+        requiresOtp: true,
+        purpose: 'login',
+      };
     }
 
-    // Generate tokens
-    const payload = { sub: user.id, username: user.username, email: user.email };
-    const accessToken = this.jwtService.sign(payload, { expiresIn: '1d' });
-    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
-
-    // Save refresh token session
-    await this.prisma.session.create({
-      data: {
-        userId: user.id,
-        token: refreshToken,
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7d
-      },
-    });
-
-    return {
-      accessToken,
-      refreshToken,
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-      },
-    };
+    return this._issueTokens(user);
   }
 
-  async verifyOtp(email: string, code: string, purpose: string): Promise<boolean> {
+  async verifyOtp(email: string, code: string, purpose: string): Promise<{ success: boolean; tokens?: { accessToken: string; refreshToken: string; user: { id: number; username: string; email: string } }; message: string }> {
     const otpRecord = await this.prisma.oTP.findFirst({
       where: {
         email,
@@ -130,9 +129,23 @@ export class AuthService {
         where: { email },
         data: { isVerified: true },
       });
+
+      const user = await this.prisma.user.findUnique({ where: { email } });
+      if (user) {
+        const tokens = this._issueTokens(user);
+        return { success: true, tokens, message: 'Registration verified. You are now logged in.' };
+      }
     }
 
-    return true;
+    if (purpose === 'login') {
+      const user = await this.prisma.user.findUnique({ where: { email } });
+      if (user && user.isVerified) {
+        const tokens = this._issueTokens(user);
+        return { success: true, tokens, message: 'Login verified. You are now logged in.' };
+      }
+    }
+
+    return { success: true, message: 'OTP verified successfully.' };
   }
 
   async forgotPassword(email: string): Promise<boolean> {
@@ -141,12 +154,11 @@ export class AuthService {
     });
 
     if (!user) {
-      // For security, don't expose if email exists, return true
       return true;
     }
 
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10m
+    const otp = this._generateOtp();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
     await this.prisma.oTP.create({
       data: {
@@ -166,7 +178,7 @@ export class AuthService {
     return true;
   }
 
-  async resetPassword(email: string, code: string, passwordHashRaw: string): Promise<boolean> {
+  async resetPassword(email: string, code: string, passwordPlain: string): Promise<boolean> {
     const otpRecord = await this.prisma.oTP.findFirst({
       where: {
         email,
@@ -187,7 +199,7 @@ export class AuthService {
     });
 
     const salt = await bcrypt.genSalt(10);
-    const passwordHash = await bcrypt.hash(passwordHashRaw, salt);
+    const passwordHash = await bcrypt.hash(passwordPlain, salt);
 
     await this.prisma.user.update({
       where: { email },
@@ -195,5 +207,33 @@ export class AuthService {
     });
 
     return true;
+  }
+
+  private _generateOtp(): string {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+  }
+
+  private _issueTokens(user: { id: number; username: string; email: string }) {
+    const payload = { sub: user.id, username: user.username, email: user.email };
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '1d' });
+    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+
+    this.prisma.session.create({
+      data: {
+        userId: user.id,
+        token: refreshToken,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      },
+    }).catch(() => {});
+
+    return {
+      accessToken,
+      refreshToken,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+      },
+    };
   }
 }

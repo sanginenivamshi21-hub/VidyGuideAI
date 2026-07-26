@@ -21,35 +21,65 @@ export class AuthController {
     @Body() dto: LoginDto,
     @Res({ passthrough: true }) res: express.Response
   ) {
-    const tokens = await this.authService.login(dto);
+    const result = await this.authService.login(dto) as any;
 
-    // Enforce secure HTTP-only cookies
-    res.cookie('accessToken', tokens.accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 24 * 60 * 60 * 1000, // 1 day
-    });
+    if (result.tokens) {
+      res.cookie('accessToken', result.tokens.accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 24 * 60 * 60 * 1000,
+      });
+      res.cookie('refreshToken', result.tokens.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
 
-    res.cookie('refreshToken', tokens.refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
+      return {
+        message: 'Login successful',
+        user: result.tokens.user,
+        accessToken: result.tokens.accessToken,
+      };
+    }
 
-    return {
-      message: 'Login successful',
-      user: tokens.user,
-    };
+    return result;
   }
 
   @Post('verify-otp')
-  async verifyOtp(@Body() dto: VerifyOtpDto) {
-    const isVerified = await this.authService.verifyOtp(dto.email, dto.code, dto.purpose);
+  async verifyOtp(
+    @Body() dto: VerifyOtpDto,
+    @Res({ passthrough: true }) res: express.Response
+  ) {
+    const result = await this.authService.verifyOtp(dto.email, dto.code, dto.purpose) as any;
+
+    if (result.tokens) {
+      const tokens = result.tokens;
+      res.cookie('accessToken', tokens.accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 24 * 60 * 60 * 1000,
+      });
+      res.cookie('refreshToken', tokens.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+
+      return {
+        message: result.message,
+        success: true,
+        user: tokens.user,
+        accessToken: tokens.accessToken,
+      };
+    }
+
     return {
-      message: 'OTP verified successfully.',
-      success: isVerified,
+      message: result.message,
+      success: result.success,
     };
   }
 

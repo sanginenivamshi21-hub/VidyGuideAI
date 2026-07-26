@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { RefreshCw, Lock, Mail, User as UserIcon, ShieldAlert } from 'lucide-react';
+import { ROUTES } from '@/lib/routes';
 
 export default function AuthPage() {
   const router = useRouter();
@@ -24,7 +25,7 @@ export default function AuthPage() {
   useEffect(() => {
     const user = localStorage.getItem('user');
     if (user) {
-      router.push('/dashboard');
+      router.push(ROUTES.DASHBOARD);
     }
   }, [router]);
 
@@ -44,16 +45,16 @@ export default function AuthPage() {
 
       const data = await resp.json();
       if (!resp.ok) {
-        if (data.message && data.message.includes('complete OTP')) {
-          setOtpPurpose('register');
+        if (data.requiresOtp || (data.message && data.message.includes('OTP'))) {
+          setOtpPurpose(data.purpose || 'login');
           setMode('otp');
-          setMessage('Please complete your OTP verification to log in.');
+          setMessage(data.message || 'Please complete your OTP verification to log in.');
         } else {
           throw new Error(data.message || 'Invalid credentials or login failed.');
         }
       } else {
         localStorage.setItem('user', JSON.stringify(data.user));
-        router.push('/dashboard');
+        router.push(ROUTES.DASHBOARD);
       }
     } catch (err: any) {
       setError(err.message || '🚫 Something went wrong. We couldn\'t process your request. Please try again.');
@@ -109,10 +110,16 @@ export default function AuthPage() {
       if (!resp.ok) {
         throw new Error(data.message || 'Invalid or expired OTP code.');
       } else {
-        setMessage('Verification successful! You can now log in with your credentials.');
+        if (data.user) {
+          localStorage.setItem('user', JSON.stringify(data.user));
+        }
+        setMessage(data.message || 'Verification successful!');
         setMode('login');
         setPassword('');
         setOtpCode('');
+        if (data.user) {
+          router.push(ROUTES.DASHBOARD);
+        }
       }
     } catch (err: any) {
       setError(err.message || '🚫 Verification failed. Check your OTP code.');
@@ -189,7 +196,7 @@ export default function AuthPage() {
       isVerified: true
     };
     localStorage.setItem('user', JSON.stringify(guestUser));
-    router.push('/career');
+    router.push(ROUTES.CAREER);
   };
 
   return (
