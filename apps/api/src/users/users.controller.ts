@@ -18,7 +18,6 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { PrismaService } from '../database/prisma.service';
 import * as bcrypt from 'bcryptjs';
 import type { Response } from 'express';
-import { Prisma } from '@prisma/client';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard)
@@ -214,6 +213,10 @@ export class UsersController {
             include: { messages: { orderBy: { createdAt: 'asc' } } },
             orderBy: { updatedAt: 'desc' },
         });
+        type ConversationWithMessages = (typeof conversations)[number];
+        type MessageFromConversation =
+            ConversationWithMessages['messages'][number];
+
         const careerHistories = await this.prisma.careerHistory.findMany({
             where: { userId },
             orderBy: { createdAt: 'desc' },
@@ -231,12 +234,8 @@ export class UsersController {
             stats: {
                 conversations: conversations.length,
                 messages: conversations.reduce(
-                    (
-                        sum: number,
-                        c: Prisma.ConversationGetPayload<{
-                            include: { messages: true };
-                        }>,
-                    ) => sum + c.messages.length,
+                    (sum: number, c: ConversationWithMessages) =>
+                        sum + c.messages.length,
                     0,
                 ),
                 historyEntries: history.length,
@@ -244,26 +243,18 @@ export class UsersController {
                 resumeHistories: resumeHistories.length,
             },
             history,
-            conversations: conversations.map(
-                (
-                    c: Prisma.ConversationGetPayload<{
-                        include: { messages: true };
-                    }>,
-                ) => ({
-                    id: c.id,
-                    title: c.title,
-                    pinned: c.pinned,
-                    createdAt: c.createdAt,
-                    updatedAt: c.updatedAt,
-                    messages: c.messages.map(
-                        (m: Prisma.MessageGetPayload<{}>) => ({
-                            role: m.role,
-                            content: m.content,
-                            createdAt: m.createdAt,
-                        }),
-                    ),
-                }),
-            ),
+            conversations: conversations.map((c: ConversationWithMessages) => ({
+                id: c.id,
+                title: c.title,
+                pinned: c.pinned,
+                createdAt: c.createdAt,
+                updatedAt: c.updatedAt,
+                messages: c.messages.map((m: MessageFromConversation) => ({
+                    role: m.role,
+                    content: m.content,
+                    createdAt: m.createdAt,
+                })),
+            })),
             careerHistories,
             resumeHistories,
         };
