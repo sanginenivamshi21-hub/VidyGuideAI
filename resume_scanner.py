@@ -8,6 +8,8 @@ Also requires: tesseract-ocr system package (sudo apt install tesseract-ocr)
 
 import io
 import os
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
 import re
 import tempfile
 from typing import Union
@@ -25,6 +27,12 @@ except ImportError:
     TESS_OK = False
 
 try:
+    import easyocr
+    EASYOCR_OK = True
+except ImportError:
+    EASYOCR_OK = False
+
+try:
     from pypdf import PdfReader
     PYPDF_OK = True
 except ImportError:
@@ -33,6 +41,16 @@ except ImportError:
         PYPDF_OK = True
     except ImportError:
         PYPDF_OK = False
+
+EASYOCR_READER = None
+
+def get_easyocr_reader():
+    global EASYOCR_READER
+    if EASYOCR_READER is None:
+        if not EASYOCR_OK:
+            raise ImportError("easyocr is not installed.")
+        EASYOCR_READER = easyocr.Reader(['en', 'hi'], gpu=False)
+    return EASYOCR_READER
 
 
 def _preprocess_image(img: "Image.Image") -> "Image.Image":
@@ -69,28 +87,39 @@ def extract_text_from_image(file_bytes: bytes, filename: str = "") -> tuple[bool
     """
     if not PIL_OK:
         return False, "Pillow not installed. Run: pip install Pillow"
-    if not TESS_OK:
-        return False, "pytesseract not installed. Run: pip install pytesseract"
 
-    try:
-        img = Image.open(io.BytesIO(file_bytes))
-        img = _preprocess_image(img)
-
-        # Try English + Hindi (covers most Indian resumes)
+    # Try EasyOCR first (Primary Production OCR)
+    if EASYOCR_OK:
         try:
-            text = pytesseract.image_to_string(img, lang="eng+hin",
-                                               config="--psm 6 --oem 3")
-        except Exception:
-            text = pytesseract.image_to_string(img, lang="eng",
-                                               config="--psm 6 --oem 3")
+            reader = get_easyocr_reader()
+            img = Image.open(io.BytesIO(file_bytes))
+            results = reader.readtext(img, detail=0)
+            text = "\n".join(results)
+            text = _clean_extracted_text(text)
+            if len(text.strip()) >= 30:
+                return True, text
+        except Exception as e:
+            # Fall through if easyocr fails
+            pass
 
-        text = _clean_extracted_text(text)
-        if len(text.strip()) < 30:
-            return False, "Could not extract enough text from this image. Try a clearer scan."
-        return True, text
+    # Fallback to Tesseract OCR
+    if TESS_OK:
+        try:
+            img = Image.open(io.BytesIO(file_bytes))
+            img = _preprocess_image(img)
+            try:
+                text = pytesseract.image_to_string(img, lang="eng+hin",
+                                                   config="--psm 6 --oem 3")
+            except Exception:
+                text = pytesseract.image_to_string(img, lang="eng",
+                                                   config="--psm 6 --oem 3")
+            text = _clean_extracted_text(text)
+            if len(text.strip()) >= 30:
+                return True, text
+        except Exception as e:
+            return False, f"Image processing fallback error: {str(e)}"
 
-    except Exception as e:
-        return False, f"Image processing error: {str(e)}"
+    return False, "No active OCR engine could extract text. Please copy-paste text manually."
 
 
 def extract_text_from_pdf(file_bytes: bytes) -> tuple[bool, str]:
@@ -116,37 +145,48 @@ def extract_text_from_pdf(file_bytes: bytes) -> tuple[bool, str]:
             pass
 
     # ── OCR fallback for scanned PDFs ─────────────────────────────────────
-    if not PIL_OK or not TESS_OK:
-        return False, ("Could not extract text. Install pytesseract + Pillow "
-                       "for scanned PDF support, or copy-paste your resume text manually.")
+    if not PIL_OK:
+        return False, "Pillow not installed. Scanned PDF processing requires Pillow."
 
-    try:
-        # Convert PDF pages to images using pdf2image if available
+    # Try EasyOCR first
+    if EASYOCR_OK:
         try:
             from pdf2image import convert_from_bytes
-            images = convert_from_bytes(file_bytes, dpi=200)
-        except ImportError:
-            return False, ("pdf2image not installed. For scanned PDFs run: "
-                           "pip install pdf2image\n"
-                           "Or copy-paste your resume text in the text box.")
+            images = convert_from_bytes(file_bytes, dpi=150)
+            reader = get_easyocr_reader()
+            full_text = ""
+            for img in images[:6]:  # max 6 pages
+                results = reader.readtext(img, detail=0)
+                full_text += "\n".join(results) + "\n"
+            full_text = _clean_extracted_text(full_text)
+            if len(full_text.strip()) >= 50:
+                return True, full_text
+        except Exception as e:
+            # Fall through if easyocr fails
+            pass
 
-        full_text = ""
-        for img in images[:6]:  # max 6 pages
-            img = _preprocess_image(img)
-            try:
-                page_text = pytesseract.image_to_string(img, lang="eng",
-                                                        config="--psm 6 --oem 3")
-            except Exception:
-                continue
-            full_text += page_text + "\n"
+    # Tesseract Fallback
+    if TESS_OK:
+        try:
+            from pdf2image import convert_from_bytes
+            images = convert_from_bytes(file_bytes, dpi=150)
+            full_text = ""
+            for img in images[:6]:  # max 6 pages
+                img = _preprocess_image(img)
+                try:
+                    page_text = pytesseract.image_to_string(img, lang="eng",
+                                                            config="--psm 6 --oem 3")
+                except Exception:
+                    continue
+                full_text += page_text + "\n"
 
-        full_text = _clean_extracted_text(full_text)
-        if len(full_text.strip()) < 50:
-            return False, "Could not extract text from this PDF. Try uploading as JPG/PNG."
-        return True, full_text
+            full_text = _clean_extracted_text(full_text)
+            if len(full_text.strip()) >= 50:
+                return True, full_text
+        except Exception as e:
+            return False, f"PDF OCR processing fallback error: {str(e)}"
 
-    except Exception as e:
-        return False, f"PDF processing error: {str(e)}"
+    return False, "Failed to extract text from scanned PDF. Try copying it manually."
 
 
 def scan_resume_file(uploaded_file) -> tuple[bool, str]:

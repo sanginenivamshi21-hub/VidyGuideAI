@@ -37,13 +37,30 @@ export class MentorController {
   async askInterview(@Body() body: any) {
     const role = body.role || 'Software Developer';
     const company = body.company || 'General MNC';
+    const experienceLevel = body.experience_level || 'Entry Level';
+    const skills = body.skills || 'General technical skills';
+    const difficulty = body.difficulty || 'Medium';
 
-    const systemPrompt = `You are an expert interviewer for Indian jobs. Generate exactly 5 relevant, realistic interview questions (mix of technical and behavioral) for the role of ${role} at ${company}. Keep them concise.`;
+    const systemPrompt = `You are an expert corporate recruiter and interviewer for Indian companies (ranging from top tech like Google/Microsoft, IT services like TCS/Infosys, banking like SBI, to UPSC/Civil Services).
+Generate exactly 5 highly relevant, realistic, and challenging interview questions for the following candidate profile:
+- Role: ${role}
+- Company: ${company}
+- Experience Level: ${experienceLevel}
+- Key Skills: ${skills}
+- Difficulty Level: ${difficulty}
+
+Keep the questions professional and realistic. Avoid generic questions. Return exactly 5 questions numbered 1 to 5. Format them strictly like this:
+1. First question
+2. Second question
+3. Third question
+4. Fourth question
+5. Fifth question`;
+
     const responseText = await this.aiService.generateText(systemPrompt, 'Generate the questions.', 0.8);
     
-    // Split into array by numbering
+    // Split into array by numbering, supporting both newlines and start of string
     const questions = responseText
-      .split(/\n\d\.\s+/)
+      .split(/(?:\r?\n|^)\d+\.\s+/)
       .map(q => q.trim())
       .filter(q => q.length > 0);
 
@@ -54,12 +71,19 @@ export class MentorController {
   async getInterviewFeedback(@Body() body: any) {
     const items = body.items || []; // Array of { question, answer }
     
-    let promptContent = 'Provide comprehensive feedback and score (out of 10) for each answer. Provide the ideal sample response:\n\n';
+    let promptContent = 'Provide comprehensive feedback, score (out of 10), strengths, weaknesses, and the ideal model response for the following answers:\n\n';
     items.forEach((item: any, idx: number) => {
       promptContent += `Q${idx + 1}: ${item.question}\nAnswer: ${item.answer}\n\n`;
     });
 
-    const systemPrompt = `You are an elite corporate interviewer. Evaluate the candidate's interview responses carefully. Point out weaknesses, score each response out of 10, and provide the ideal concise model answer.`;
+    const systemPrompt = `You are an elite corporate interviewer. Evaluate the candidate's interview responses.
+Provide feedback in a premium, beautifully formatted conversational markdown layout:
+- Score each question out of 10 (format as "**Score:** X/10").
+- Use bullet points, bold key terms, and emojis where appropriate.
+- List distinct strengths and weaknesses.
+- Provide a concise, professional model answer that the candidate should use as a reference.
+- End with a brief, encouraging tip or warning.`;
+
     const responseText = await this.aiService.generateText(systemPrompt, promptContent, 0.6);
 
     return { feedback: responseText };

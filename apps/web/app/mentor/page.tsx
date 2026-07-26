@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Bot, RefreshCw, Send, Trash2, ArrowRight } from 'lucide-react';
+import MarkdownRenderer from '../../components/MarkdownRenderer';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -184,13 +185,13 @@ export default function MentorPage() {
               {msg.role === 'user' ? '👤' : '🌿'}
             </div>
             <div
-              className={`p-4 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
+              className={`p-4 rounded-2xl text-sm leading-relaxed ${
                 msg.role === 'user'
-                  ? 'bg-emerald-600/10 border border-emerald-500/20 text-white rounded-tr-sm font-medium'
+                  ? 'bg-emerald-600/10 border border-emerald-500/20 text-white rounded-tr-sm font-medium whitespace-pre-wrap'
                   : 'bg-slate-900 border border-slate-800/80 text-slate-200 rounded-tl-sm'
               }`}
             >
-              {msg.content}
+              {msg.role === 'user' ? msg.content : <MarkdownRenderer content={msg.content} />}
             </div>
           </div>
         ))}

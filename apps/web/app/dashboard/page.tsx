@@ -78,7 +78,7 @@ export default function DashboardPage() {
       icon: Map,
       title: 'Career Roadmap',
       desc: 'Visualize your academic and career step milestones chronologically in a scrolling timeline.',
-      href: '/career/roadmap',
+      href: '/career',
       color: 'bg-purple-500/10 text-purple-455 border-purple-500/20 hover:border-purple-500/40',
     },
     {
@@ -99,7 +99,7 @@ export default function DashboardPage() {
       icon: ScanLine,
       title: 'Resume Scanner (OCR)',
       desc: 'Extract raw textual paragraphs recursively from image or PDF documents.',
-      href: '/ocr',
+      href: '/resume/feedback',
       color: 'bg-amber-500/10 text-amber-455 border-amber-500/20 hover:border-amber-500/40',
     },
     {

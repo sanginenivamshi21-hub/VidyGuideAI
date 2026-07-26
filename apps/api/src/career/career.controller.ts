@@ -15,6 +15,24 @@ export class CareerController {
     const goal = body.goal || '';
     const location = body.location || '';
     const extraContext = body.extra_context || '';
+    
+    // Advanced profile properties
+    const cgpa = body.cgpa || '';
+    const languages = body.languages || '';
+    const targetCompany = body.target_company || '';
+    const preferredCountry = body.preferred_country || '';
+    const dreamJob = body.dream_job || '';
+    const expectedSalary = body.expected_salary || '';
+    const studyHours = body.study_hours || '';
+    const timeline = body.timeline || '';
+    const linkedin = body.linkedin || '';
+    const github = body.github || '';
+    const leetcode = body.leetcode || '';
+    const hackerrank = body.hackerrank || '';
+    const projects = body.projects || '';
+    const certificates = body.certificates || '';
+    const strengths = body.strengths || '';
+    const weaknesses = body.weaknesses || '';
     const replyLang = body.reply_language || 'en';
 
     const langInstructions: Record<string, string> = {
@@ -34,26 +52,37 @@ export class CareerController {
 
     const langInstr = langInstructions[replyLang] || '';
 
-    const systemPrompt = `You are VidyGuide, a compassionate career counselor for Indian students.`;
+    const systemPrompt = `You are VidyGuideAI, a compassionate, expert career counselor for Indian students and young professionals.
+Provide highly structured, premium career advice using rich Markdown:
+- Format titles and sections with beautiful headings (e.g. ## Career Path: [Title]).
+- Use clear bullet points and bold key terms.
+- Use emojis (e.g., 💼, 💰, 🎓, 📈) to make the content highly readable and scanner-friendly.
+- Format structured metrics (e.g., Salary in India, Job Demand, Time to Income) using Markdown Tables for comparison.
+- Use Callout blocks or blockquotes for important tips and warnings.
+- Keep paragraphs short and simple so they are easy to read for beginners.`;
+
     const userPrompt = `Student Profile:
 - Education Level: ${educationLevel} — ${education}
-- Education Details: ${educationDetail}
-- Skills: ${skills}
-- Interests: ${interests}
-- Goal: ${goal}
-- Location: ${location}
-- Additional Context: ${extraContext}
+- Education Details: ${educationDetail} ${cgpa ? `(CGPA/Marks: ${cgpa})` : ''}
+- Skills: ${skills} ${languages ? `(Programming Languages: ${languages})` : ''}
+- Interests & Strengths: ${interests} ${strengths ? `| Strengths: ${strengths}` : ''}
+- Goal & Dream Job: ${goal} ${dreamJob ? `(Target Dream Job: ${dreamJob})` : ''}
+- Location & Preferred Country: ${location} ${preferredCountry ? `(Preferred Work Country: ${preferredCountry})` : ''}
+- Expected Salary: ${expectedSalary} ${targetCompany ? `(Target Company: ${targetCompany})` : ''}
+- Context & Weaknesses: ${extraContext} ${weaknesses ? `(Areas to improve: ${weaknesses})` : ''}
+- Study Availability: ${studyHours ? `${studyHours} hours per day` : ''}
+- Timeline Target: ${timeline || 'General'}
+- Professional Portfolios: ${[linkedin, github, leetcode, hackerrank].filter(Boolean).join(' | ')}
+- Current Projects & Certifications: ${[projects, certificates].filter(Boolean).join(' | ')}
 
-Provide 3-5 tailored career suggestions. For each include:
-1. Career Title
-2. Why it suits this person
-3. Clear next steps (action plan)
-4. What to learn / certifications
-5. Realistic salary range in India
-6. Job demand (High/Medium/Stable)
-7. Time to first income from today
-
-End with a "Your Next 30 Days" action plan with 3 concrete steps.${langInstr}`;
+Provide a highly customized, comprehensive Career Guidance Report covering exactly these sections:
+1. **Career Analysis** — Analyze why their profile matches this path, pointing out strengths and areas to grow.
+2. **Roadmap & Timeline** — A detailed step-by-step timeline matching their study schedule (e.g., Phase 1, Phase 2, Phase 3).
+3. **Projects & Certificates** — Concrete project suggestions and industry-standard certifications they should target.
+4. **Target Companies** — List matching Indian companies (MNCs/Startups/Govt bodies) hiring for this path.
+5. **Interview Preparation** — Specific tips and resources for passing screening rounds.
+6. **Resume Advice** — Advice on what sections to highlight.
+7. **Final Action Plan** — A "Your Next 30 Days" plan with 3 concrete next steps. ${langInstr}`;
 
     const result = await this.aiService.generateText(systemPrompt, userPrompt, 0.7);
     return { career_suggestions: result };

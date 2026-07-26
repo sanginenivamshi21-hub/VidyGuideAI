@@ -134,4 +134,66 @@ export class AuthService {
 
     return true;
   }
+
+  async forgotPassword(email: string): Promise<boolean> {
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      // For security, don't expose if email exists, return true
+      return true;
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10m
+
+    await this.prisma.oTP.create({
+      data: {
+        email,
+        code: otp,
+        purpose: 'reset_password',
+        expiresAt,
+      },
+    });
+
+    await this.mailService.sendEmail(
+      email,
+      'VidyGuideAI - Password Reset OTP',
+      `<p>You requested a password reset. Your OTP is: <strong>${otp}</strong>. It will expire in 10 minutes.</p>`
+    );
+
+    return true;
+  }
+
+  async resetPassword(email: string, code: string, passwordHashRaw: string): Promise<boolean> {
+    const otpRecord = await this.prisma.oTP.findFirst({
+      where: {
+        email,
+        code,
+        purpose: 'reset_password',
+        isUsed: false,
+        expiresAt: { gt: new Date() },
+      },
+    });
+
+    if (!otpRecord) {
+      throw new BadRequestException('Invalid or expired OTP code.');
+    }
+
+    await this.prisma.oTP.update({
+      where: { id: otpRecord.id },
+      data: { isUsed: true },
+    });
+
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(passwordHashRaw, salt);
+
+    await this.prisma.user.update({
+      where: { email },
+      data: { passwordHash },
+    });
+
+    return true;
+  }
 }

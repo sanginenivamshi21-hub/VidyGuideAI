@@ -39,10 +39,8 @@ export default function Sidebar() {
   const menuItems: SidebarItem[] = [
     { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard', color: 'text-blue-400' },
     { icon: Compass, label: 'Career Guidance', href: '/career', color: 'text-emerald-400' },
-    { icon: Map, label: 'Career Roadmap', href: '/career/roadmap', color: 'text-purple-400' },
     { icon: FileText, label: 'Resume Builder', href: '/resume', color: 'text-indigo-400' },
     { icon: FileEdit, label: 'Resume Feedback', href: '/resume/feedback', color: 'text-pink-400' },
-    { icon: ScanLine, label: 'Resume Scanner (OCR)', href: '/ocr', color: 'text-amber-400' },
     { icon: Bot, label: 'AI Mentor', href: '/mentor', color: 'text-cyan-400' },
     { icon: Mic, label: 'Voice Mentor', href: '/voice-mentor', color: 'text-red-400' },
     { icon: Languages, label: 'Translator', href: '/translator', color: 'text-orange-400' },
@@ -106,7 +104,7 @@ export default function Sidebar() {
         <nav className="flex flex-col gap-1">
           {menuItems.map((item) => {
             const Icon = item.icon;
-            const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+            const isActive = pathname === item.href;
             return (
               <Link
                 key={item.href}

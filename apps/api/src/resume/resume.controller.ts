@@ -75,21 +75,26 @@ Output the complete resume in plain text format, ready to use.`;
 
     const langInstr = langInstructions[replyLang] || '';
 
-    const systemPrompt = `You are an expert resume reviewer for Indian job seekers.`;
+    const systemPrompt = `You are an expert resume reviewer for Indian job seekers.
+Provide structured feedback using rich Markdown:
+- Format sections with beautiful headings.
+- Use clear bullet points and bold key terms.
+- Use emojis (e.g., 🎯, 🚀, 💡, ⚠️) to call attention to strengths, weaknesses, and priorities.
+- Format the scores (e.g. ATS Score) inside a highlight/callout box.
+- Keep the language conversational, encouraging, and easy to read for beginners.`;
     const userPrompt = `Analyze this resume and provide detailed, actionable feedback:
 
 Resume:
 ${resumeText}
 
-Provide structured feedback covering:
-1. **Overall Impression** — First impression score (X/10) and one-line summary
-2. **Strengths** — What's working well (3-5 points)
-3. **Weaknesses** — What needs improvement (3-5 points)  
-4. **ATS Optimization** — Keywords missing, formatting issues
-5. **Section-by-Section Review** — Objective, Education, Skills, Projects, Experience
-6. **Missing Elements** — What should be added
-7. **Top 3 Priority Fixes** — The most impactful changes to make right now
-8. **Improved Objective Statement** — Rewrite their objective for their target role${langInstr}`;
+Provide structured feedback covering exactly these sections:
+1. **ATS Score** — First impression score (format strictly as "**ATS Score:** X/100" in a callout box).
+2. **Recruiter Review** — One-line professional recruiter summary.
+3. **Grammar & Formatting Critique** — Point out grammar, structural, or layout errors.
+4. **Keyword & Keyword Density Analysis** — Check keyword density and keywords missing.
+5. **Missing Skills & Keywords** — List missing skills or topics to be added.
+6. **Improved Objective Statement** — Rewrite their objective for their target role.
+7. **Full Improved Resume (Plain Text Layout)** — Provide a complete, polished, ATS-optimized plain text version of their resume. Use section headers in ALL CAPS followed by a line of dashes (e.g., EDUCATION\n---------) so it is ready for ReportLab PDF compilation. Do not include markdown asterisks inside this resume block. Wrap the complete Improved Resume strictly inside a code block with language 'resume' (e.g. \`\`\`resume\n[Plain text resume here]\n\`\`\`). Make it clean and professional. ${langInstr}`;
 
     const result = await this.aiService.generateText(systemPrompt, userPrompt, 0.6);
     return { feedback: result };
