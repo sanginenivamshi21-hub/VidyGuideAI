@@ -18,6 +18,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { PrismaService } from '../database/prisma.service';
 import * as bcrypt from 'bcryptjs';
 import type { Response } from 'express';
+import { Prisma } from '@prisma/client';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard)
@@ -230,7 +231,12 @@ export class UsersController {
             stats: {
                 conversations: conversations.length,
                 messages: conversations.reduce(
-                    (sum, c) => sum + c.messages.length,
+                    (
+                        sum: number,
+                        c: Prisma.ConversationGetPayload<{
+                            include: { messages: true };
+                        }>,
+                    ) => sum + c.messages.length,
                     0,
                 ),
                 historyEntries: history.length,
@@ -238,18 +244,26 @@ export class UsersController {
                 resumeHistories: resumeHistories.length,
             },
             history,
-            conversations: conversations.map((c) => ({
-                id: c.id,
-                title: c.title,
-                pinned: c.pinned,
-                createdAt: c.createdAt,
-                updatedAt: c.updatedAt,
-                messages: c.messages.map((m) => ({
-                    role: m.role,
-                    content: m.content,
-                    createdAt: m.createdAt,
-                })),
-            })),
+            conversations: conversations.map(
+                (
+                    c: Prisma.ConversationGetPayload<{
+                        include: { messages: true };
+                    }>,
+                ) => ({
+                    id: c.id,
+                    title: c.title,
+                    pinned: c.pinned,
+                    createdAt: c.createdAt,
+                    updatedAt: c.updatedAt,
+                    messages: c.messages.map(
+                        (m: Prisma.MessageGetPayload<{}>) => ({
+                            role: m.role,
+                            content: m.content,
+                            createdAt: m.createdAt,
+                        }),
+                    ),
+                }),
+            ),
             careerHistories,
             resumeHistories,
         };
