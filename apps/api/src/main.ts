@@ -12,7 +12,16 @@ async function bootstrap() {
   const logger = new Logger('Bootstrap');
 
   app.use(cookieParser());
-  app.use(helmet());
+  app.use(helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        frameAncestors: [process.env.CLIENT_URL || 'http://localhost:3000', "'self'"],
+      },
+    },
+  }));
 
   app.useGlobalPipes(
     new ValidationPipe({
