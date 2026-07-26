@@ -49,7 +49,7 @@ export class AuthService {
       },
     });
 
-    await this.mailService.sendEmail(
+    const emailSent = await this.mailService.sendEmail(
       dto.email,
       'VidyGuideAI - Registration OTP',
       `<p>Your registration OTP is: <strong>${otp}</strong>. It will expire in 10 minutes.</p>`
@@ -58,6 +58,7 @@ export class AuthService {
     return {
       message: 'Registration successful. OTP sent to email.',
       userId: user.id,
+      ...(process.env.NODE_ENV !== 'production' ? { devOtp: otp } : {}),
     };
   }
 
@@ -98,6 +99,7 @@ export class AuthService {
         message: 'Account not verified. OTP sent to your email for verification.',
         requiresOtp: true,
         purpose: 'login',
+        ...(process.env.NODE_ENV !== 'production' ? { devOtp: otp } : {}),
       };
     }
 
@@ -148,13 +150,13 @@ export class AuthService {
     return { success: true, message: 'OTP verified successfully.' };
   }
 
-  async forgotPassword(email: string): Promise<boolean> {
+  async forgotPassword(email: string): Promise<{ success: boolean; devOtp?: string }> {
     const user = await this.prisma.user.findUnique({
       where: { email },
     });
 
     if (!user) {
-      return true;
+      return { success: true };
     }
 
     const otp = this._generateOtp();
@@ -175,7 +177,10 @@ export class AuthService {
       `<p>You requested a password reset. Your OTP is: <strong>${otp}</strong>. It will expire in 10 minutes.</p>`
     );
 
-    return true;
+    return {
+      success: true,
+      ...(process.env.NODE_ENV !== 'production' ? { devOtp: otp } : {}),
+    };
   }
 
   async resetPassword(email: string, code: string, passwordPlain: string): Promise<boolean> {

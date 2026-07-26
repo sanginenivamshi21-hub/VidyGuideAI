@@ -31,6 +31,9 @@ export class MailService {
   }
 
   async sendEmail(to: string, subject: string, htmlContent: string): Promise<boolean> {
+    this.logger.log(`[EMAIL LOG] To: ${to} | Subject: ${subject}`);
+    this.logger.log(`[EMAIL LOG] Body: ${htmlContent.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()}`);
+
     if (this.resendApiKey) {
       try {
         const response = await fetch('https://api.resend.com/emails', {

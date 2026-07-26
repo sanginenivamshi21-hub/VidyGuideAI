@@ -1,26 +1,45 @@
-# Local environment variables
+# Environment
 .env
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*.local
 
-# Database files
-*.db
-
-# Python caches
-__pycache__/
-*.pyc
-
-# Node.js dependencies and builds
+# Dependencies
 node_modules/
+.pnpm-store/
+
+# Build output
 .next/
 dist/
 out/
 build/
-.docusaurus/
+*.tsbuildinfo
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+.mypy_cache/
+.ruff_cache/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
 .pnpm-debug.log*
 
-# OS files
-.DS_Store
-logo.jpeg
+# Misc
+*.tgz

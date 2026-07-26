@@ -1,6 +1,7 @@
 {
-  "name": "web",
-  "version": "0.1.0",
+  "name": "@vidyguide/web",
+  "version": "3.0.0",
+  "description": "VidyGuideAI Next.js frontend — AI career counseling platform",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -16,10 +17,7 @@
     "ogl": "^0.0.117",
     "lucide-react": "^0.453.0",
     "clsx": "^2.1.1",
-    "tailwind-merge": "^2.5.4",
-    "@vidyguide/ui": "workspace:*",
-    "@vidyguide/types": "workspace:*",
-    "@vidyguide/utils": "workspace:*"
+    "tailwind-merge": "^2.5.4"
   },
   "devDependencies": {
     "@types/node": "^20",

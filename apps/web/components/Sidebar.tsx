@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import type { LucideIcon } from 'lucide-react';
 import {
   LayoutDashboard,
   Compass,
@@ -19,20 +20,19 @@ import {
   User,
   Settings,
   LogOut,
-  Login,
   Menu,
   ChevronLeft,
 } from 'lucide-react';
 import { ROUTES, SIDEBAR_ITEMS } from '@/lib/routes';
 
 interface SidebarItem {
-  icon: any;
+  icon: LucideIcon;
   label: string;
   href: string;
   color: string;
 }
 
-const ICON_MAP: Record<string, any> = {
+const ICON_MAP: Record<string, LucideIcon> = {
   LayoutDashboard,
   Compass,
   Map,
@@ -47,7 +47,6 @@ const ICON_MAP: Record<string, any> = {
   User,
   Settings,
   LogOut,
-  Login,
   Menu,
   ChevronLeft,
 };

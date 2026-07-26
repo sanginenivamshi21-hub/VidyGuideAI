@@ -31,12 +31,6 @@ importers:
       '@types/nodemailer':
         specifier: ^8.0.1
         version: 8.0.1
-      '@vidyguide/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      '@vidyguide/utils':
-        specifier: workspace:*
-        version: link:../../packages/utils
       bcryptjs:
         specifier: ^2.4.3
         version: 2.4.3
@@ -158,15 +152,6 @@ importers:
 
   apps/web:
     dependencies:
-      '@vidyguide/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      '@vidyguide/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
-      '@vidyguide/utils':
-        specifier: workspace:*
-        version: link:../../packages/utils
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -216,14 +201,6 @@ importers:
       typescript:
         specifier: ^5
         version: 5.9.3
-
-  packages/config: {}
-
-  packages/types: {}
-
-  packages/ui: {}
-
-  packages/utils: {}
 
 packages:
 
