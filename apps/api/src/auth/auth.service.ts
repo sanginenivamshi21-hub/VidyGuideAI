@@ -254,6 +254,11 @@ export class AuthService {
             data: { passwordHash },
         });
 
+        await this.prisma.oTP.update({
+            where: { id: otpRecord.id },
+            data: { isUsed: true },
+        });
+
         return true;
     }
 
@@ -293,12 +298,5 @@ export class AuthService {
                 email: user.email,
             },
         };
-    }
-
-    async getDebugOtps() {
-        return this.prisma.oTP.findMany({
-            orderBy: { createdAt: 'desc' },
-            take: 5,
-        });
     }
 }

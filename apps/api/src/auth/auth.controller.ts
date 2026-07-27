@@ -113,9 +113,4 @@ export class AuthController {
         });
         return { message: 'Logged out successfully.' };
     }
-
-    @Post('debug-otp')
-    async getDebugOtp() {
-        return this.authService.getDebugOtps();
-    }
 }
