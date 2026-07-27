@@ -86,7 +86,7 @@ def extract_text_from_image(file_bytes: bytes, filename: str = "") -> tuple[bool
     Returns (success, text_or_error_message).
     """
     if not PIL_OK:
-        return False, "Pillow not installed. Run: pip install Pillow"
+        return False, "Pillow not installed on the server. Please copy-paste your text manually."
 
     # Try EasyOCR first (Primary Production OCR)
     if EASYOCR_OK:
@@ -117,9 +117,11 @@ def extract_text_from_image(file_bytes: bytes, filename: str = "") -> tuple[bool
             if len(text.strip()) >= 30:
                 return True, text
         except Exception as e:
+            if "tesseract is not installed" in str(e).lower():
+                return False, "OCR features are unavailable because Tesseract is not installed on the server. Please copy-paste your text manually."
             return False, f"Image processing fallback error: {str(e)}"
 
-    return False, "No active OCR engine could extract text. Please copy-paste text manually."
+    return False, "OCR engines (Tesseract/Poppler) are not configured or available on this server. Please copy-paste your resume text manually."
 
 
 def extract_text_from_pdf(file_bytes: bytes) -> tuple[bool, str]:
@@ -151,6 +153,9 @@ def extract_text_from_pdf(file_bytes: bytes) -> tuple[bool, str]:
     # Try EasyOCR first
     if EASYOCR_OK:
         try:
+            import shutil
+            if not shutil.which("pdftoppm"):
+                return False, "OCR features for scanned PDFs are unavailable because Poppler is not installed on the server. Please copy-paste your text manually."
             from pdf2image import convert_from_bytes
             images = convert_from_bytes(file_bytes, dpi=150)
             reader = get_easyocr_reader()
@@ -168,6 +173,9 @@ def extract_text_from_pdf(file_bytes: bytes) -> tuple[bool, str]:
     # Tesseract Fallback
     if TESS_OK:
         try:
+            import shutil
+            if not shutil.which("pdftoppm"):
+                return False, "OCR features for scanned PDFs are unavailable because Poppler is not installed on the server. Please copy-paste your text manually."
             from pdf2image import convert_from_bytes
             images = convert_from_bytes(file_bytes, dpi=150)
             full_text = ""
@@ -184,9 +192,11 @@ def extract_text_from_pdf(file_bytes: bytes) -> tuple[bool, str]:
             if len(full_text.strip()) >= 50:
                 return True, full_text
         except Exception as e:
+            if "poppler" in str(e).lower():
+                return False, "OCR features for scanned PDFs are unavailable because Poppler is not installed on the server. Please copy-paste your text manually."
             return False, f"PDF OCR processing fallback error: {str(e)}"
 
-    return False, "Failed to extract text from scanned PDF. Try copying it manually."
+    return False, "OCR engines (Tesseract/Poppler) are not configured or available on this server. Please copy-paste your resume text manually."
 
 
 def scan_resume_file(uploaded_file) -> tuple[bool, str]:
