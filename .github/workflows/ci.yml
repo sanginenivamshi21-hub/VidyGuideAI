@@ -10,6 +10,26 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: vidyguide_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://postgres:password@localhost:5432/vidyguide_test?schema=public
+      JWT_SECRET: ci-test-jwt-secret-key-vidyguide-token
+      NODE_ENV: test
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -17,12 +37,12 @@ jobs:
     - name: Setup pnpm
       uses: pnpm/action-setup@v4
       with:
-        version: 9
+        version: 10.0.0
 
-    - name: Set up Node.js 20
+    - name: Set up Node.js 22
       uses: actions/setup-node@v4
       with:
-        node-version: '20'
+        node-version: '22'
         cache: 'pnpm'
 
     - name: Install root dependencies

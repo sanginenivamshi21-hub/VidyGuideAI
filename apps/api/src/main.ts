@@ -4,6 +4,7 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { validateEnv } from './config/env.validation';
+import { PrismaService } from './database/prisma.service';
 
 async function bootstrap() {
     validateEnv();
@@ -67,6 +68,23 @@ async function bootstrap() {
             forbidNonWhitelisted: true,
         }),
     );
+
+    // Clean up any dummy users ending with @example.com in production database
+    try {
+        const prisma = app.get(PrismaService);
+        const deleteCount = await prisma.user.deleteMany({
+            where: {
+                email: {
+                    endsWith: '@example.com',
+                },
+            },
+        });
+        if (deleteCount.count > 0) {
+            logger.log(`[DATABASE CLEANUP] Purged ${deleteCount.count} dummy user account(s) ending with @example.com`);
+        }
+    } catch (dbError) {
+        logger.error(`[DATABASE CLEANUP] FAILED to clean up dummy users: ${(dbError as Error).message}`);
+    }
 
     const port = Number(process.env.PORT) || 8000;
     await app.listen(port, '0.0.0.0');

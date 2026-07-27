@@ -35,6 +35,7 @@ export class MailService {
         subject: string,
         htmlContent: string,
     ): Promise<boolean> {
+        this.logger.log(`Sending OTP/Email to: ${to}`);
         this.logger.log(`[EMAIL LOG] To: ${to} | Subject: ${subject}`);
         this.logger.log(
             `[EMAIL LOG] Body: ${htmlContent
