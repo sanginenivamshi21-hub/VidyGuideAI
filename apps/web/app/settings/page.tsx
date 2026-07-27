@@ -84,7 +84,7 @@ export default function SettingsPage() {
   const handlePasswordUpdate = async () => {
     if (password.length < 6) { setPasswordMsg('Password must be at least 6 characters.'); return; }
     try {
-      const res = await fetch('${API_BASE}/users/profile', {
+      const res = await fetch(`${API_BASE}/users/profile`, {
         method: 'PUT', credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password }),
@@ -99,7 +99,7 @@ export default function SettingsPage() {
     if (!confirm('Are you sure you want to permanently delete your account?\n\nThis action CANNOT be undone. All your data will be erased.')) return;
     if (!confirm('This will delete ALL your:\n- Profile & settings\n- Chat conversations\n- Career history\n- Resumes\n- OCR history\n\nAre you absolutely sure?')) return;
     try {
-      const res = await fetch('${API_BASE}/users/account', { method: 'DELETE', credentials: 'include' });
+      const res = await fetch(`${API_BASE}/users/account`, { method: 'DELETE', credentials: 'include' });
       if (res.ok) {
         localStorage.clear();
         router.push('/auth');
@@ -109,7 +109,7 @@ export default function SettingsPage() {
 
   const handleExportData = async () => {
     try {
-      const res = await fetch('${API_BASE}/users/export', { credentials: 'include' });
+      const res = await fetch(`${API_BASE}/users/export`, { credentials: 'include' });
       if (res.ok) {
         const blob = await res.blob();
         const url = URL.createObjectURL(blob);
@@ -126,7 +126,7 @@ export default function SettingsPage() {
     const formData = new FormData();
     formData.append('file', file);
     try {
-      const res = await fetch('${API_BASE}/users/profile/picture', {
+      const res = await fetch(`${API_BASE}/users/profile/picture`, {
         method: 'POST', credentials: 'include', body: formData,
       });
       if (res.ok) {
@@ -138,7 +138,7 @@ export default function SettingsPage() {
 
   const handleDeleteProfilePicture = async () => {
     try {
-      await fetch('${API_BASE}/users/profile/picture', { method: 'DELETE', credentials: 'include' });
+      await fetch(`${API_BASE}/users/profile/picture`, { method: 'DELETE', credentials: 'include' });
       setProfilePicture('');
     } catch {}
   };
@@ -360,7 +360,7 @@ export default function SettingsPage() {
                 <Download size={14} /> Download my data (JSON)
               </button>
               <button onClick={() => {
-                fetch('${API_BASE}/auth/logout', { method: 'POST', credentials: 'include' }).catch(() => {});
+                fetch(`${API_BASE}/auth/logout`, { method: 'POST', credentials: 'include' }).catch(() => {});
                 localStorage.clear();
                 router.push('/auth');
               }} className="w-full text-left px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-lg transition-colors flex items-center gap-2">

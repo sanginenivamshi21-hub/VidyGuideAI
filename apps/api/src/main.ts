@@ -11,7 +11,25 @@ async function bootstrap() {
     const app = await NestFactory.create(AppModule);
     const logger = new Logger('Bootstrap');
 
+    // 1. Enable CORS first to handle OPTIONS preflight correctly before any other middleware
+    app.enableCors({
+        origin: [
+            'https://vidyguideai-web.onrender.com',
+            'http://localhost:3000',
+            'http://localhost:3001',
+            process.env.CLIENT_URL,
+        ].filter(Boolean),
+        credentials: true,
+        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+        allowedHeaders: 'Content-Type, Accept, Authorization, Cookie, X-Requested-With',
+        preflightContinue: false,
+        optionsSuccessStatus: 204,
+    });
+
+    // 2. Cookie parser next
     app.use(cookieParser());
+
+    // 3. Helmet security middleware
     app.use(
         helmet({
             contentSecurityPolicy: {
@@ -26,9 +44,12 @@ async function bootstrap() {
                     ],
                     mediaSrc: ["'self'", 'blob:', 'https:'],
                     frameAncestors: [
-                        process.env.CLIENT_URL || 'http://localhost:3000',
+                        'https://vidyguideai-web.onrender.com',
+                        process.env.CLIENT_URL || '',
+                        'http://localhost:3000',
+                        'http://localhost:3001',
                         "'self'",
-                    ],
+                    ].filter(Boolean),
                     upgradeInsecureRequests: null,
                 },
             },
@@ -38,6 +59,7 @@ async function bootstrap() {
         }),
     );
 
+    // 4. Global validation pipes
     app.useGlobalPipes(
         new ValidationPipe({
             whitelist: true,
@@ -45,15 +67,6 @@ async function bootstrap() {
             forbidNonWhitelisted: true,
         }),
     );
-
-    app.enableCors({
-        origin: [
-            process.env.CLIENT_URL || 'http://localhost:3000',
-            'http://localhost:3001',
-            process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
-        ].filter(Boolean),
-        credentials: true,
-    });
 
     const port = Number(process.env.PORT) || 8000;
     await app.listen(port, '0.0.0.0');

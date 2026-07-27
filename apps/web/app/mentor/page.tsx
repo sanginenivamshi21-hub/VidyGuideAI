@@ -76,7 +76,7 @@ export default function MentorPage() {
 
   const fetchConversations = async () => {
     try {
-      const res = await fetch('${API_BASE}/conversations', { credentials: 'include' });
+      const res = await fetch(`${API_BASE}/conversations`, { credentials: 'include' });
       if (res.ok) {
         const data = await res.json();
         setConversations(Array.isArray(data) ? data : []);
@@ -96,7 +96,7 @@ export default function MentorPage() {
 
   const createConversation = async () => {
     try {
-      const res = await fetch('${API_BASE}/conversations', {
+      const res = await fetch(`${API_BASE}/conversations`, {
         method: 'POST', credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title: 'New Chat' }),
@@ -238,7 +238,7 @@ export default function MentorPage() {
         const fd = new FormData();
         fd.append('file', file);
         try {
-          const res = await fetch('${API_BASE}/ocr/scan', { method: 'POST', body: fd });
+          const res = await fetch(`${API_BASE}/ocr/scan`, { method: 'POST', body: fd });
           if (res.ok) {
             const data = await res.json();
             extraText += `--- ${file.name} ---\n${data.text || '(no text extracted)'}\n`;
@@ -269,7 +269,7 @@ export default function MentorPage() {
     let convId = activeConvId;
     if (!convId) {
       try {
-        const res = await fetch('${API_BASE}/conversations', {
+        const res = await fetch(`${API_BASE}/conversations`, {
           method: 'POST', credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ title: text.slice(0, 50) }),
@@ -297,7 +297,7 @@ export default function MentorPage() {
 
     try {
       const historyMessages = messages.map(m => ({ role: m.role, content: m.content }));
-      const res = await fetch('${API_BASE}/mentor/stream', {
+      const res = await fetch(`${API_BASE}/mentor/stream`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

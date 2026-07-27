@@ -13,6 +13,18 @@ describe('AppController (e2e)', () => {
         }).compile();
 
         app = moduleFixture.createNestApplication();
+        app.enableCors({
+            origin: [
+                'https://vidyguideai-web.onrender.com',
+                'http://localhost:3000',
+                'http://localhost:3001',
+            ],
+            credentials: true,
+            methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+            allowedHeaders: 'Content-Type, Accept, Authorization, Cookie, X-Requested-With',
+            preflightContinue: false,
+            optionsSuccessStatus: 204,
+        });
         await app.init();
     });
 
@@ -20,7 +32,23 @@ describe('AppController (e2e)', () => {
         return request(app.getHttpServer())
             .get('/')
             .expect(200)
-            .expect('Hello World!');
+            .expect({
+                status: 'ok',
+                service: 'VidyGuideAI API',
+            });
+    });
+
+    it('/auth/login (OPTIONS) - CORS preflight', () => {
+        return request(app.getHttpServer())
+            .options('/auth/login')
+            .set('Origin', 'https://vidyguideai-web.onrender.com')
+            .set('Access-Control-Request-Method', 'POST')
+            .set('Access-Control-Request-Headers', 'Content-Type')
+            .expect(204)
+            .expect('Access-Control-Allow-Origin', 'https://vidyguideai-web.onrender.com')
+            .expect('Access-Control-Allow-Credentials', 'true')
+            .expect('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS')
+            .expect('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization, Cookie, X-Requested-With');
     });
 
     afterEach(async () => {
