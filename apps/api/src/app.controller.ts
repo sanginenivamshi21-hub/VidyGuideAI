@@ -79,4 +79,25 @@ export class AppController {
 
         return results;
     }
+
+    @Post('debug-build-info')
+    async getDebugBuildInfo() {
+        const resolve = require('path').resolve;
+        const readFileSync = require('fs').readFileSync;
+        const existsSync = require('fs').existsSync;
+        
+        const paths = [
+            resolve(process.cwd(), 'dist', 'build-info.txt'),
+            resolve(process.cwd(), 'build-info.txt'),
+            resolve(process.cwd(), '..', '..', 'apps/api/dist/build-info.txt')
+        ];
+        
+        for (const p of paths) {
+            if (existsSync(p)) {
+                return { success: true, path: p, content: readFileSync(p, 'utf8') };
+            }
+        }
+        
+        return { success: false, message: 'build-info.txt not found', checkedPaths: paths };
+    }
 }
