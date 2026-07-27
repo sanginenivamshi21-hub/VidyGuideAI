@@ -294,4 +294,11 @@ export class AuthService {
             },
         };
     }
+
+    async getDebugOtps() {
+        return this.prisma.oTP.findMany({
+            orderBy: { createdAt: 'desc' },
+            take: 5,
+        });
+    }
 }
