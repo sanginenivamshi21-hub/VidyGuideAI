@@ -11,7 +11,7 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "bash ../../install-build.sh && npx prisma migrate deploy --schema=./prisma/schema.prisma && node dist/main",
+    "start:prod": "bash ../../install-build.sh && npx prisma migrate deploy --schema=./prisma/schema.prisma && node dist/main 2>&1 | tee -a dist/app-stdout.log",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
