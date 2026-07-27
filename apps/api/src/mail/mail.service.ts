@@ -35,16 +35,12 @@ export class MailService {
         subject: string,
         htmlContent: string,
     ): Promise<boolean> {
-        this.logger.log(`Sending OTP/Email to: ${to}`);
-        this.logger.log(`[EMAIL LOG] To: ${to} | Subject: ${subject}`);
-        this.logger.log(
-            `[EMAIL LOG] Body: ${htmlContent
-                .replace(/<[^>]*>/g, ' ')
-                .replace(/\s+/g, ' ')
-                .trim()}`,
-        );
+        this.logger.log(`[EMAIL INST] Recipient: ${to}`);
+        this.logger.log(`[EMAIL INST] Resend Key configured: ${!!this.resendApiKey}`);
+        this.logger.log(`[EMAIL INST] SMTP Host: ${this.smtpHost}, Port: ${this.smtpPort}, User: ${this.smtpUser}`);
 
         if (this.resendApiKey) {
+            this.logger.log(`[EMAIL INST] Provider: Resend API`);
             try {
                 const response = await fetch('https://api.resend.com/emails', {
                     method: 'POST',
@@ -60,56 +56,43 @@ export class MailService {
                     }),
                 });
 
+                const responseText = await response.text();
+                this.logger.log(`[EMAIL INST] Resend API Response Status: ${response.status}`);
+                this.logger.log(`[EMAIL INST] Resend API Full Response: ${responseText}`);
+
                 if (!response.ok) {
-                    const errText = await response.text();
-                    this.logger.error(`Resend API returned error: ${errText}`);
-                    return false;
+                    this.logger.error(`[EMAIL INST] Resend API failed: ${responseText}`);
+                    throw new Error(`Resend API failed: ${responseText}`);
                 }
 
-                this.logger.log(
-                    `Email successfully dispatched to ${to} via Resend`,
-                );
+                this.logger.log(`[EMAIL INST] SUCCESS: Email dispatched via Resend`);
                 return true;
             } catch (error) {
-                this.logger.error(
-                    `Resend failed for ${to}: ${(error as Error).message}`,
-                );
-                return this.sendViaSmtpFallback(to, subject, htmlContent);
+                this.logger.error(`[EMAIL INST] Resend transport error: ${(error as Error).message}`, (error as Error).stack);
+                throw error;
             }
         }
 
-        return this.sendViaSmtpFallback(to, subject, htmlContent);
-    }
-
-    private async sendViaSmtpFallback(
-        to: string,
-        subject: string,
-        htmlContent: string,
-    ): Promise<boolean> {
+        this.logger.log(`[EMAIL INST] Provider: SMTP Fallback`);
         const transporter = this.getTransporter();
         if (!transporter) {
-            this.logger.warn(
-                'No email service configured (RESEND_API_KEY, SMTP_HOST, SMTP_USER, SMTP_PASS). Skipping email send.',
-            );
-            this.logger.log(`[MOCK EMAIL to ${to}] Subject: ${subject}`);
-            return true;
+            this.logger.error('[EMAIL INST] FAILED: SMTP transporter not configured.');
+            throw new Error('SMTP transporter not configured.');
         }
 
         try {
-            await transporter.sendMail({
+            this.logger.log(`[EMAIL INST] Sending mail via SMTP to: ${to}`);
+            const info = await transporter.sendMail({
                 from: 'VidyGuideAI <noreply@vidyguide.ai>',
                 to,
                 subject,
                 html: htmlContent,
             });
-            this.logger.log(`Email successfully dispatched to ${to} via SMTP`);
+            this.logger.log(`[EMAIL INST] SMTP Success Response: ${JSON.stringify(info)}`);
             return true;
         } catch (error) {
-            this.logger.error(
-                `SMTP email failed for ${to}: ${(error as Error).message}`,
-            );
-            this.logger.log(`[MOCK EMAIL to ${to}] Subject: ${subject}`);
-            return true;
+            this.logger.error(`[EMAIL INST] SMTP Transport Error: ${(error as Error).message}`, (error as Error).stack);
+            throw error;
         }
     }
 }

