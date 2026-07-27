@@ -68,23 +68,31 @@ export class AuthService {
     }
 
     async login(dto: LoginDto) {
+        console.log(`[LOGIN INST] Checking login for email: ${dto.email}`);
         const user = await this.prisma.user.findUnique({
             where: { email: dto.email },
         });
 
         if (!user) {
+            console.log(`[LOGIN INST] FAILED: User not found for email: ${dto.email}`);
             throw new UnauthorizedException('Invalid credentials.');
         }
+        console.log(`[LOGIN INST] SUCCESS: User found. Stored email: ${user.email}, passwordHash exists: ${!!user.passwordHash}`);
 
         let isMatch = false;
         try {
             isMatch = await bcrypt.compare(dto.password, user.passwordHash);
+            console.log(`[LOGIN INST] bcrypt.compare result: ${isMatch}`);
         } catch (error) {
+            console.log(`[LOGIN INST] FAILED: bcrypt.compare threw error: ${(error as Error).message}`);
             throw new UnauthorizedException('Invalid credentials.');
         }
         if (!isMatch) {
+            console.log(`[LOGIN INST] FAILED: Password does not match hash.`);
             throw new UnauthorizedException('Invalid credentials.');
         }
+
+        console.log(`[LOGIN INST] SUCCESS: Authentication check passed.`);
 
         if (!user.isVerified) {
             const otp = this._generateOtp();
