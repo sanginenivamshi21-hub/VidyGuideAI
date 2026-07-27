@@ -48,6 +48,21 @@ export class OcrController {
             let stdoutData = '';
             let stderrData = '';
 
+            pyProcess.on('error', (err) => {
+                this.logger.error('Failed to start Python process:', err);
+                try {
+                    if (existsSync(tempFilePath)) {
+                        unlinkSync(tempFilePath);
+                    }
+                } catch {}
+                reject(
+                    new HttpException(
+                        'OCR engine is unavailable.',
+                        HttpStatus.INTERNAL_SERVER_ERROR,
+                    ),
+                );
+            });
+
             pyProcess.stdout.on('data', (chunk) => {
                 stdoutData += chunk.toString();
             });

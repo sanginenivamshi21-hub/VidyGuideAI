@@ -150,6 +150,13 @@ export class ResumeController {
         const chunks: Buffer[] = [];
         let errText = '';
 
+        pyProcess.on('error', (err) => {
+            this.logger.error('Failed to start PDF generation process:', err);
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+                error: 'PDF generation tool is unavailable',
+            });
+        });
+
         pyProcess.stdout.on('data', (chunk) => {
             chunks.push(chunk);
         });
