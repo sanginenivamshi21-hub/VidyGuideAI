@@ -1,4 +1,8 @@
 #!/bin/bash
+# Get the directory of this script (the workspace root)
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+cd "$DIR"
+
 mkdir -p apps/api/dist
 echo "=== Build Environment Diagnostics ===" > apps/api/dist/build-info.txt
 date >> apps/api/dist/build-info.txt
@@ -7,7 +11,7 @@ echo "Python3 path: $(which python3)" >> apps/api/dist/build-info.txt
 echo "Python3 version: $(python3 --version 2>&1)" >> apps/api/dist/build-info.txt
 echo "Pip3 path: $(which pip3)" >> apps/api/dist/build-info.txt
 
-# Create venv
+# Create venv at workspace root
 python3 -m venv .venv 2>&1 >> apps/api/dist/build-info.txt
 if [ -d ".venv" ]; then
   echo "Virtual env created successfully at .venv" >> apps/api/dist/build-info.txt
