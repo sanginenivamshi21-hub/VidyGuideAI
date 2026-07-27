@@ -20,9 +20,10 @@ export class AuthService {
     ) {}
 
     async register(dto: RegisterDto) {
+        const email = dto.email.trim().toLowerCase();
         const existing = await this.prisma.user.findFirst({
             where: {
-                OR: [{ username: dto.username }, { email: dto.email }],
+                OR: [{ username: dto.username }, { email }],
             },
         });
 
@@ -36,7 +37,7 @@ export class AuthService {
         const user = await this.prisma.user.create({
             data: {
                 username: dto.username,
-                email: dto.email,
+                email,
                 passwordHash,
                 fullName: dto.fullName,
             },
@@ -47,7 +48,7 @@ export class AuthService {
 
         await this.prisma.oTP.create({
             data: {
-                email: dto.email,
+                email,
                 code: otp,
                 purpose: 'register',
                 expiresAt,
@@ -55,10 +56,17 @@ export class AuthService {
         });
 
         const emailSent = await this.mailService.sendEmail(
-            dto.email,
+            email,
             'VidyGuideAI - Registration OTP',
             `<p>Your registration OTP is: <strong>${otp}</strong>. It will expire in 10 minutes.</p>`,
         );
+
+        if (!emailSent) {
+            return {
+                message: 'Unable to send OTP email. Please try again later.',
+                userId: user.id,
+            };
+        }
 
         return {
             message: 'Registration successful. OTP sent to email.',
@@ -68,13 +76,14 @@ export class AuthService {
     }
 
     async login(dto: LoginDto) {
-        console.log(`[LOGIN INST] Checking login for email: ${dto.email}`);
+        const email = dto.email.trim().toLowerCase();
+        console.log(`[LOGIN INST] Checking login for email: ${email}`);
         const user = await this.prisma.user.findUnique({
-            where: { email: dto.email },
+            where: { email },
         });
 
         if (!user) {
-            console.log(`[LOGIN INST] FAILED: User not found for email: ${dto.email}`);
+            console.log(`[LOGIN INST] FAILED: User not found for email: ${email}`);
             throw new UnauthorizedException('Invalid credentials.');
         }
         console.log(`[LOGIN INST] SUCCESS: User found. Stored email: ${user.email}, passwordHash exists: ${!!user.passwordHash}`);
@@ -100,18 +109,24 @@ export class AuthService {
 
             await this.prisma.oTP.create({
                 data: {
-                    email: dto.email,
+                    email,
                     code: otp,
                     purpose: 'login',
                     expiresAt,
                 },
             });
 
-            await this.mailService.sendEmail(
-                dto.email,
+            const emailSent = await this.mailService.sendEmail(
+                email,
                 'VidyGuideAI - Login Verification OTP',
                 `<p>Your login verification OTP is: <strong>${otp}</strong>. It will expire in 10 minutes.</p>`,
             );
+
+            if (!emailSent) {
+                return {
+                    message: 'Unable to send OTP email. Please try again later.',
+                };
+            }
 
             return {
                 message:
@@ -140,9 +155,10 @@ export class AuthService {
         };
         message: string;
     }> {
+        const emailLower = email.trim().toLowerCase();
         const otpRecord = await this.prisma.oTP.findFirst({
             where: {
-                email,
+                email: emailLower,
                 code,
                 purpose,
                 isUsed: false,
@@ -161,12 +177,12 @@ export class AuthService {
 
         if (purpose === 'register') {
             await this.prisma.user.update({
-                where: { email },
+                where: { email: emailLower },
                 data: { isVerified: true },
             });
 
             const user = await this.prisma.user.findUnique({
-                where: { email },
+                where: { email: emailLower },
             });
             if (user) {
                 const tokens = this._issueTokens(user);
@@ -180,7 +196,7 @@ export class AuthService {
 
         if (purpose === 'login') {
             const user = await this.prisma.user.findUnique({
-                where: { email },
+                where: { email: emailLower },
             });
             if (user && user.isVerified) {
                 const tokens = this._issueTokens(user);
@@ -198,8 +214,9 @@ export class AuthService {
     async forgotPassword(
         email: string,
     ): Promise<{ success: boolean; devOtp?: string }> {
+        const emailLower = email.trim().toLowerCase();
         const user = await this.prisma.user.findUnique({
-            where: { email },
+            where: { email: emailLower },
         });
 
         if (!user) {
@@ -211,7 +228,7 @@ export class AuthService {
 
         await this.prisma.oTP.create({
             data: {
-                email,
+                email: emailLower,
                 code: otp,
                 purpose: 'reset_password',
                 expiresAt,
@@ -219,7 +236,7 @@ export class AuthService {
         });
 
         await this.mailService.sendEmail(
-            email,
+            emailLower,
             'VidyGuideAI - Password Reset OTP',
             `<p>You requested a password reset. Your OTP is: <strong>${otp}</strong>. It will expire in 10 minutes.</p>`,
         );
@@ -235,9 +252,10 @@ export class AuthService {
         code: string,
         passwordPlain: string,
     ): Promise<boolean> {
+        const emailLower = email.trim().toLowerCase();
         const otpRecord = await this.prisma.oTP.findFirst({
             where: {
-                email,
+                email: emailLower,
                 code,
                 purpose: 'reset_password',
                 isUsed: false,
@@ -258,13 +276,8 @@ export class AuthService {
         const passwordHash = await bcrypt.hash(passwordPlain, salt);
 
         await this.prisma.user.update({
-            where: { email },
+            where: { email: emailLower },
             data: { passwordHash },
-        });
-
-        await this.prisma.oTP.update({
-            where: { id: otpRecord.id },
-            data: { isUsed: true },
         });
 
         return true;
@@ -295,7 +308,7 @@ export class AuthService {
                     expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
                 },
             })
-            .catch(() => {});
+            .catch((err) => console.error('[SESSION] Failed to create session:', (err as Error).message));
 
         return {
             accessToken,

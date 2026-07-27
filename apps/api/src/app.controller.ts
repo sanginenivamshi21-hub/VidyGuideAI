@@ -22,37 +22,34 @@ export class AppController {
 
     @Post('debug-smtp-test')
     async debugSmtpTest(@Body() body: any) {
-        const nodemailer = require('nodemailer');
-        const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
-        const smtpPort = parseInt(process.env.SMTP_PORT || '587', 10);
-        const smtpUser = process.env.SMTP_USER || '';
-        const smtpPass = process.env.SMTP_PASS || '';
+        const { Resend } = require('resend');
+        const apiKey = process.env.RESEND_API_KEY || '';
+        const fromEmail = process.env.RESEND_FROM_EMAIL || process.env.SMTP_USER || 'noreply@vidyguide.ai';
 
-        const transporter = nodemailer.createTransport({
-            host: smtpHost,
-            port: smtpPort,
-            secure: smtpPort === 465,
-            auth: {
-                user: smtpUser,
-                pass: smtpPass,
-            },
-        });
+        if (!apiKey) {
+            return { success: false, message: 'RESEND_API_KEY is not configured.' };
+        }
 
+        const resend = new Resend(apiKey);
         try {
-            const info = await transporter.sendMail({
-                from: 'VidyGuideAI <noreply@vidyguide.ai>',
-                to: body.to || smtpUser,
-                subject: 'VidyGuideAI SMTP Diagnostics Test',
-                html: '<p>This is a test email sent from VidyGuideAI production diagnostics.</p>',
+            const { data, error } = await resend.emails.send({
+                from: `VidyGuideAI <${fromEmail}>`,
+                to: [body.to || fromEmail],
+                subject: 'VidyGuideAI Email Diagnostics Test',
+                html: '<p>This is a test email sent from VidyGuideAI production diagnostics via Resend.</p>',
             });
-            return { success: true, info };
+
+            if (error) {
+                return { success: false, message: error.message };
+            }
+
+            return { success: true, id: data?.id };
         } catch (error) {
-            console.error('SMTP Diagnostic Failure:', error);
-            return { 
-                success: false, 
-                message: (error as Error).message, 
+            console.error('Resend Diagnostic Failure:', error);
+            return {
+                success: false,
+                message: (error as Error).message,
                 stack: (error as Error).stack,
-                errorDetails: JSON.parse(JSON.stringify(error, Object.getOwnPropertyNames(error)))
             };
         }
     }
