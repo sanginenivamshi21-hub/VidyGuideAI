@@ -9,6 +9,7 @@ import {
   createEmptyResume, saveResume, loadResume,
   createEmptyEnhancedExperience, createEmptyEnhancedProject,
   createEmptyEducation, createEmptyCertification, createEmptyAchievement,
+  createEmptyVolunteer, createEmptyPublication,
 } from '@/components/resume/types';
 import ResumePreview from '@/components/resume/ResumePreview';
 import {
@@ -25,8 +26,10 @@ const STEPS = [
   { id: 5, label: 'Skills', short: 'Skills' },
   { id: 6, label: 'Certifications', short: 'Certs' },
   { id: 7, label: 'Achievements', short: 'Awards' },
-  { id: 8, label: 'Languages', short: 'Lang' },
-  { id: 9, label: 'Review', short: 'Review' },
+  { id: 8, label: 'Volunteer', short: 'Vol' },
+  { id: 9, label: 'Publications', short: 'Pub' },
+  { id: 10, label: 'Languages', short: 'Lang' },
+  { id: 11, label: 'Review', short: 'Review' },
 ];
 
 const EXPERIENCE_LEVELS = ['Fresher', 'Junior (1-2 years)', 'Mid-Level (3-5 years)', 'Senior (6-9 years)', 'Lead (10+ years)'];
@@ -474,8 +477,10 @@ export default function ResumeBuilderPage() {
               {step === 5 && <SkillsStep data={data} updateData={updateData} roleConfig={currentRoleConfig} />}
               {step === 6 && <CertificationsStep data={data} updateData={updateData} />}
               {step === 7 && <AchievementsStep data={data} updateData={updateData} />}
-              {step === 8 && <LanguagesStep data={data} updateData={updateData} />}
-              {step === 9 && <ReviewStep data={data} generatedResume={generatedResume} error={error} handleGenerate={handleGenerate} handleDownloadPdf={handleDownloadPdf} generating={generating} qualityChecks={qualityChecks} showQualityCheck={showQualityCheck} setShowQualityCheck={setShowQualityCheck} runQualityChecks={runQualityChecks} />}
+              {step === 8 && <VolunteerStep data={data} updateData={updateData} />}
+              {step === 9 && <PublicationsStep data={data} updateData={updateData} />}
+              {step === 10 && <LanguagesStep data={data} updateData={updateData} />}
+              {step === 11 && <ReviewStep data={data} generatedResume={generatedResume} error={error} handleGenerate={handleGenerate} handleDownloadPdf={handleDownloadPdf} generating={generating} qualityChecks={qualityChecks} showQualityCheck={showQualityCheck} setShowQualityCheck={setShowQualityCheck} runQualityChecks={runQualityChecks} />}
             </div>
 
             {/* Navigation */}
@@ -488,9 +493,9 @@ export default function ResumeBuilderPage() {
                 <ArrowLeft size={16} /> Back
               </button>
               <div className="flex items-center gap-2">
-                {step < 9 && (
+                {step < 11 && (
                   <button
-                    onClick={() => setStep(s => Math.min(9, s + 1))}
+                    onClick={() => setStep(s => Math.min(11, s + 1))}
                     className="flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-emerald-500/20 transition-all"
                   >
                     Next <ArrowRight size={16} />
@@ -1024,6 +1029,80 @@ function LanguagesStep({ data, updateData }: any) {
           className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm"
         />
       </div>
+    </div>
+  );
+}
+
+function VolunteerStep({ data, updateData }: any) {
+  const add = () => updateData({ volunteer: [...data.volunteer, createEmptyVolunteer()] });
+  const update = (id: string, field: string, value: any) => updateData({ volunteer: data.volunteer.map((v: any) => v.id === id ? { ...v, [field]: value } : v) });
+  const remove = (id: string) => updateData({ volunteer: data.volunteer.filter((v: any) => v.id !== id) });
+
+  return (
+    <div className="flex flex-col gap-4 animate-fadeIn">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-purple-500/10 border border-purple-500/20 rounded-xl text-purple-400"><Sparkles size={20} /></div>
+          <h2 className="text-xl font-bold text-white">Volunteer Experience</h2>
+        </div>
+        <button onClick={add} className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold rounded-lg hover:bg-emerald-500/20 transition-all"><span className="text-lg leading-none">+</span> Add</button>
+      </div>
+      {data.volunteer.length === 0 && <p className="text-sm text-slate-500 italic py-8 text-center">Add volunteer or community service experience.</p>}
+      {data.volunteer.map((item: any, idx: number) => (
+        <div key={item.id} className="p-4 bg-slate-950/50 border border-slate-800 rounded-xl flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Entry {idx + 1}</span>
+            <button onClick={() => remove(item.id)} className="p-1 text-slate-500 hover:text-red-400"><span className="text-lg leading-none">&times;</span></button>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <input value={item.organization} onChange={e => update(item.id, 'organization', e.target.value)} placeholder="Organization" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
+            <input value={item.role} onChange={e => update(item.id, 'role', e.target.value)} placeholder="Role" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
+            <input value={item.startDate} onChange={e => update(item.id, 'startDate', e.target.value)} placeholder="Start date" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
+            <div className="flex gap-2 items-center">
+              {!item.current && <input value={item.endDate} onChange={e => update(item.id, 'endDate', e.target.value)} placeholder="End date" className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />}
+            </div>
+          </div>
+          <label className="flex items-center gap-2 text-sm text-slate-400 cursor-pointer">
+            <input type="checkbox" checked={item.current} onChange={e => update(item.id, 'current', e.target.checked)} className="accent-emerald-500" />
+            Currently active
+          </label>
+          <textarea value={item.description} onChange={e => update(item.id, 'description', e.target.value)} placeholder="Describe your volunteer work and impact..." rows={2} className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm resize-none" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function PublicationsStep({ data, updateData }: any) {
+  const add = () => updateData({ publications: [...data.publications, createEmptyPublication()] });
+  const update = (id: string, field: string, value: string) => updateData({ publications: data.publications.map((p: any) => p.id === id ? { ...p, [field]: value } : p) });
+  const remove = (id: string) => updateData({ publications: data.publications.filter((p: any) => p.id !== id) });
+
+  return (
+    <div className="flex flex-col gap-4 animate-fadeIn">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-sky-500/10 border border-sky-500/20 rounded-xl text-sky-400"><Sparkles size={20} /></div>
+          <h2 className="text-xl font-bold text-white">Publications</h2>
+        </div>
+        <button onClick={add} className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold rounded-lg hover:bg-emerald-500/20 transition-all"><span className="text-lg leading-none">+</span> Add</button>
+      </div>
+      {data.publications.length === 0 && <p className="text-sm text-slate-500 italic py-8 text-center">Add research papers, articles, blog posts, or other publications.</p>}
+      {data.publications.map((item: any, idx: number) => (
+        <div key={item.id} className="p-4 bg-slate-950/50 border border-slate-800 rounded-xl flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Pub {idx + 1}</span>
+            <button onClick={() => remove(item.id)} className="p-1 text-slate-500 hover:text-red-400"><span className="text-lg leading-none">&times;</span></button>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <input value={item.title} onChange={e => update(item.id, 'title', e.target.value)} placeholder="Title" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
+            <input value={item.venue} onChange={e => update(item.id, 'venue', e.target.value)} placeholder="Conference / Journal / Venue" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
+            <input value={item.date} onChange={e => update(item.id, 'date', e.target.value)} placeholder="Date" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
+            <input value={item.link} onChange={e => update(item.id, 'link', e.target.value)} placeholder="DOI / URL" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
+          </div>
+          <textarea value={item.description} onChange={e => update(item.id, 'description', e.target.value)} placeholder="Brief description, key findings, or abstract..." rows={2} className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm resize-none" />
+        </div>
+      ))}
     </div>
   );
 }

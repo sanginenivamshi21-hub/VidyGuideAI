@@ -13,6 +13,21 @@ import type { Response } from 'express';
 export class MentorController {
     constructor(private readonly aiService: AiService) {}
 
+    private langInstructions: Record<string, string> = {
+        en: 'Reply in English.',
+        te: 'IMPORTANT: Reply ONLY in Telugu (తెలుగు). Do not use English at all.',
+        hi: 'IMPORTANT: Reply ONLY in Hindi (हिन्दी). Do not use English at all.',
+        ta: 'IMPORTANT: Reply ONLY in Tamil (தமிழ்). Do not use English at all.',
+        kn: 'IMPORTANT: Reply ONLY in Kannada (ಕನ್ನಡ). Do not use English at all.',
+        ml: 'IMPORTANT: Reply ONLY in Malayalam (മലയാളം). Do not use English at all.',
+        mr: 'IMPORTANT: Reply ONLY in Marathi (मराठी). Do not use English at all.',
+    };
+
+    private buildMentorPrompt(replyLang: string): string {
+        const lang = this.langInstructions[replyLang] || this.langInstructions.en;
+        return `You are VidyGuide AI Mentor — a warm, experienced career counselor for Indian students and young professionals. Give clear, practical, actionable career advice. Be encouraging but honest. End with one concrete next step. Use Markdown with headers, lists, and emojis naturally. ${lang}`;
+    }
+
     @Post()
     async askMentor(@Body() body: any) {
         const question = body.question || '';
@@ -20,24 +35,8 @@ export class MentorController {
         const model = body.model || 'llama-3.3-70b-versatile';
         const temperature = body.temperature ?? 0.7;
 
-        const langInstructions: Record<string, string> = {
-            en: 'Reply in English.',
-            te: 'IMPORTANT: Reply ONLY in Telugu (తెలుగు). Do not use English at all.',
-            hi: 'IMPORTANT: Reply ONLY in Hindi (हिन्दी). Do not use English at all.',
-            ta: 'IMPORTANT: Reply ONLY in Tamil (தமிழ்). Do not use English at all.',
-            kn: 'IMPORTANT: Reply ONLY in Kannada (ಕನ್ನಡ). Do not use English at all.',
-            ml: 'IMPORTANT: Reply ONLY in Malayalam (മലയാളം). Do not use English at all.',
-            mr: 'IMPORTANT: Reply ONLY in Marathi (मराठी). Do not use English at all.',
-            bn: 'IMPORTANT: Reply ONLY in Bengali (বাংলা). Do not use English at all.',
-            gu: 'IMPORTANT: Reply ONLY in Gujarati (ગુજરાતી). Do not use English at all.',
-        };
-
-        const langInstr = langInstructions[replyLang] || langInstructions.en;
-
-        const systemPrompt = `You are VidyGuide AI Mentor — a warm, experienced career counselor for Indian students and young professionals. Give clear, practical, actionable career advice. Be encouraging but honest. End with one concrete next step. Use Markdown formatting with headers, lists, and emojis naturally. ${langInstr}`;
-
         const responseText = await this.aiService.generateText(
-            systemPrompt,
+            this.buildMentorPrompt(replyLang),
             question,
             temperature,
             model,
@@ -54,20 +53,6 @@ export class MentorController {
         const maxTokens = body.maxTokens ?? 2048;
         const messages = body.messages || [];
 
-        const langInstructions: Record<string, string> = {
-            en: 'Reply in English.',
-            te: 'IMPORTANT: Reply ONLY in Telugu (తెలుగు). Do not use English at all.',
-            hi: 'IMPORTANT: Reply ONLY in Hindi (हिन्दी). Do not use English at all.',
-            ta: 'IMPORTANT: Reply ONLY in Tamil (தமிழ்). Do not use English at all.',
-            kn: 'IMPORTANT: Reply ONLY in Kannada (ಕನ್ನಡ). Do not use English at all.',
-            ml: 'IMPORTANT: Reply ONLY in Malayalam (മലയാളം). Do not use English at all.',
-            mr: 'IMPORTANT: Reply ONLY in Marathi (मराठी). Do not use English at all.',
-        };
-
-        const langInstr = langInstructions[replyLang] || langInstructions.en;
-
-        const systemPrompt = `You are VidyGuide AI Mentor — a warm, experienced career counselor for Indian students and young professionals. Give clear, practical, actionable career advice. Be encouraging but honest. Use Markdown formatting with headers, lists, tables, and emojis naturally. ${langInstr}`;
-
         res.setHeader('Content-Type', 'text/event-stream');
         res.setHeader('Cache-Control', 'no-cache');
         res.setHeader('Connection', 'keep-alive');
@@ -79,7 +64,7 @@ export class MentorController {
             }));
 
             const stream = await this.aiService.generateTextStream(
-                systemPrompt,
+                this.buildMentorPrompt(replyLang),
                 question,
                 temperature,
                 model,

@@ -60,6 +60,25 @@ export interface Achievement {
   date: string;
 }
 
+export interface Volunteer {
+  id: string;
+  organization: string;
+  role: string;
+  startDate: string;
+  endDate: string;
+  current: boolean;
+  description: string;
+}
+
+export interface Publication {
+  id: string;
+  title: string;
+  venue: string;
+  date: string;
+  link: string;
+  description: string;
+}
+
 export interface Language {
   id: string;
   name: string;
@@ -114,6 +133,8 @@ export interface ResumeData {
   achievements: Achievement[];
   languages: Language[];
   socialLinks: SocialLink[];
+  volunteer: Volunteer[];
+  publications: Publication[];
   template: ResumeTemplate;
   target: ResumeTarget;
   interests: string[];
@@ -139,6 +160,8 @@ export function createEmptyResume(): ResumeData {
     achievements: [],
     languages: [],
     socialLinks: [],
+    volunteer: [],
+    publications: [],
     template: 'professional',
     target: { role: '', industry: '', experienceLevel: '', country: '' },
     interests: [],
@@ -196,4 +219,12 @@ export function createEmptyCertification(): Certification {
 
 export function createEmptyAchievement(): Achievement {
   return { id: crypto.randomUUID(), title: '', description: '', date: '' };
+}
+
+export function createEmptyVolunteer(): Volunteer {
+  return { id: crypto.randomUUID(), organization: '', role: '', startDate: '', endDate: '', current: false, description: '' };
+}
+
+export function createEmptyPublication(): Publication {
+  return { id: crypto.randomUUID(), title: '', venue: '', date: '', link: '', description: '' };
 }
