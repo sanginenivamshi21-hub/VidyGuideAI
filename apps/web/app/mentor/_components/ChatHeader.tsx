@@ -19,7 +19,7 @@ export default function ChatHeader({
 }: ChatHeaderProps) {
   return (
     <div
-      className="flex items-center justify-between px-4 py-3 border-b shrink-0 safe-area-top"
+      className="flex items-center justify-between px-4 py-2 lg:py-3 border-b shrink-0 safe-area-top"
       style={{ backgroundColor: 'rgba(15,23,42,0.8)', borderColor: 'rgba(51,65,85,0.5)' }}
     >
       <div className="flex items-center gap-2">
@@ -39,13 +39,13 @@ export default function ChatHeader({
             {showSidebar ? <PanelLeftClose size={18} /> : <PanelLeft size={18} />}
           </button>
         )}
-        <h1 className="text-sm font-bold text-white tracking-wide">AI Mentor</h1>
+        <h1 className="hidden lg:block text-sm font-bold text-white tracking-wide">AI Mentor</h1>
       </div>
       <div className="flex items-center gap-1">
         {hasMessages && (
           <button
             onClick={onNewChat}
-            className="p-2 rounded-lg hover:bg-slate-800 text-slate-400 active:bg-slate-700 transition-colors touch-manipulation"
+            className="hidden lg:block p-2 rounded-lg hover:bg-slate-800 text-slate-400 active:bg-slate-700 transition-colors touch-manipulation"
             title="New chat"
           >
             <SquarePen size={16} />

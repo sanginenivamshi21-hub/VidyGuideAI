@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { Copy, RefreshCw, Volume2, ChevronDown, Check } from 'lucide-react';
-import MarkdownRenderer from '@/components/MarkdownRenderer';
+import dynamic from 'next/dynamic';
 import type { ChatMessage as ChatMessageType } from '../types';
 
 interface ChatMessageProps {
@@ -13,7 +13,9 @@ interface ChatMessageProps {
   onCopy?: (text: string) => void;
 }
 
-export default function ChatMessage({
+const MarkdownRenderer = dynamic(() => import('@/components/MarkdownRenderer'), { ssr: false });
+
+const ChatMessage = memo(function ChatMessage({
   message,
   isLast,
   isStreaming,
@@ -34,10 +36,10 @@ export default function ChatMessage({
   return (
     <div className={`mb-3 message-enter flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
       <div
-        className="max-w-[88%] sm:max-w-[80%] min-w-0"
+        className={`max-w-[88%] sm:max-w-[80%] min-w-0 ${message.role === 'assistant' ? 'bg-slate-800/30 border border-slate-800/30' : ''}`}
         style={{
-          backgroundColor: message.role === 'user' ? 'var(--accent-10)' : 'rgba(30,41,59,0.3)',
-          border: message.role === 'user' ? '1px solid var(--accent-20)' : '1px solid rgba(51,65,85,0.3)',
+          backgroundColor: message.role === 'user' ? 'var(--accent-10)' : undefined,
+          border: message.role === 'user' ? '1px solid var(--accent-20)' : undefined,
           borderRadius: message.role === 'user' ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
           padding: '12px 16px',
         }}
@@ -49,8 +51,7 @@ export default function ChatMessage({
                 {message.attachments.map((att, ai) => (
                   <div
                     key={ai}
-                    className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px]"
-                    style={{ backgroundColor: 'rgba(30,41,59,0.6)', border: '1px solid rgba(51,65,85,0.4)' }}
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px] bg-slate-800/60 border border-slate-800/40"
                   >
                     <span className={att.type.startsWith('image/') ? 'text-blue-400' : 'text-slate-400'}>
                       {att.type.startsWith('image/') ? '🖼️' : att.type === 'application/pdf' ? '📄' : '📎'}
@@ -72,8 +73,7 @@ export default function ChatMessage({
         )}
         {message.role === 'assistant' && message.content && isLast && !isStreaming && (
           <div
-            className="flex items-center gap-1 mt-2 pt-2 border-t"
-            style={{ borderColor: 'rgba(51,65,85,0.25)' }}
+            className="flex items-center gap-1 mt-2 pt-2 border-t border-slate-800/25"
           >
             <button
               onClick={handleCopy}
@@ -114,4 +114,6 @@ export default function ChatMessage({
       </div>
     </div>
   );
-}
+});
+
+export default ChatMessage;

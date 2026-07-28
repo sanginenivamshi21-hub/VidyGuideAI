@@ -9,6 +9,8 @@ import ChatHeader from './_components/ChatHeader';
 import ChatMessages from './_components/ChatMessages';
 import ChatComposer from './_components/ChatComposer';
 import ConversationDrawer from './_components/ConversationDrawer';
+import ToolPalette from './_components/ToolPalette';
+import VoiceRecorder from './_components/VoiceRecorder';
 import type { ChatMessage, Conversation } from './types';
 
 const MAX_FILE_SIZE = 20 * 1024 * 1024;
@@ -28,6 +30,8 @@ export default function MentorPage() {
   const [attachments, setAttachments] = useState<File[]>([]);
   const [attachmentPreviews, setAttachmentPreviews] = useState<Record<number, string>>({});
   const [fileError, setFileError] = useState('');
+  const [toolPaletteOpen, setToolPaletteOpen] = useState(false);
+  const [voiceRecorderOpen, setVoiceRecorderOpen] = useState(false);
 
   const chatRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -61,7 +65,7 @@ export default function MentorPage() {
     setIsStreaming(false);
   }, []);
 
-  const loadConversation = async (id: number) => {
+  const loadConversation = useCallback(async (id: number) => {
     try {
       const res = await fetch(`${API_BASE}/conversations/${id}`, { credentials: 'include' });
       if (res.ok) {
@@ -76,9 +80,9 @@ export default function MentorPage() {
         );
       }
     } catch { /* ignore */ }
-  };
+  }, []);
 
-  const deleteConversation = async (id: number) => {
+  const deleteConversation = useCallback(async (id: number) => {
     try {
       await fetch(`${API_BASE}/conversations/${id}`, { method: 'DELETE', credentials: 'include' });
       if (activeConvId === id) {
@@ -87,9 +91,9 @@ export default function MentorPage() {
       }
       fetchConversations();
     } catch { /* ignore */ }
-  };
+  }, [activeConvId]);
 
-  const togglePin = async (conv: Conversation) => {
+  const togglePin = useCallback(async (conv: Conversation) => {
     try {
       await fetch(`${API_BASE}/conversations/${conv.id}`, {
         method: 'PUT',
@@ -99,9 +103,9 @@ export default function MentorPage() {
       });
       fetchConversations();
     } catch { /* ignore */ }
-  };
+  }, []);
 
-  const renameConversation = async (id: number, title: string) => {
+  const renameConversation = useCallback(async (id: number, title: string) => {
     try {
       await fetch(`${API_BASE}/conversations/${id}`, {
         method: 'PUT',
@@ -111,9 +115,9 @@ export default function MentorPage() {
       });
       fetchConversations();
     } catch { /* ignore */ }
-  };
+  }, []);
 
-  const saveMessage = async (role: string, content: string) => {
+  const saveMessage = useCallback(async (role: string, content: string) => {
     if (!activeConvId) return;
     try {
       await fetch(`${API_BASE}/conversations/${activeConvId}/messages`, {
@@ -123,13 +127,13 @@ export default function MentorPage() {
         body: JSON.stringify({ role, content }),
       });
     } catch { /* ignore */ }
-  };
+  }, [activeConvId]);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     if (chatRef.current) {
       chatRef.current.scrollTo({ top: chatRef.current.scrollHeight, behavior: 'smooth' });
     }
-  };
+  }, []);
 
   useEffect(() => {
     const el = chatRef.current;
@@ -140,6 +144,15 @@ export default function MentorPage() {
     el.addEventListener('scroll', handleScroll);
     return () => el.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const insertToolResult = useCallback((text: string) => {
+    setMessages((prev) => [...prev, {
+      role: 'assistant',
+      content: text,
+      timestamp: getTimestamp(),
+    }]);
+    if (activeConvId && settings.chatHistory) saveMessage('assistant', text);
+  }, [activeConvId, settings.chatHistory]);
 
   const stopStreaming = useCallback(() => {
     if (streamAbortRef.current) {
@@ -160,7 +173,7 @@ export default function MentorPage() {
     { key: 'n', ctrl: true, shift: true, handler: () => handleNewChat(), description: 'New chat' },
   ]);
 
-  const speakText = (text: string) => {
+  const speakText = useCallback((text: string) => {
     if (!window.speechSynthesis) return;
     window.speechSynthesis.cancel();
     const cleanText = text.replace(/[#*\[\]()>|`\-\\]/g, '').slice(0, 2000);
@@ -173,17 +186,17 @@ export default function MentorPage() {
       if (voice) utterance.voice = voice;
     }
     window.speechSynthesis.speak(utterance);
-  };
+  }, [settings.speechRate, settings.speechPitch, settings.voiceName]);
 
-  const copyToClipboard = (text: string) => navigator.clipboard.writeText(text);
+  const copyToClipboard = useCallback((text: string) => navigator.clipboard.writeText(text), []);
 
-  const getTimestamp = () =>
-    new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const getTimestamp = useCallback(() =>
+    new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), []);
 
-  const validateFile = (file: File): string | null => {
+  const validateFile = useCallback((file: File): string | null => {
     if (file.size > MAX_FILE_SIZE) return `${file.name} exceeds the 20MB limit`;
     return null;
-  };
+  }, []);
 
   const addFiles = useCallback(
     (files: FileList | File[]) => {
@@ -214,15 +227,15 @@ export default function MentorPage() {
     []
   );
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) addFiles(e.target.files);
     e.target.value = '';
-  };
+  }, [addFiles]);
 
-  const removeAttachment = (index: number) => {
+  const removeAttachment = useCallback((index: number) => {
     setAttachments((prev) => {
       const removed = prev[index];
-      if (removed?.type.startsWith('image/') && attachmentPreviews[index]) {
+      if (removed?.type.startsWith('image/')) {
         URL.revokeObjectURL(attachmentPreviews[index]);
       }
       return prev.filter((_, i) => i !== index);
@@ -232,7 +245,7 @@ export default function MentorPage() {
       delete next[index];
       return next;
     });
-  };
+  }, [attachmentPreviews]);
 
   const processAttachments = async (): Promise<string> => {
     if (attachments.length === 0) return '';
@@ -393,41 +406,31 @@ export default function MentorPage() {
     [messages, attachments, activeConvId, isStreaming, settings]
   );
 
-  const startVoiceInput = () => {
-    const SR =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SR) return;
-    const recognition = new SR();
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    const langMap: Record<string, string> = {
-      en: 'en-US', hi: 'hi-IN', te: 'te-IN', ta: 'ta-IN', kn: 'kn-IN',
-      ml: 'ml-IN', mr: 'mr-IN', bn: 'bn-IN', gu: 'gu-IN',
-    };
-    recognition.lang = langMap[settings.language] || 'en-US';
-    recognition.onresult = (event: any) => {
-      setInput((prev) => prev + ' ' + event.results[0][0].transcript);
-      setTimeout(() => document.querySelector<HTMLTextAreaElement>('textarea')?.focus(), 100);
-    };
-    recognition.start();
-  };
+  const startVoiceInput = useCallback(() => {
+    setVoiceRecorderOpen(true);
+  }, []);
 
-  const regenerateLast = () => {
+  const handleVoiceResult = useCallback((text: string) => {
+    setInput((prev) => prev + ' ' + text);
+    setTimeout(() => document.querySelector<HTMLTextAreaElement>('textarea')?.focus(), 100);
+  }, []);
+
+  const regenerateLast = useCallback(() => {
     const lastUserMsg = [...messages].reverse().find((m) => m.role === 'user');
     if (lastUserMsg) {
       setMessages((prev) => prev.slice(0, prev.length - 1));
       sendMessage(lastUserMsg.content);
     }
-  };
+  }, [messages, sendMessage]);
 
-  const continueLast = () => {
+  const continueLast = useCallback(() => {
     if (messages.length > 0) {
       const lastMsg = messages[messages.length - 1];
       if (lastMsg.role === 'assistant' && lastMsg.content) {
         setInput('... continue from the previous response');
       }
     }
-  };
+  }, [messages]);
 
   return (
     <>
@@ -443,7 +446,7 @@ export default function MentorPage() {
         onRename={renameConversation}
       />
 
-      <div className="flex h-full overflow-hidden -mx-4 sm:-mx-6 lg:-mx-8 w-[calc(100%+2rem)] sm:w-[calc(100%+3rem)] lg:w-[calc(100%+4rem)]">
+      <div className="flex h-full overflow-hidden lg:-mx-8 lg:w-[calc(100%+4rem)]">
         <div className="flex-1 flex flex-col h-full overflow-hidden relative">
           <ChatHeader
             onToggleDrawer={() => setDrawerOpen((s) => !s)}
@@ -487,6 +490,15 @@ export default function MentorPage() {
             onVoiceInput={startVoiceInput}
             fileError={fileError}
             fileInputRef={fileInputRef}
+            toolPaletteOpen={toolPaletteOpen}
+            onToolPaletteToggle={() => setToolPaletteOpen((s) => !s)}
+          />
+
+          <ToolPalette
+            onResult={insertToolResult}
+            isOpen={toolPaletteOpen}
+            onClose={() => setToolPaletteOpen(false)}
+            onOpen={() => setToolPaletteOpen(true)}
           />
         </div>
       </div>
@@ -497,12 +509,8 @@ export default function MentorPage() {
           onClick={() => setShowShortcuts(false)}
         >
           <div
-            className="border rounded-2xl p-6 max-w-sm w-full mx-4"
+            className="surface-modal p-6 max-w-sm w-full mx-4"
             onClick={(e) => e.stopPropagation()}
-            style={{
-              backgroundColor: 'rgba(15,23,42,1)',
-              borderColor: 'rgba(51,65,85,0.5)',
-            }}
           >
             <h3 className="text-sm font-bold text-white mb-4">Keyboard Shortcuts</h3>
             <div className="space-y-2.5">
@@ -518,11 +526,7 @@ export default function MentorPage() {
                 <div key={i} className="flex items-center justify-between text-xs">
                   <span className="text-slate-400">{s.label}</span>
                   <kbd
-                    className="px-2 py-0.5 border rounded text-slate-300 font-mono text-[10px]"
-                    style={{
-                      backgroundColor: 'rgba(30,41,59,1)',
-                      borderColor: 'rgba(51,65,85,0.5)',
-                    }}
+                    className="px-2 py-0.5 border border-slate-800 rounded text-slate-300 font-mono text-[10px] bg-slate-800"
                   >
                     {s.keys}
                   </kbd>
@@ -532,6 +536,13 @@ export default function MentorPage() {
           </div>
         </div>
       )}
+
+      <VoiceRecorder
+        open={voiceRecorderOpen}
+        onClose={() => setVoiceRecorderOpen(false)}
+        onResult={handleVoiceResult}
+        lang={settings.language}
+      />
     </>
   );
 }

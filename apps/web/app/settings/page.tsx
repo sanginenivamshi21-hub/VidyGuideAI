@@ -51,22 +51,22 @@ export default function SettingsPage() {
   ];
 
   const Section = ({ title, desc, children }: { title: string; desc?: string; children: React.ReactNode }) => (
-    <div className="rounded-xl border p-5" style={{ backgroundColor: 'rgba(15,23,42,0.6)', borderColor: 'rgba(51,65,85,0.5)' }}>
-      <h3 className="text-sm font-bold text-white mb-1">{title}</h3>
-      {desc && <p className="text-xs text-slate-500 mb-4">{desc}</p>}
+    <div className="surface-card p-5">
+      <h3 className="text-h3 mb-1">{title}</h3>
+      {desc && <p className="text-caption mb-4">{desc}</p>}
       <div className="space-y-3">{children}</div>
     </div>
   );
 
   const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
     <div className="flex items-center justify-between gap-4">
-      <span className="text-xs text-slate-400 font-medium">{label}</span>
+      <span className="text-caption font-medium">{label}</span>
       <div className="w-48">{children}</div>
     </div>
   );
 
   const Select = ({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[] }) => (
-    <select value={value} onChange={e => onChange(e.target.value)} className="w-full bg-slate-800 text-slate-200 text-xs rounded-lg px-3 py-2 outline-none border border-slate-700 transition-colors" style={{ borderColor: 'rgba(51,65,85,0.5)' }}>
+    <select value={value} onChange={e => onChange(e.target.value)} className="input-field text-xs">
       {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
     </select>
   );
@@ -170,11 +170,11 @@ export default function SettingsPage() {
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors border"
               style={{
-                backgroundColor: isActive ? 'var(--accent-10)' : 'transparent',
-                color: isActive ? 'var(--accent)' : 'rgba(148,163,184,1)',
-                borderColor: isActive ? 'var(--accent-ring)' : 'transparent',
-              }}>
-              <Icon size={14} /> {tab.label}
+                  backgroundColor: isActive ? 'var(--accent-10)' : 'transparent',
+                  color: isActive ? 'var(--accent)' : undefined,
+                  borderColor: isActive ? 'var(--accent-ring)' : 'transparent',
+                }}>
+                <Icon size={14} /> {tab.label}
             </button>
           );
         })}
@@ -354,7 +354,7 @@ export default function SettingsPage() {
         {activeTab === 'security' && (
           <>
             <Section title="Change Password" desc="Update your account password. This will invalidate all existing sessions.">
-              <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="New password (min 6 chars)" className="w-full bg-slate-800 text-slate-200 text-xs rounded-lg px-3 py-2 outline-none border transition-colors" style={{ borderColor: 'rgba(51,65,85,0.5)' }} />
+              <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="New password (min 6 chars)" className="input-field" />
               <button onClick={handlePasswordUpdate} className="px-4 py-1.5 text-white text-xs font-semibold rounded-lg transition-colors" style={{ backgroundColor: 'var(--accent)' }}>Update Password</button>
               {passwordMsg && <p className="text-xs text-slate-400">{passwordMsg}</p>}
             </Section>
@@ -369,8 +369,8 @@ export default function SettingsPage() {
               }} className="w-full text-left px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-lg transition-colors flex items-center gap-2">
                 <LogOut size={14} /> Logout everywhere
               </button>
-              <div className="border-t pt-3 mt-3" style={{ borderColor: 'rgba(51,65,85,0.5)' }}>
-                <button onClick={handleDeleteAccount} className="w-full text-left px-3 py-2 rounded-lg text-xs flex items-center gap-2 transition-colors" style={{ backgroundColor: 'rgba(239,68,68,0.1)', color: 'rgba(239,68,68,1)' }}>
+              <div className="border-t border-slate-800 pt-3 mt-3">
+                <button onClick={handleDeleteAccount} className="btn-danger w-full text-left px-3 py-2 text-xs flex items-center gap-2">
                   <AlertTriangle size={14} /> Delete account permanently
                 </button>
               </div>
@@ -391,7 +391,7 @@ export default function SettingsPage() {
                 { keys: 'Ctrl + ,', label: 'Open settings' },
                 { keys: 'Shift + Enter', label: 'New line in input' },
               ].map((s, i) => (
-                <div key={i} className="flex items-center justify-between py-1.5 border-b last:border-0" style={{ borderColor: 'rgba(51,65,85,0.3)' }}>
+                <div key={i} className="flex items-center justify-between py-1.5 border-b border-slate-800/30 last:border-0">
                   <span className="text-xs text-slate-400">{s.label}</span>
                   <kbd className="px-2 py-0.5 bg-slate-800 border border-slate-700 rounded text-xs text-slate-300 font-mono">{s.keys}</kbd>
                 </div>

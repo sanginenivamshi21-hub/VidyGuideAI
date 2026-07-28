@@ -66,8 +66,7 @@ export default function ChatMessages({
       {showScrollBtn && (
         <button
           onClick={onScrollToBottom}
-          className="fixed bottom-28 right-6 p-2.5 rounded-full shadow-lg border transition-all z-10 hover:scale-105 active:scale-95 touch-manipulation"
-          style={{ backgroundColor: 'rgba(30,41,59,0.95)', borderColor: 'rgba(51,65,85,0.5)', color: 'rgba(148,163,184,1)' }}
+          className="fixed bottom-28 right-6 p-2.5 rounded-full shadow-lg border border-slate-800 bg-slate-800/95 text-slate-400 transition-all z-10 hover:scale-105 active:scale-95 touch-manipulation"
         >
           <ChevronDown size={18} />
         </button>

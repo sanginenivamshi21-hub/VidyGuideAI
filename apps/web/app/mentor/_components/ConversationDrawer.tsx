@@ -53,10 +53,9 @@ export default function ConversationDrawer({
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 250 }}
-            className="fixed left-0 top-0 bottom-0 w-72 z-50 flex flex-col"
-            style={{ backgroundColor: 'rgba(15,23,42,0.98)' }}
+            className="fixed left-0 top-0 bottom-0 w-72 z-50 flex flex-col bg-slate-900/98"
           >
-            <div className="flex items-center justify-between px-4 py-3.5 border-b shrink-0" style={{ borderColor: 'rgba(51,65,85,0.5)' }}>
+            <div className="flex items-center justify-between px-4 py-3.5 border-b border-slate-800 shrink-0">
               <h2 className="text-sm font-bold text-white">Conversations</h2>
               <div className="flex items-center gap-1">
                 <button
@@ -83,8 +82,7 @@ export default function ConversationDrawer({
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search conversations..."
-                  className="w-full text-xs rounded-xl pl-8 pr-3 py-2.5 outline-none border transition-colors"
-                  style={{ backgroundColor: 'rgba(30,41,59,1)', color: 'rgba(226,232,240,1)', borderColor: 'rgba(51,65,85,0.5)' }}
+                  className="w-full text-xs rounded-xl pl-8 pr-3 py-2.5 input-field"
                 />
               </div>
             </div>
@@ -170,7 +168,7 @@ function ConvItem({
           className="flex-1 bg-slate-700 text-xs text-white rounded-lg px-2 py-1 outline-none"
         />
       ) : (
-        <button onClick={onSelect} className="flex-1 text-left truncate" style={{ color: isActive ? 'var(--accent)' : 'rgba(148,163,184,1)' }}>
+        <button onClick={onSelect} className="flex-1 text-left truncate text-slate-400" style={isActive ? { color: 'var(--accent)' } : {}}>
           {conv.title}
         </button>
       )}

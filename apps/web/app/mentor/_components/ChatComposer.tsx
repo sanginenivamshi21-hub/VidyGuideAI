@@ -1,5 +1,5 @@
 import { useRef, useEffect, useCallback } from 'react';
-import { Mic, Paperclip, Square, SendHorizonal } from 'lucide-react';
+import { Mic, Paperclip, Square, SendHorizonal, Plus } from 'lucide-react';
 import AttachmentCard from '@/components/AttachmentCard';
 
 interface ChatComposerProps {
@@ -16,6 +16,8 @@ interface ChatComposerProps {
   onVoiceInput: () => void;
   fileError: string;
   fileInputRef: React.RefObject<HTMLInputElement | null>;
+  toolPaletteOpen?: boolean;
+  onToolPaletteToggle?: () => void;
 }
 
 export default function ChatComposer({
@@ -32,6 +34,8 @@ export default function ChatComposer({
   onVoiceInput,
   fileError,
   fileInputRef,
+  toolPaletteOpen,
+  onToolPaletteToggle,
 }: ChatComposerProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -71,19 +75,17 @@ export default function ChatComposer({
 
   return (
     <div
-      className="shrink-0 border-t safe-area-bottom"
-      style={{ backgroundColor: 'rgba(15,23,42,0.95)', borderColor: 'rgba(51,65,85,0.5)' }}
+      className="shrink-0 border-t border-slate-800 safe-area-bottom bg-slate-950/95"
     >
       {fileError && (
-        <div className="px-4 py-2" style={{ backgroundColor: 'rgba(239,68,68,0.1)' }}>
+        <div className="px-4 py-2 bg-red-500/10">
           <p className="text-xs text-red-400">{fileError}</p>
         </div>
       )}
 
       {attachments.length > 0 && (
         <div
-          className="px-4 py-2.5 flex gap-2 overflow-x-auto scrollbar-thin"
-          style={{ borderBottom: '1px solid rgba(51,65,85,0.3)' }}
+          className="px-4 py-2.5 flex gap-2 overflow-x-auto scrollbar-thin border-b border-slate-800/30"
         >
           {attachments.map((file, i) => (
             <AttachmentCard
@@ -99,19 +101,18 @@ export default function ChatComposer({
 
       <div className="px-3 sm:px-4 py-3 max-w-3xl mx-auto">
         <div
-          className="flex items-end gap-2 rounded-2xl px-3 py-2 border transition-colors focus-within:border-slate-600"
-          style={{ backgroundColor: 'rgba(30,41,59,1)', borderColor: 'rgba(51,65,85,0.5)' }}
+          className="flex items-end gap-2 rounded-2xl px-3 py-2 border border-slate-800 transition-colors focus-within:border-slate-600 bg-slate-800"
         >
           <button
             type="button"
             onClick={onVoiceInput}
-            className="p-2 rounded-xl hover:bg-slate-700/50 text-slate-400 shrink-0 transition-colors touch-manipulation"
+            className="p-2 rounded-xl hover:bg-slate-700/50 text-slate-400 shrink-0 transition-colors touch-manipulation hidden sm:block"
             aria-label="Voice input"
           >
             <Mic size={19} />
           </button>
 
-          <label className="p-2 rounded-xl hover:bg-slate-700/50 text-slate-400 cursor-pointer shrink-0 transition-colors touch-manipulation">
+          <label className="p-2 rounded-xl hover:bg-slate-700/50 text-slate-400 cursor-pointer shrink-0 transition-colors touch-manipulation hidden sm:block">
             <Paperclip size={19} />
             <input
               type="file"
@@ -122,6 +123,20 @@ export default function ChatComposer({
               ref={fileInputRef}
             />
           </label>
+
+          {onToolPaletteToggle && (
+            <button
+              type="button"
+              onClick={onToolPaletteToggle}
+              className={`p-2 rounded-xl shrink-0 transition-colors touch-manipulation ${
+                toolPaletteOpen ? 'text-white' : 'text-slate-400 hover:text-slate-200'
+              }`}
+              style={toolPaletteOpen ? { backgroundColor: 'var(--accent-10)' } : {}}
+              aria-label="Open tools"
+            >
+              <Plus size={19} />
+            </button>
+          )}
 
           <textarea
             ref={textareaRef}
@@ -139,8 +154,7 @@ export default function ChatComposer({
             <button
               type="button"
               onClick={onStop}
-              className="p-2 rounded-xl shrink-0 transition-colors touch-manipulation"
-              style={{ backgroundColor: 'rgba(239,68,68,0.15)', color: 'rgb(239,68,68)' }}
+              className="p-2 rounded-xl shrink-0 transition-colors touch-manipulation bg-red-500/15 text-red-400"
               aria-label="Stop generating"
             >
               <Square size={16} />
