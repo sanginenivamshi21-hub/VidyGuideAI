@@ -143,9 +143,7 @@ export class ResumeController {
             systemPrompt,
             userPrompt,
             0.4,
-            undefined,
             [],
-            3,
             4096,
             'gemini',
         );
@@ -271,9 +269,7 @@ export class ResumeController {
             systemPrompt,
             userPrompt,
             0.6,
-            undefined,
             [],
-            3,
             2048,
             'gemini',
         );
@@ -316,7 +312,7 @@ export class ResumeController {
             strengths: string[];
             improvements: string[];
             enhancedResume: string;
-        }>(systemPrompt, userPrompt, 0.1, 'gemini-2.0-flash', 3, 4096, 'gemini');
+        }>(systemPrompt, userPrompt, 0.1, 4096, 'gemini');
 
         return result;
     }

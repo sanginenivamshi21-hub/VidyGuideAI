@@ -105,7 +105,7 @@ export default function HistoryPage() {
           🔒
         </div>
         <h2 className="text-xl font-bold text-white">History is Disabled</h2>
-        <p className="text-xs text-slate-405 leading-relaxed">
+        <p className="text-xs text-slate-400 leading-relaxed">
           You are currently signed in as a Guest. History logging, career roadmap persistence, and user profiles are only available for registered student accounts.
         </p>
         <button onClick={() => { router.push(ROUTES.AUTH); }}
@@ -143,7 +143,7 @@ export default function HistoryPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search logs..."
-            className="w-full bg-slate-950 border border-slate-850 focus:border-emerald-500 text-white rounded-lg pl-9 pr-4 py-2.5 outline-none text-xs transition-all"
+            className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 text-white rounded-lg pl-9 pr-4 py-2.5 outline-none text-xs transition-all"
           />
         </div>
 
@@ -161,14 +161,14 @@ export default function HistoryPage() {
               <div
                 key={item.id}
                 onClick={() => setSelectedItem(item)}
-                className={`p-3.5 rounded-xl border cursor-pointer flex flex-col gap-2 transition-all select-none ${
+                className={`p-3.5 rounded-xl border cursor-pointer flex flex-col gap-2 transition-all ${
                   selectedItem?.id === item.id
                     ? 'bg-emerald-500/10 border-emerald-500/40 text-white shadow-sm'
-                    : 'bg-slate-900/60 border-slate-850 hover:border-slate-750 text-slate-350 hover:text-white'
+                    : 'bg-slate-900/60 border-slate-800 hover:border-slate-700 text-slate-400 hover:text-white'
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-slate-950 border border-slate-850 text-slate-400">
+                  <span className="text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-400">
                     {item.actionType}
                   </span>
                   <span className="text-[10px] text-slate-500 flex items-center gap-1">
@@ -186,12 +186,12 @@ export default function HistoryPage() {
       </div>
 
       {/* Log detail view column */}
-      <div className="lg:col-span-2 bg-slate-950/40 border border-slate-850 rounded-2xl p-6 h-full overflow-hidden flex flex-col justify-between">
+      <div className="lg:col-span-2 bg-slate-950/40 border border-slate-800 rounded-2xl p-6 h-full overflow-hidden flex flex-col justify-between">
         {selectedItem ? (
           <div className="flex flex-col gap-4 h-full overflow-hidden justify-between">
-            <div className="flex justify-between items-center border-b border-slate-850 pb-4">
+            <div className="flex justify-between items-center border-b border-slate-800 pb-4">
               <div className="flex flex-col gap-1">
-                <span className="text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-slate-900 border border-slate-850 text-slate-400 w-fit">
+                <span className="text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-slate-400 w-fit">
                   {selectedItem.actionType}
                 </span>
                 <h3 className="text-md font-bold text-white leading-normal pr-4">
@@ -200,7 +200,7 @@ export default function HistoryPage() {
               </div>
               <button
                 onClick={() => handleDeleteItem(selectedItem.id)}
-                className="p-2 rounded-lg bg-slate-900 hover:bg-red-500/10 border border-slate-850 hover:border-red-500/20 text-slate-450 hover:text-red-400 transition-all duration-200"
+                className="p-2 rounded-lg bg-slate-900 hover:bg-red-500/10 border border-slate-800 hover:border-red-500/20 text-slate-400 hover:text-red-400 transition-all duration-200"
                 title="Delete Log"
               >
                 <Trash2 size={15} />
@@ -208,17 +208,17 @@ export default function HistoryPage() {
             </div>
 
             {/* Results display scroll block */}
-            <div className="flex-1 overflow-y-auto my-4 pr-1 scrollbar-thin scrollbar-thumb-slate-800 text-slate-200 text-xs font-mono leading-relaxed whitespace-pre-wrap selection:bg-emerald-500/30 p-4 bg-slate-950/80 border border-slate-850 rounded-xl">
+            <div className="flex-1 overflow-y-auto my-4 pr-1 scrollbar-thin scrollbar-thumb-slate-800 text-slate-200 text-xs font-mono leading-relaxed whitespace-pre-wrap selection:bg-emerald-500/30 p-4 bg-slate-950/80 border border-slate-800 rounded-xl">
               {selectedItem.result}
             </div>
 
-            <div className="text-[10px] text-slate-600 font-semibold font-mono border-t border-slate-850 pt-3 flex justify-between">
+            <div className="text-[10px] text-slate-600 font-semibold font-mono border-t border-slate-800 pt-3 flex justify-between">
               <span>Log ID: #{selectedItem.id}</span>
               <span>Generated: {new Date(selectedItem.createdAt).toLocaleString()}</span>
             </div>
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center h-full text-center text-slate-550 gap-2">
+          <div className="flex flex-col items-center justify-center h-full text-center text-slate-500 gap-2">
             <Eye size={24} />
             <p className="text-xs italic font-semibold">Select a history log from the sidebar list to view details.</p>
           </div>

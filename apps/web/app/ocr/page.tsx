@@ -120,7 +120,7 @@ export default function OcrScannerPage() {
             <div className="flex items-center gap-2 w-full sm:w-auto">
               <button
                 onClick={handleCopy}
-                className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-750 text-slate-350 hover:text-white text-xs font-bold rounded-lg transition-all"
+                className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-white text-xs font-bold rounded-lg transition-all"
               >
                 {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
                 {copied ? 'Copied!' : 'Copy text'}
@@ -134,7 +134,7 @@ export default function OcrScannerPage() {
               </button>
               <button
                 onClick={handleClear}
-                className="p-1.5 rounded-lg bg-slate-950 border border-slate-850 hover:border-red-500/40 text-slate-400 hover:text-red-400 transition-all duration-200"
+                className="p-1.5 rounded-lg bg-slate-950 border border-slate-800 hover:border-red-500/40 text-slate-400 hover:text-red-400 transition-all duration-200"
                 title="Clear scanned text"
               >
                 <Trash2 size={16} />
@@ -142,7 +142,7 @@ export default function OcrScannerPage() {
             </div>
           </div>
 
-          <pre className="p-6 bg-slate-950 border border-slate-850 rounded-2xl text-slate-350 text-xs font-mono leading-relaxed whitespace-pre-wrap overflow-x-auto max-h-[500px]">
+          <pre className="p-6 bg-slate-950 border border-slate-800 rounded-2xl text-slate-400 text-xs font-mono leading-relaxed whitespace-pre-wrap overflow-x-auto max-h-[500px]">
             {extractedText}
           </pre>
         </div>

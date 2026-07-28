@@ -1,4 +1,4 @@
-import { Injectable, Logger, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import Groq from 'groq-sdk';
 import type { ChatCompletionMessageParam } from 'groq-sdk/resources/chat/completions';
 import type { AiProvider, AiProviderConfig, ChatMessage } from './ai-provider.interface';
@@ -16,11 +16,7 @@ export class GroqProvider implements AiProvider {
     this.config = {
       name: 'groq',
       apiKey,
-      models: {
-        chat: process.env.GROQ_CHAT_MODEL || 'llama-3.3-70b-versatile',
-        json: process.env.GROQ_JSON_MODEL || 'llama-3.1-8b-instant',
-        streaming: process.env.GROQ_STREAM_MODEL || 'llama-3.3-70b-versatile',
-      },
+      model: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
       priority: 1,
     };
     if (apiKey) {
@@ -36,19 +32,17 @@ export class GroqProvider implements AiProvider {
     systemPrompt: string,
     userPrompt: string,
     temperature = 0.4,
-    model?: string,
     historyMessages: ChatMessage[] = [],
     maxTokens = 2048,
   ): Promise<string> {
     if (!this.client) throw new Error('Groq not configured');
-    const m = model || this.config.models.chat;
     const history = historyMessages.map((h) => ({
       role: h.role,
       content: h.content,
     })) as ChatCompletionMessageParam[];
 
     const response = await this.client.chat.completions.create({
-      model: m,
+      model: this.config.model,
       messages: [
         { role: 'system', content: systemPrompt },
         ...history,
@@ -64,19 +58,17 @@ export class GroqProvider implements AiProvider {
     systemPrompt: string,
     userPrompt: string,
     temperature = 0.7,
-    model?: string,
     historyMessages: ChatMessage[] = [],
     maxTokens = 2048,
   ): Promise<ReadableStream> {
     if (!this.client) throw new Error('Groq not configured');
-    const m = model || this.config.models.streaming;
     const history = historyMessages.map((h) => ({
       role: h.role,
       content: h.content,
     })) as ChatCompletionMessageParam[];
 
     const response = await this.client.chat.completions.create({
-      model: m,
+      model: this.config.model,
       messages: [
         { role: 'system', content: systemPrompt },
         ...history,
@@ -106,14 +98,12 @@ export class GroqProvider implements AiProvider {
     systemPrompt: string,
     userPrompt: string,
     temperature = 0.1,
-    model?: string,
     maxTokens = 4096,
   ): Promise<T> {
     if (!this.client) throw new Error('Groq not configured');
-    const m = model || this.config.models.json;
 
     const response = await this.client.chat.completions.create({
-      model: m,
+      model: this.config.model,
       messages: [
         { role: 'system', content: systemPrompt + '\nEnsure output is strictly JSON.' },
         { role: 'user', content: userPrompt },

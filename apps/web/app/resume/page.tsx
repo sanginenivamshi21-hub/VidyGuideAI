@@ -211,7 +211,7 @@ export default function ResumeBuilderPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Input parameters form */}
         <div className="md:col-span-2 flex flex-col gap-6 bg-slate-900/40 border border-slate-800 rounded-2xl p-6 backdrop-blur-md">
-          <h3 className="text-md font-bold text-white flex items-center gap-1.5 border-b border-slate-850 pb-3">
+          <h3 className="text-md font-bold text-white flex items-center gap-1.5 border-b border-slate-800 pb-3">
             📋 Basic Candidate Details
           </h3>
 
@@ -224,7 +224,7 @@ export default function ResumeBuilderPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Ravi Kumar"
-                className="w-full bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
+                className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
               />
             </div>
 
@@ -236,7 +236,7 @@ export default function ResumeBuilderPage() {
                 value={targetRole}
                 onChange={(e) => setTargetRole(e.target.value)}
                 placeholder="e.g. Software Engineer, Welder, Clerk"
-                className="w-full bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
+                className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
               />
             </div>
           </div>
@@ -249,7 +249,7 @@ export default function ResumeBuilderPage() {
                 value={targetCompany}
                 onChange={(e) => setTargetCompany(e.target.value)}
                 placeholder="e.g. TCS, Tata Motors, SBI"
-                className="w-full bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
+                className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
               />
             </div>
 
@@ -260,7 +260,7 @@ export default function ResumeBuilderPage() {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="e.g. +91 98765 43210"
-                className="w-full bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
+                className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
               />
             </div>
           </div>
@@ -273,7 +273,7 @@ export default function ResumeBuilderPage() {
                 value={resumeEmail}
                 onChange={(e) => setResumeEmail(e.target.value)}
                 placeholder="you@gmail.com"
-                className="w-full bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
+                className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
               />
             </div>
 
@@ -284,7 +284,7 @@ export default function ResumeBuilderPage() {
                 value={resumeLocation}
                 onChange={(e) => setResumeLocation(e.target.value)}
                 placeholder="e.g. Guntur, AP"
-                className="w-full bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
+                className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
               />
             </div>
 
@@ -295,12 +295,12 @@ export default function ResumeBuilderPage() {
                 value={linkedin}
                 onChange={(e) => setLinkedin(e.target.value)}
                 placeholder="linkedin.com/in/name"
-                className="w-full bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
+                className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
               />
             </div>
           </div>
 
-          <div className="border-t border-slate-850 my-2" />
+          <div className="border-t border-slate-800 my-2" />
 
           {/* Education parameters section */}
           <h3 className="text-md font-bold text-white flex items-center gap-1.5">
@@ -312,7 +312,7 @@ export default function ResumeBuilderPage() {
             <select
               value={eduLevel}
               onChange={(e) => setEduLevel(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all cursor-pointer font-semibold"
+              className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all cursor-pointer font-semibold"
             >
               {Object.keys(QUALIFICATIONS).map((key) => (
                 <option key={key} value={key}>
@@ -331,14 +331,14 @@ export default function ResumeBuilderPage() {
                   placeholder="📋 Board (e.g. CBSE, State Board)"
                   value={board}
                   onChange={(e) => setBoard(e.target.value)}
-                  className="bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
+                  className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
                 />
                 <input
                   type="text"
                   placeholder="🏫 School Name"
                   value={school}
                   onChange={(e) => setSchool(e.target.value)}
-                  className="bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
+                  className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
                 />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -347,14 +347,14 @@ export default function ResumeBuilderPage() {
                   placeholder="📅 Completion Year"
                   value={year}
                   onChange={(e) => setYear(e.target.value)}
-                  className="bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
+                  className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
                 />
                 <input
                   type="text"
                   placeholder="📊 Percentage / CGPA"
                   value={pct}
                   onChange={(e) => setPct(e.target.value)}
-                  className="bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
+                  className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
                 />
               </div>
               <textarea
@@ -362,7 +362,7 @@ export default function ResumeBuilderPage() {
                 rows={2}
                 value={activities}
                 onChange={(e) => setActivities(e.target.value)}
-                className="bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all resize-none"
+                className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all resize-none"
               />
             </div>
           )}
@@ -375,21 +375,21 @@ export default function ResumeBuilderPage() {
                   placeholder="📋 Board (e.g. CBSE, State Board)"
                   value={board}
                   onChange={(e) => setBoard(e.target.value)}
-                  className="bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
+                  className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
                 />
                 <input
                   type="text"
                   placeholder="🏫 College Name"
                   value={college}
                   onChange={(e) => setCollege(e.target.value)}
-                  className="bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
+                  className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
                 />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <select
                   value={stream}
                   onChange={(e) => setStream(e.target.value)}
-                  className="bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-xs transition-all cursor-pointer font-semibold"
+                  className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-xs transition-all cursor-pointer font-semibold"
                 >
                   <option value="MPC">MPC</option>
                   <option value="BiPC">BiPC</option>
@@ -403,14 +403,14 @@ export default function ResumeBuilderPage() {
                   placeholder="📅 Completion Year"
                   value={year}
                   onChange={(e) => setYear(e.target.value)}
-                  className="bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
+                  className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
                 />
                 <input
                   type="text"
                   placeholder="📊 Percentage / CGPA"
                   value={pct}
                   onChange={(e) => setPct(e.target.value)}
-                  className="bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
+                  className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
                 />
               </div>
               <textarea
@@ -418,7 +418,7 @@ export default function ResumeBuilderPage() {
                 rows={2}
                 value={activities}
                 onChange={(e) => setActivities(e.target.value)}
-                className="bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all resize-none"
+                className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all resize-none"
               />
             </div>
           )}
@@ -431,14 +431,14 @@ export default function ResumeBuilderPage() {
                   placeholder="🔧 Branch (e.g. Mechanical, Civil, CSE)"
                   value={branch}
                   onChange={(e) => setBranch(e.target.value)}
-                  className="bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
+                  className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
                 />
                 <input
                   type="text"
                   placeholder="🏫 Polytechnic / College Name"
                   value={college}
                   onChange={(e) => setCollege(e.target.value)}
-                  className="bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
+                  className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
                 />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -447,14 +447,14 @@ export default function ResumeBuilderPage() {
                   placeholder="📅 Completion Year"
                   value={year}
                   onChange={(e) => setYear(e.target.value)}
-                  className="bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
+                  className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
                 />
                 <input
                   type="text"
                   placeholder="📊 Percentage"
                   value={pct}
                   onChange={(e) => setPct(e.target.value)}
-                  className="bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
+                  className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
                 />
               </div>
               <textarea
@@ -462,7 +462,7 @@ export default function ResumeBuilderPage() {
                 rows={2}
                 value={projects}
                 onChange={(e) => setProjects(e.target.value)}
-                className="bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all resize-none"
+                className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all resize-none"
               />
             </div>
           )}
@@ -475,14 +475,14 @@ export default function ResumeBuilderPage() {
                   placeholder="🔧 Trade (e.g. Electrician, Fitter, COPA)"
                   value={trade}
                   onChange={(e) => setTrade(e.target.value)}
-                  className="bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
+                  className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
                 />
                 <input
                   type="text"
                   placeholder="🏫 Institute Name"
                   value={institute}
                   onChange={(e) => setInstitute(e.target.value)}
-                  className="bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
+                  className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
                 />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -491,14 +491,14 @@ export default function ResumeBuilderPage() {
                   placeholder="📅 Completion Year"
                   value={year}
                   onChange={(e) => setYear(e.target.value)}
-                  className="bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
+                  className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
                 />
                 <input
                   type="text"
                   placeholder="📊 Grade / % (e.g. A, 78%)"
                   value={grade}
                   onChange={(e) => setGrade(e.target.value)}
-                  className="bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
+                  className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
                 />
               </div>
               <input
@@ -506,7 +506,7 @@ export default function ResumeBuilderPage() {
                 placeholder="🏭 Apprenticeship Details (e.g. Railways Fitter, 1 Year)"
                 value={apprenticeship}
                 onChange={(e) => setApprenticeship(e.target.value)}
-                className="bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
+                className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
               />
             </div>
           )}
@@ -519,14 +519,14 @@ export default function ResumeBuilderPage() {
                   placeholder="🎓 Degree & Branch (e.g. B.Tech CSE, MBA Finance)"
                   value={degree}
                   onChange={(e) => setDegree(e.target.value)}
-                  className="bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
+                  className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
                 />
                 <input
                   type="text"
                   placeholder="🏫 College / University Name"
                   value={college}
                   onChange={(e) => setCollege(e.target.value)}
-                  className="bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
+                  className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
                 />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -535,14 +535,14 @@ export default function ResumeBuilderPage() {
                   placeholder="📅 Completion Year"
                   value={year}
                   onChange={(e) => setYear(e.target.value)}
-                  className="bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
+                  className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
                 />
                 <input
                   type="text"
                   placeholder="📊 CGPA / Percentage"
                   value={cgpa}
                   onChange={(e) => setCgpa(e.target.value)}
-                  className="bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
+                  className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
                 />
               </div>
               <textarea
@@ -550,21 +550,21 @@ export default function ResumeBuilderPage() {
                 rows={2}
                 value={projects}
                 onChange={(e) => setProjects(e.target.value)}
-                className="bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all resize-none"
+                className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all resize-none"
               />
               <textarea
                 placeholder="🏢 Internships / Experience (Company — Role — Duration)"
                 rows={2}
                 value={internships}
                 onChange={(e) => setInternships(e.target.value)}
-                className="bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all resize-none"
+                className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all resize-none"
               />
               <input
                 type="text"
                 placeholder="📜 Certifications (e.g. AWS Cloud, NPTEL Programming)"
                 value={certs}
                 onChange={(e) => setCerts(e.target.value)}
-                className="bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
+                className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
               />
             </div>
           )}
@@ -577,14 +577,14 @@ export default function ResumeBuilderPage() {
                   placeholder="📜 Course Name"
                   value={course}
                   onChange={(e) => setCourse(e.target.value)}
-                  className="bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
+                  className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
                 />
                 <input
                   type="text"
                   placeholder="⏱ Duration (e.g. 6 months)"
                   value={duration}
                   onChange={(e) => setDuration(e.target.value)}
-                  className="bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
+                  className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
                 />
               </div>
               <textarea
@@ -592,12 +592,12 @@ export default function ResumeBuilderPage() {
                 rows={2}
                 value={projects}
                 onChange={(e) => setProjects(e.target.value)}
-                className="bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all resize-none"
+                className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all resize-none"
               />
             </div>
           )}
 
-          <div className="border-t border-slate-850 my-2" />
+          <div className="border-t border-slate-800 my-2" />
 
           {/* Section details */}
           <h3 className="text-md font-bold text-white flex items-center gap-1.5">
@@ -612,7 +612,7 @@ export default function ResumeBuilderPage() {
                 value={skills}
                 onChange={(e) => setSkills(e.target.value)}
                 placeholder="e.g. Python, SQL, Excel, Communication"
-                className="w-full bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
+                className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
               />
             </div>
 
@@ -623,7 +623,7 @@ export default function ResumeBuilderPage() {
                 value={languages}
                 onChange={(e) => setLanguages(e.target.value)}
                 placeholder="e.g. English, Telugu, Hindi"
-                className="w-full bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
+                className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
               />
             </div>
           </div>
@@ -636,7 +636,7 @@ export default function ResumeBuilderPage() {
                 value={achievements}
                 onChange={(e) => setAchievements(e.target.value)}
                 placeholder="e.g. IIT-JEE rank 1450, Hackathon finalist"
-                className="w-full bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
+                className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
               />
             </div>
 
@@ -647,7 +647,7 @@ export default function ResumeBuilderPage() {
                 value={hobbies}
                 onChange={(e) => setHobbies(e.target.value)}
                 placeholder="e.g. Cricket, Chess, Blogging"
-                className="w-full bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
+                className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm transition-all"
               />
             </div>
           </div>
@@ -658,7 +658,7 @@ export default function ResumeBuilderPage() {
           <h3 className="text-md font-bold text-white flex items-center gap-1.5">
             💡 Pro Resume Tips
           </h3>
-          <div className="p-5 bg-slate-900/60 border border-slate-850 rounded-xl flex flex-col gap-4">
+          <div className="p-5 bg-slate-900/60 border border-slate-800 rounded-xl flex flex-col gap-4">
             <div className="flex gap-2">
               <span className="text-emerald-400 font-bold">1.</span>
               <p className="text-xs text-slate-400 leading-normal">
@@ -688,7 +688,7 @@ export default function ResumeBuilderPage() {
       )}
 
       {/* Submit button row */}
-      <div className="flex items-center gap-4 border-t border-slate-850 pt-6">
+      <div className="flex items-center gap-4 border-t border-slate-800 pt-6">
         <button
           onClick={handleBuild}
           disabled={loading}
@@ -710,7 +710,7 @@ export default function ResumeBuilderPage() {
 
       {/* Generated resume code output result */}
       {resumeResult && (
-        <div className="flex flex-col gap-6 mt-6 border-t border-slate-850 pt-10 animate-fadeIn">
+        <div className="flex flex-col gap-6 mt-6 border-t border-slate-800 pt-10 animate-fadeIn">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <h3 className="text-xl font-bold text-white flex items-center gap-2">
               <span>📝</span> Your Tailored Resume
@@ -725,7 +725,7 @@ export default function ResumeBuilderPage() {
               </button>
               <button
                 onClick={handleClear}
-                className="p-2.5 rounded-lg bg-slate-950 border border-slate-850 hover:border-red-500/40 text-slate-400 hover:text-red-400 transition-all duration-200"
+                className="p-2.5 rounded-lg bg-slate-950 border border-slate-800 hover:border-red-500/40 text-slate-400 hover:text-red-400 transition-all duration-200"
                 title="Clear results"
               >
                 <Trash2 size={16} />
@@ -733,7 +733,7 @@ export default function ResumeBuilderPage() {
             </div>
           </div>
 
-          <pre className="p-8 bg-slate-950 border border-slate-850 rounded-2xl text-slate-350 text-xs font-mono leading-relaxed whitespace-pre-wrap overflow-x-auto selection:bg-emerald-500/30">
+          <pre className="p-8 bg-slate-950 border border-slate-800 rounded-2xl text-slate-400 text-xs font-mono leading-relaxed whitespace-pre-wrap overflow-x-auto selection:bg-emerald-500/30">
             {resumeResult}
           </pre>
         </div>

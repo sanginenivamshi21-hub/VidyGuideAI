@@ -115,7 +115,7 @@ export default function ProfilePage() {
           🔒
         </div>
         <h2 className="text-xl font-bold text-white">Profile is Disabled</h2>
-        <p className="text-xs text-slate-405 leading-relaxed">
+        <p className="text-xs text-slate-400 leading-relaxed">
           You are currently signed in as a Guest. Profile settings and user stats dashboards are only available for registered student accounts.
         </p>
         <button
@@ -144,8 +144,14 @@ export default function ProfilePage() {
       </div>
 
       {loading ? (
-        <div className="text-xs font-semibold text-slate-500 text-center py-12">
-          Loading profile parameters...
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 animate-pulse">
+          <div className="md:col-span-1 flex flex-col gap-4">
+            <div className="h-4 bg-slate-800 rounded w-24 mb-2" />
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="p-4 bg-slate-800/60 border border-slate-800/80 rounded-xl h-[68px]" />
+            ))}
+          </div>
+          <div className="md:col-span-2 bg-slate-800/40 border border-slate-800/80 rounded-2xl p-6 h-[400px]" />
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -153,7 +159,7 @@ export default function ProfilePage() {
           <div className="md:col-span-1 flex flex-col gap-4">
             <h3 className="text-sm font-bold text-white uppercase tracking-wider">Activity Stats</h3>
             
-            <div className="p-4 bg-slate-900/60 border border-slate-850 rounded-xl flex items-center gap-4">
+            <div className="p-4 bg-slate-900/60 border border-slate-800 rounded-xl flex items-center gap-4">
               <div className="p-2.5 bg-emerald-500/10 text-emerald-400 rounded-lg text-lg">🌱</div>
               <div className="flex flex-col">
                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none">Roadmaps</span>
@@ -161,7 +167,7 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            <div className="p-4 bg-slate-900/60 border border-slate-850 rounded-xl flex items-center gap-4">
+            <div className="p-4 bg-slate-900/60 border border-slate-800 rounded-xl flex items-center gap-4">
               <div className="p-2.5 bg-indigo-500/10 text-indigo-400 rounded-lg text-lg">📝</div>
               <div className="flex flex-col">
                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none">Resumes</span>
@@ -169,7 +175,7 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            <div className="p-4 bg-slate-900/60 border border-slate-850 rounded-xl flex items-center gap-4">
+            <div className="p-4 bg-slate-900/60 border border-slate-800 rounded-xl flex items-center gap-4">
               <div className="p-2.5 bg-cyan-500/10 text-cyan-400 rounded-lg text-lg">🤖</div>
               <div className="flex flex-col">
                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none">Chats</span>
@@ -180,7 +186,7 @@ export default function ProfilePage() {
 
           {/* Edit details form column */}
           <div className="md:col-span-2 bg-slate-900/40 border border-slate-800 rounded-2xl p-6 backdrop-blur-md flex flex-col gap-6">
-            <h3 className="text-sm font-bold text-white uppercase tracking-wider border-b border-slate-850 pb-3">
+            <h3 className="text-sm font-bold text-white uppercase tracking-wider border-b border-slate-800 pb-3">
               Edit Account Parameters
             </h3>
 
@@ -225,7 +231,7 @@ export default function ProfilePage() {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="Ravi Kumar"
-                  className="w-full bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-xs transition-all"
+                  className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-xs transition-all"
                 />
               </div>
 
@@ -237,7 +243,7 @@ export default function ProfilePage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••"
-                    className="w-full bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-xs transition-all"
+                    className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-xs transition-all"
                   />
                 </div>
 
@@ -248,7 +254,7 @@ export default function ProfilePage() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="••••••"
-                    className="w-full bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-xs transition-all"
+                    className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-xs transition-all"
                   />
                 </div>
               </div>
@@ -256,7 +262,7 @@ export default function ProfilePage() {
               <button
                 type="submit"
                 disabled={saving}
-                className="w-full sm:w-auto py-2.5 px-6 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-lg shadow-lg shadow-emerald-500/25 active:scale-95 transition-all mt-4 flex items-center justify-center gap-1.5 w-fit"
+                className="w-full sm:w-fit py-2.5 px-6 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-lg shadow-lg shadow-emerald-500/25 active:scale-95 transition-all mt-4 flex items-center justify-center gap-1.5"
               >
                 {saving ? (
                   <>

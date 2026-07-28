@@ -146,7 +146,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
             </thead>
             <tbody>
               {tableRows.map((row, i) => (
-                <tr key={i} className="border-b border-slate-850/50 hover:bg-slate-900/20">
+                <tr key={i} className="border-b border-slate-800/50 hover:bg-slate-900/20">
                   {row.map((cell, j) => (
                     <td key={j} className="p-3 text-slate-300">{parseInline(cell)}</td>
                   ))}
@@ -319,7 +319,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
       flushCodeBlock();
       const cleanText = line.startsWith('## ') ? line.slice(3) : line.slice(2);
       renderedElements.push(
-        <h2 key={i} className="text-white font-extrabold text-base mt-6 mb-3 flex items-center gap-2 border-b border-slate-850 pb-2">
+        <h2 key={i} className="text-white font-extrabold text-base mt-6 mb-3 flex items-center gap-2 border-b border-slate-800 pb-2">
           {parseInline(cleanText)}
         </h2>
       );

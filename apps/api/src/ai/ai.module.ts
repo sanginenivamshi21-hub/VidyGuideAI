@@ -4,6 +4,7 @@ import { GroqProvider } from './providers/groq.provider';
 import { GeminiProvider } from './providers/gemini.provider';
 import { OpenRouterProvider } from './providers/openrouter.provider';
 import { ProviderFactory } from './providers/provider-factory';
+import { ConfigValidator } from './config-validator';
 
 @Module({
   providers: [
@@ -12,6 +13,7 @@ import { ProviderFactory } from './providers/provider-factory';
     GeminiProvider,
     OpenRouterProvider,
     ProviderFactory,
+    ConfigValidator,
   ],
   exports: [AiService],
 })

@@ -254,7 +254,7 @@ export default function InterviewPrepPage() {
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
                 placeholder="e.g. Frontend Engineer, UPSC Aspirant, SBI Clerk"
-                className="w-full bg-slate-950/80 border border-slate-855 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm transition-all"
+                className="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm transition-all"
               />
             </div>
 
@@ -265,7 +265,7 @@ export default function InterviewPrepPage() {
                 value={company}
                 onChange={(e) => setCompany(e.target.value)}
                 placeholder="e.g. Google, TCS, SBI, Police Recruitment"
-                className="w-full bg-slate-950/80 border border-slate-855 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm transition-all"
+                className="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm transition-all"
               />
             </div>
 
@@ -276,7 +276,7 @@ export default function InterviewPrepPage() {
                 value={skills}
                 onChange={(e) => setSkills(e.target.value)}
                 placeholder="e.g. React, Python, Data structures, Customer care"
-                className="w-full bg-slate-950/80 border border-slate-855 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm transition-all"
+                className="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm transition-all"
               />
             </div>
 
@@ -286,7 +286,7 @@ export default function InterviewPrepPage() {
                 <select
                   value={experienceLevel}
                   onChange={(e) => setExperienceLevel(e.target.value)}
-                  className="w-full bg-slate-950/80 border border-slate-855 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm transition-all"
+                  className="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm transition-all"
                 >
                   <option>Entry Level</option>
                   <option>Mid Level</option>
@@ -300,7 +300,7 @@ export default function InterviewPrepPage() {
                 <select
                   value={difficulty}
                   onChange={(e) => setDifficulty(e.target.value)}
-                  className="w-full bg-slate-950/80 border border-slate-855 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm transition-all"
+                  className="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm transition-all"
                 >
                   <option>Easy</option>
                   <option>Medium</option>
@@ -334,7 +334,7 @@ export default function InterviewPrepPage() {
       {stage === 'question' && (
         <div className="flex flex-col gap-6 animate-fadeIn">
           {/* Progress Tracker */}
-          <div className="bg-slate-950/40 border border-slate-855 rounded-2xl p-4 flex items-center justify-between text-xs font-semibold">
+          <div className="bg-slate-950/40 border border-slate-800 rounded-2xl p-4 flex items-center justify-between text-xs font-semibold">
             <span className="text-slate-400">Question {currentIndex + 1} of {questions.length}</span>
             <div className="flex items-center gap-1.5">
               {questions.map((_, i) => (
@@ -375,14 +375,14 @@ export default function InterviewPrepPage() {
                 onChange={(e) => setCurrentAnswer(e.target.value)}
                 placeholder="Type your structured, detailed interview answer response here. Take your time..."
                 rows={6}
-                className="w-full bg-slate-950/80 border border-slate-855 hover:border-slate-700 focus:border-emerald-500 text-white text-sm rounded-xl p-4 outline-none resize-none transition-all leading-relaxed"
+                className="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white text-sm rounded-xl p-4 outline-none resize-none transition-all leading-relaxed"
               />
             </div>
 
             <div className="flex justify-between items-center pt-2 border-t border-slate-800/80">
               <button
                 onClick={handleRestart}
-                className="px-4 py-2 bg-slate-950 border border-slate-855 hover:border-slate-800 text-slate-400 rounded-lg hover:text-white transition-all text-xs font-semibold"
+                className="px-4 py-2 bg-slate-950 border border-slate-800 hover:border-slate-800 text-slate-400 rounded-lg hover:text-white transition-all text-xs font-semibold"
               >
                 Quit Session
               </button>
@@ -413,7 +413,7 @@ export default function InterviewPrepPage() {
       {stage === 'evaluation' && feedbacks[currentIndex] && (
         <div className="flex flex-col gap-6 animate-fadeIn">
           {/* Question display */}
-          <div className="bg-slate-950/40 border border-slate-855 rounded-2xl p-6 flex flex-col gap-3">
+          <div className="bg-slate-950/40 border border-slate-800 rounded-2xl p-6 flex flex-col gap-3">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Question evaluated</span>
             <h3 className="text-sm font-semibold text-slate-200 leading-normal">{questions[currentIndex]}</h3>
           </div>
@@ -435,14 +435,14 @@ export default function InterviewPrepPage() {
             </div>
 
             {/* Rendered feedback Markdown */}
-            <div className="text-slate-200 text-sm leading-relaxed whitespace-pre-wrap font-sans break-words bg-slate-950/40 border border-slate-855 p-6 rounded-2xl select-text">
+            <div className="text-slate-200 text-sm leading-relaxed whitespace-pre-wrap font-sans break-words bg-slate-950/40 border border-slate-800 p-6 rounded-2xl select-text">
               {feedbacks[currentIndex].content}
             </div>
 
             <div className="flex justify-between items-center pt-2">
               <button
                 onClick={handleRestart}
-                className="px-4 py-2 bg-slate-950 border border-slate-855 hover:border-slate-800 text-slate-400 rounded-lg hover:text-white transition-all text-xs font-semibold"
+                className="px-4 py-2 bg-slate-950 border border-slate-800 hover:border-slate-800 text-slate-400 rounded-lg hover:text-white transition-all text-xs font-semibold"
               >
                 End Session
               </button>
@@ -465,7 +465,7 @@ export default function InterviewPrepPage() {
           {/* Overall performance Score Card */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Score circle gauge */}
-            <div className="bg-slate-900/40 border border-slate-855 rounded-3xl p-6 backdrop-blur-md flex flex-col items-center justify-center text-center gap-3 col-span-1">
+            <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-6 backdrop-blur-md flex flex-col items-center justify-center text-center gap-3 col-span-1">
               <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Average Score</span>
               <div className="relative w-32 h-32 flex items-center justify-center">
                 <svg className="w-full h-full transform -rotate-90">
@@ -498,26 +498,26 @@ export default function InterviewPrepPage() {
             </div>
 
             {/* Stats list card */}
-            <div className="bg-slate-900/40 border border-slate-855 rounded-3xl p-6 backdrop-blur-md col-span-2 flex flex-col gap-4">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-855 pb-2">Session Parameters</span>
+            <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-6 backdrop-blur-md col-span-2 flex flex-col gap-4">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-800 pb-2">Session Parameters</span>
               
               <div className="grid grid-cols-2 gap-4 text-xs">
-                <div className="flex flex-col gap-1 bg-slate-950/40 border border-slate-855/80 p-3.5 rounded-xl">
+                <div className="flex flex-col gap-1 bg-slate-950/40 border border-slate-800/80 p-3.5 rounded-xl">
                   <span className="text-slate-500 font-semibold uppercase tracking-wider text-[9px]">Job Target Role</span>
                   <span className="text-slate-200 font-bold">{role}</span>
                 </div>
 
-                <div className="flex flex-col gap-1 bg-slate-950/40 border border-slate-855/80 p-3.5 rounded-xl">
+                <div className="flex flex-col gap-1 bg-slate-950/40 border border-slate-800/80 p-3.5 rounded-xl">
                   <span className="text-slate-500 font-semibold uppercase tracking-wider text-[9px]">Company Environment</span>
                   <span className="text-slate-200 font-bold">{company || 'General MNC'}</span>
                 </div>
 
-                <div className="flex flex-col gap-1 bg-slate-950/40 border border-slate-855/80 p-3.5 rounded-xl">
+                <div className="flex flex-col gap-1 bg-slate-950/40 border border-slate-800/80 p-3.5 rounded-xl">
                   <span className="text-slate-500 font-semibold uppercase tracking-wider text-[9px]">Difficulty Scale</span>
                   <span className="text-slate-200 font-bold">{difficulty}</span>
                 </div>
 
-                <div className="flex flex-col gap-1 bg-slate-950/40 border border-slate-855/80 p-3.5 rounded-xl">
+                <div className="flex flex-col gap-1 bg-slate-950/40 border border-slate-800/80 p-3.5 rounded-xl">
                   <span className="text-slate-500 font-semibold uppercase tracking-wider text-[9px]">Career Level</span>
                   <span className="text-slate-200 font-bold">{experienceLevel}</span>
                 </div>
@@ -539,9 +539,9 @@ export default function InterviewPrepPage() {
 
             <div className="flex flex-col gap-6">
               {questions.map((q, idx) => (
-                <div key={idx} className="bg-slate-900/30 border border-slate-855 rounded-2xl overflow-hidden">
+                <div key={idx} className="bg-slate-900/30 border border-slate-800 rounded-2xl overflow-hidden">
                   {/* Header bar */}
-                  <div className="p-4 bg-slate-950/40 border-b border-slate-855 flex items-center justify-between text-xs">
+                  <div className="p-4 bg-slate-950/40 border-b border-slate-800 flex items-center justify-between text-xs">
                     <span className="font-bold text-slate-400">Question {idx + 1}</span>
                     <span className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-extrabold px-2.5 py-1 rounded-lg">
                       Score: {feedbacks[idx]?.score}/10
@@ -550,19 +550,19 @@ export default function InterviewPrepPage() {
 
                   {/* Body question answers feedback */}
                   <div className="p-6 flex flex-col gap-4 text-xs leading-relaxed">
-                    <div className="flex flex-col gap-1 bg-slate-950/20 p-3 rounded-lg border border-slate-855/50">
+                    <div className="flex flex-col gap-1 bg-slate-950/20 p-3 rounded-lg border border-slate-800/50">
                       <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500">Question Asked</span>
                       <p className="text-slate-300 font-semibold">{q}</p>
                     </div>
 
-                    <div className="flex flex-col gap-1 bg-slate-950/20 p-3 rounded-lg border border-slate-855/50">
+                    <div className="flex flex-col gap-1 bg-slate-950/20 p-3 rounded-lg border border-slate-800/50">
                       <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500">Your Response Answer</span>
-                      <p className="text-slate-355 italic break-words">{answers[idx]}</p>
+                      <p className="text-slate-400 italic break-words">{answers[idx]}</p>
                     </div>
 
                     <div className="flex flex-col gap-2">
                       <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500">Recruiter Evaluation</span>
-                      <div className="p-4 bg-slate-950/40 rounded-lg text-slate-200 whitespace-pre-wrap select-text break-words border border-slate-855/60 leading-normal">
+                      <div className="p-4 bg-slate-950/40 rounded-lg text-slate-200 whitespace-pre-wrap select-text break-words border border-slate-800/60 leading-normal">
                         {feedbacks[idx]?.content}
                       </div>
                     </div>

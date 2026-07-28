@@ -105,7 +105,7 @@ export default function TranslatorPage() {
         <select
           value={sourceLang}
           onChange={(e) => setSourceLang(e.target.value)}
-          className="bg-slate-950 border border-slate-850 hover:border-slate-700 text-white rounded-lg px-3 py-1.5 outline-none text-xs font-semibold cursor-pointer"
+          className="bg-slate-950 border border-slate-800 hover:border-slate-700 text-white rounded-lg px-3 py-1.5 outline-none text-xs font-semibold cursor-pointer"
         >
           {Object.keys(SUPPORTED_LANGUAGES).map((l) => (
             <option key={l} value={l}>
@@ -116,7 +116,7 @@ export default function TranslatorPage() {
 
         <button
           onClick={handleSwap}
-          className="p-2 rounded-lg bg-slate-950 border border-slate-850 hover:border-emerald-500/40 text-slate-400 hover:text-white transition-all duration-200"
+          className="p-2 rounded-lg bg-slate-950 border border-slate-800 hover:border-emerald-500/40 text-slate-400 hover:text-white transition-all duration-200"
           title="Swap Languages"
         >
           <Languages size={15} />
@@ -125,7 +125,7 @@ export default function TranslatorPage() {
         <select
           value={targetLang}
           onChange={(e) => setTargetLang(e.target.value)}
-          className="bg-slate-950 border border-slate-850 hover:border-slate-700 text-white rounded-lg px-3 py-1.5 outline-none text-xs font-semibold cursor-pointer"
+          className="bg-slate-950 border border-slate-800 hover:border-slate-700 text-white rounded-lg px-3 py-1.5 outline-none text-xs font-semibold cursor-pointer"
         >
           {Object.keys(SUPPORTED_LANGUAGES).map((l) => (
             <option key={l} value={l}>
@@ -156,7 +156,7 @@ export default function TranslatorPage() {
             onChange={(e) => setText(e.target.value)}
             placeholder="Type or paste your text to translate..."
             rows={10}
-            className="w-full bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-3 outline-none text-sm transition-all resize-none"
+            className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-3 outline-none text-sm transition-all resize-none"
           />
         </div>
 
@@ -175,7 +175,7 @@ export default function TranslatorPage() {
               </button>
             )}
           </div>
-          <div className="w-full bg-slate-950 border border-slate-850 text-slate-200 rounded-lg p-3 text-sm min-h-[224px] whitespace-pre-wrap leading-relaxed select-text font-sans">
+          <div className="w-full bg-slate-950 border border-slate-800 text-slate-200 rounded-lg p-3 text-sm min-h-[224px] whitespace-pre-wrap leading-relaxed select-text font-sans">
             {loading ? (
               <div className="flex items-center gap-2 text-slate-500 text-xs font-semibold">
                 <RefreshCw className="animate-spin text-emerald-400" size={14} />

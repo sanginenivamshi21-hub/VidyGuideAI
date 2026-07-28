@@ -28,7 +28,7 @@ export default function RootLayout({
         <AuthProvider>
           <div className="flex h-screen overflow-hidden">
             <Sidebar />
-            <main className="flex-1 h-screen overflow-y-auto relative flex flex-col pb-16 lg:pb-0">
+            <main className="flex-1 h-screen overflow-y-auto relative flex flex-col pb-16 lg:pb-0 safe-area-bottom">
               <SoftAurora speed={0.4} scale={1.2} brightness={0.8} />
               <div className="flex-1 p-4 sm:p-6 lg:p-8 z-10 max-w-7xl mx-auto w-full">
                 {children}

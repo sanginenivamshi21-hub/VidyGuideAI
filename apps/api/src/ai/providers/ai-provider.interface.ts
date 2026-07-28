@@ -6,23 +6,19 @@ export interface ChatMessage {
 export interface AiProviderConfig {
   name: string;
   apiKey: string;
-  models: {
-    chat: string;
-    json: string;
-    streaming: string;
-  };
+  model: string;
   priority: number;
 }
 
 export interface AiProvider {
   readonly name: string;
   readonly priority: number;
+  readonly config: AiProviderConfig;
   isAvailable(): boolean;
   generateText(
     systemPrompt: string,
     userPrompt: string,
     temperature?: number,
-    model?: string,
     historyMessages?: ChatMessage[],
     maxTokens?: number,
   ): Promise<string>;
@@ -30,7 +26,6 @@ export interface AiProvider {
     systemPrompt: string,
     userPrompt: string,
     temperature?: number,
-    model?: string,
     historyMessages?: ChatMessage[],
     maxTokens?: number,
   ): Promise<ReadableStream>;
@@ -38,7 +33,6 @@ export interface AiProvider {
     systemPrompt: string,
     userPrompt: string,
     temperature?: number,
-    model?: string,
     maxTokens?: number,
   ): Promise<T>;
 }

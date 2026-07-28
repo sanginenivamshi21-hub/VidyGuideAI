@@ -200,7 +200,7 @@ export default function ResumeReviewPage() {
         <div className="md:col-span-2 flex flex-col gap-6 bg-slate-900/40 border border-slate-800 rounded-3xl p-6 backdrop-blur-md">
           <div className="flex flex-col gap-2">
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Upload Resume</label>
-            <div className="border-2 border-dashed border-slate-850 hover:border-slate-700 bg-slate-950/50 rounded-2xl p-8 flex flex-col items-center justify-center gap-4 relative transition-all group">
+            <div className="border-2 border-dashed border-slate-800 hover:border-slate-700 bg-slate-950/50 rounded-2xl p-8 flex flex-col items-center justify-center gap-4 relative transition-all group">
               <input type="file" accept=".pdf,.jpg,.jpeg,.png,.txt,.webp"
                 onChange={handleFileUpload} disabled={scanning || loading}
                 className="absolute inset-0 opacity-0 cursor-pointer w-full h-full disabled:pointer-events-none" />
@@ -216,16 +216,16 @@ export default function ResumeReviewPage() {
           </div>
 
           <div className="flex items-center gap-4 my-1">
-            <div className="flex-1 h-px bg-slate-850" />
+            <div className="flex-1 h-px bg-slate-800" />
             <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider font-mono">or paste plaintext</span>
-            <div className="flex-1 h-px bg-slate-850" />
+            <div className="flex-1 h-px bg-slate-800" />
           </div>
 
           <div className="flex flex-col gap-1.5">
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Resume Text</label>
             <textarea value={resumeText} onChange={(e) => setResumeText(e.target.value)}
               placeholder="Paste the plain text of your resume here..." rows={8}
-              className="w-full bg-slate-950/80 border border-slate-855 hover:border-slate-700 focus:border-indigo-500 text-white rounded-xl p-4 outline-none text-xs font-mono leading-relaxed transition-all resize-none" />
+              className="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 focus:border-indigo-500 text-white rounded-xl p-4 outline-none text-xs font-mono leading-relaxed transition-all resize-none" />
           </div>
         </div>
 
@@ -233,7 +233,7 @@ export default function ResumeReviewPage() {
           <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
             <Shield size={14} className="text-indigo-400" /> Review Includes
           </h3>
-          <div className="p-5 bg-slate-900/60 border border-slate-850 rounded-2xl flex flex-col gap-4">
+          <div className="p-5 bg-slate-900/60 border border-slate-800 rounded-2xl flex flex-col gap-4">
             {[
               'ATS Score (0-100) with color gauge',
               'Matched & missing keywords',
@@ -261,11 +261,11 @@ export default function ResumeReviewPage() {
         </div>
       )}
 
-      <div className="flex flex-col md:flex-row items-center gap-6 border-t border-slate-850 pt-6">
+      <div className="flex flex-col md:flex-row items-center gap-6 border-t border-slate-800 pt-6">
         <div className="flex items-center gap-3">
           <label className="text-xs font-bold text-slate-400 uppercase tracking-wider whitespace-nowrap">🌐 Language:</label>
           <select value={language} onChange={(e) => setLanguage(e.target.value)}
-            className="bg-slate-950 border border-slate-855 hover:border-slate-700 focus:border-indigo-500 text-white rounded-lg px-4 py-2 outline-none text-xs transition-all font-semibold cursor-pointer">
+            className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-indigo-500 text-white rounded-lg px-4 py-2 outline-none text-xs transition-all font-semibold cursor-pointer">
             {Object.keys(SUPPORTED_LANGUAGES).map((langName) => (
               <option key={langName} value={langName}>{langName}</option>
             ))}
@@ -277,18 +277,18 @@ export default function ResumeReviewPage() {
             : <><Sparkles size={16} /> Analyze & Review</>}
         </button>
         {analysis && (
-          <button onClick={handleClear} className="px-4 py-3.5 bg-slate-950 border border-slate-855 hover:border-slate-800 text-slate-400 hover:text-white rounded-xl text-xs font-bold transition-all">Clear</button>
+          <button onClick={handleClear} className="px-4 py-3.5 bg-slate-950 border border-slate-800 hover:border-slate-800 text-slate-400 hover:text-white rounded-xl text-xs font-bold transition-all">Clear</button>
         )}
       </div>
 
       {analysis && (
-        <div className="flex flex-col gap-8 mt-2 border-t border-slate-850 pt-10 animate-fadeIn">
+        <div className="flex flex-col gap-8 mt-2 border-t border-slate-800 pt-10 animate-fadeIn">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-slate-900/40 border border-slate-855 rounded-3xl p-6 flex flex-col items-center justify-center text-center gap-3">
+            <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-6 flex flex-col items-center justify-center text-center gap-3">
               <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">ATS Score</span>
               <div className="relative w-28 h-28 flex items-center justify-center">
                 <svg className="w-full h-full transform -rotate-90">
-                  <circle cx="56" cy="56" r="48" className="stroke-slate-850 fill-transparent" strokeWidth="8" />
+                  <circle cx="56" cy="56" r="48" className="stroke-slate-800 fill-transparent" strokeWidth="8" />
                   <circle cx="56" cy="56" r="48" className={`${gaugeColor(analysis.atsScore)} fill-transparent`} strokeWidth="8"
                     strokeDasharray={301.6} strokeDashoffset={301.6 - (301.6 * analysis.atsScore) / 100} strokeLinecap="round" />
                 </svg>
@@ -298,8 +298,8 @@ export default function ResumeReviewPage() {
                 </div>
               </div>
             </div>
-            <div className="bg-slate-900/40 border border-slate-855 rounded-3xl p-5 flex flex-col gap-3 md:col-span-3">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-855 pb-2">Summary</span>
+            <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-5 flex flex-col gap-3 md:col-span-3">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-800 pb-2">Summary</span>
               <p className="text-sm text-slate-200 font-medium leading-relaxed">{analysis.summary}</p>
               <div className="flex items-center gap-4 mt-auto pt-2 text-[10px] text-slate-500 font-semibold uppercase tracking-wider">
                 <span>Keywords: {analysis.keywords.present.length} matched / {analysis.keywords.missing.length} missing</span>
@@ -308,7 +308,7 @@ export default function ResumeReviewPage() {
             </div>
           </div>
 
-          <div className="flex gap-2 border-b border-slate-850 pb-2">
+          <div className="flex gap-2 border-b border-slate-800 pb-2">
             {(['analyze', 'enhanced', 'feedback'] as const).map((tab) => (
               <button key={tab} onClick={() => setActiveTab(tab)}
                 className={`px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
@@ -323,7 +323,7 @@ export default function ResumeReviewPage() {
 
           {activeTab === 'analyze' && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-slate-900/40 border border-slate-855 rounded-3xl p-5 flex flex-col gap-3">
+              <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-5 flex flex-col gap-3">
                 <h3 className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-2"><CheckCircle2 size={14} /> Keywords Present</h3>
                 <div className="flex flex-wrap gap-2">
                   {analysis.keywords.present.length > 0 ? analysis.keywords.present.map((kw, i) => (
@@ -332,7 +332,7 @@ export default function ResumeReviewPage() {
                 </div>
                 <p className="text-[10px] text-slate-500 mt-1">Density: {analysis.keywords.density}</p>
               </div>
-              <div className="bg-slate-900/40 border border-slate-855 rounded-3xl p-5 flex flex-col gap-3">
+              <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-5 flex flex-col gap-3">
                 <h3 className="text-xs font-bold text-red-400 uppercase tracking-wider flex items-center gap-2"><XCircle size={14} /> Missing Keywords</h3>
                 <div className="flex flex-wrap gap-2">
                   {analysis.keywords.missing.length > 0 ? analysis.keywords.missing.map((kw, i) => (
@@ -340,7 +340,7 @@ export default function ResumeReviewPage() {
                   )) : <p className="text-xs text-slate-500 italic">No missing keywords</p>}
                 </div>
               </div>
-              <div className="bg-slate-900/40 border border-slate-855 rounded-3xl p-5 flex flex-col gap-3">
+              <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-5 flex flex-col gap-3">
                 <h3 className="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-2"><FileText size={14} /> Formatting Issues</h3>
                 {analysis.formattingIssues.length > 0 ? (
                   <ul className="list-disc list-inside text-xs text-slate-300 flex flex-col gap-1.5">
@@ -348,7 +348,7 @@ export default function ResumeReviewPage() {
                   </ul>
                 ) : <p className="text-xs text-slate-500 italic">No formatting issues</p>}
               </div>
-              <div className="bg-slate-900/40 border border-slate-855 rounded-3xl p-5 flex flex-col gap-3">
+              <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-5 flex flex-col gap-3">
                 <h3 className="text-xs font-bold text-orange-400 uppercase tracking-wider flex items-center gap-2"><Languages size={14} /> Grammar Suggestions</h3>
                 {analysis.grammarSuggestions.length > 0 ? (
                   <ul className="list-disc list-inside text-xs text-slate-300 flex flex-col gap-1.5">
@@ -356,7 +356,7 @@ export default function ResumeReviewPage() {
                   </ul>
                 ) : <p className="text-xs text-slate-500 italic">No grammar issues</p>}
               </div>
-              <div className="bg-slate-900/40 border border-slate-855 rounded-3xl p-5 flex flex-col gap-3">
+              <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-5 flex flex-col gap-3">
                 <h3 className="text-xs font-bold text-violet-400 uppercase tracking-wider flex items-center gap-2"><Sword size={14} /> Missing Skills</h3>
                 {analysis.missingSkills.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
@@ -366,7 +366,7 @@ export default function ResumeReviewPage() {
                   </div>
                 ) : <p className="text-xs text-slate-500 italic">None identified</p>}
               </div>
-              <div className="bg-slate-900/40 border border-slate-855 rounded-3xl p-5 flex flex-col gap-3">
+              <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-5 flex flex-col gap-3">
                 <h3 className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-2"><TrendingUp size={14} /> Strengths</h3>
                 {analysis.strengths.length > 0 ? (
                   <ul className="list-disc list-inside text-xs text-slate-300 flex flex-col gap-1.5">
@@ -374,12 +374,12 @@ export default function ResumeReviewPage() {
                   </ul>
                 ) : <p className="text-xs text-slate-500 italic">None identified</p>}
               </div>
-              <div className="md:col-span-2 bg-slate-900/40 border border-slate-855 rounded-3xl p-5 flex flex-col gap-3">
+              <div className="md:col-span-2 bg-slate-900/40 border border-slate-800 rounded-3xl p-5 flex flex-col gap-3">
                 <h3 className="text-xs font-bold text-blue-400 uppercase tracking-wider flex items-center gap-2"><Lightbulb size={14} /> Improvements</h3>
                 {analysis.improvements.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {analysis.improvements.map((imp, i) => (
-                      <div key={i} className="flex items-start gap-2.5 p-3 bg-slate-950/50 border border-slate-850 rounded-xl">
+                      <div key={i} className="flex items-start gap-2.5 p-3 bg-slate-950/50 border border-slate-800 rounded-xl">
                         <span className="w-5 h-5 rounded-full bg-blue-500/10 border border-blue-500/25 flex items-center justify-center text-[10px] text-blue-400 mt-0.5 shrink-0">{i + 1}</span>
                         <p className="text-xs text-slate-300 leading-relaxed">{imp}</p>
                       </div>
@@ -400,7 +400,7 @@ export default function ResumeReviewPage() {
                   <p className="text-[10px] text-slate-500 mt-0.5">Copy or export as PDF.</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button onClick={handleCopyEnhanced} className="flex items-center justify-center gap-1.5 px-4 py-2 bg-slate-950 border border-slate-855 hover:border-slate-800 text-slate-300 hover:text-white rounded-xl text-xs font-bold transition-all">
+                  <button onClick={handleCopyEnhanced} className="flex items-center justify-center gap-1.5 px-4 py-2 bg-slate-950 border border-slate-800 hover:border-slate-800 text-slate-300 hover:text-white rounded-xl text-xs font-bold transition-all">
                     {copied ? <><Check size={14} className="text-emerald-400" /> Copied</> : <><Copy size={14} /> Copy</>}
                   </button>
                   <button onClick={handleDownloadPdf} disabled={downloadingPdf}
@@ -410,7 +410,7 @@ export default function ResumeReviewPage() {
                   </button>
                 </div>
               </div>
-              <div className="p-6 bg-slate-950 border border-slate-855 rounded-2xl text-slate-300 font-mono text-xs leading-relaxed whitespace-pre select-text overflow-x-auto shadow-inner max-h-[600px] overflow-y-auto">
+              <div className="p-6 bg-slate-950 border border-slate-800 rounded-2xl text-slate-300 font-mono text-xs leading-relaxed whitespace-pre select-text overflow-x-auto shadow-inner max-h-[600px] overflow-y-auto">
                 {analysis.enhancedResume}
               </div>
             </div>
@@ -418,12 +418,12 @@ export default function ResumeReviewPage() {
 
           {activeTab === 'feedback' && (
             <div className="flex flex-col gap-6">
-              <div className="bg-slate-900/40 border border-slate-855 rounded-3xl p-6 flex flex-col gap-4">
+              <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-6 flex flex-col gap-4">
                 <h3 className="text-md font-bold text-white flex items-center gap-2">
                   <MessageSquare size={16} className="text-pink-400" /> AI Coach Detailed Feedback
                 </h3>
                 <p className="text-xs text-slate-500">Language: {language}</p>
-                <div className="p-6 bg-slate-950/60 border border-slate-855 rounded-2xl text-slate-200 text-sm leading-relaxed">
+                <div className="p-6 bg-slate-950/60 border border-slate-800 rounded-2xl text-slate-200 text-sm leading-relaxed">
                   {feedbackContent ? <MarkdownRenderer content={feedbackContent} /> : (
                     <p className="text-slate-500 italic">No feedback content available.</p>
                   )}

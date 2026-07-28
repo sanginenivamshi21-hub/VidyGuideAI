@@ -72,7 +72,7 @@ export default function CareerRoadmapPage() {
             onChange={(e) => setText(e.target.value)}
             placeholder="Paste your career guidance text here. (e.g. Month 1: Learn HTML/CSS. Month 2: Build a portfolio. Month 3: Apply for front-end developer internships.)"
             rows={8}
-            className="w-full bg-slate-950 border border-slate-850 hover:border-slate-700 focus:border-purple-500 text-white rounded-lg p-3 outline-none text-sm transition-all resize-none"
+            className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-purple-500 text-white rounded-lg p-3 outline-none text-sm transition-all resize-none"
           />
         </div>
 
@@ -103,7 +103,7 @@ export default function CareerRoadmapPage() {
       </div>
 
       {parsed && milestones.length > 0 && (
-        <div className="bg-slate-950 border border-slate-850 rounded-2xl p-6 flex flex-col gap-6 shadow-inner animate-fadeIn">
+        <div className="bg-slate-950 border border-slate-800 rounded-2xl p-6 flex flex-col gap-6 shadow-inner animate-fadeIn">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
               <span className="text-xl">🗺️</span>

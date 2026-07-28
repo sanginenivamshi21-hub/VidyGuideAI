@@ -104,7 +104,7 @@ VidyGuideAI is a full-stack, AI-powered career preparation platform built for st
 - **Security:** Helmet, Rate Limiting (@nestjs/throttler)
 
 ### AI & ML
-- **AI Provider:** Groq (LLaMA 3 70B)
+- **AI Providers:** Groq (LLaMA 3 70B), Gemini 1.5 Flash, OpenRouter (GPT-4o-mini) — with automatic fallback
 - **OCR:** EasyOCR (PyTorch), Tesseract (pytesseract)
 - **PDF Generation:** ReportLab (Python)
 
@@ -134,11 +134,12 @@ VidyGuideAI is a full-stack, AI-powered career preparation platform built for st
 └───────┬──────────────────────────────────────┬───────────┘
         │                                      │
         ▼                                      ▼
-┌──────────────────┐              ┌────────────────────────┐
-│   PostgreSQL 16   │              │   Groq AI (LLaMA 3)    │
-│   + Prisma ORM    │              │   + Resend (Email)     │
-│   + Migrations    │              │   + Cloudinary Files   │
-└──────────────────┘              └────────────────────────┘
+┌──────────────────┐              ┌──────────────────────────┐
+│   PostgreSQL 16   │              │   Groq / Gemini /        │
+│   + Prisma ORM    │              │   OpenRouter (Fallback)  │
+│   + Migrations    │              │   + Resend (Email)       │
+└──────────────────┘              │   + Cloudinary Files     │
+                                  └──────────────────────────┘
 ```
 
 ---
@@ -331,7 +332,7 @@ See [docs/API.md](docs/API.md) for full documentation.
 - [x] Interview preparation simulator
 - [x] JWT authentication with OTP verification
 - [ ] Custom domain (vidyguide.is-a.dev)
-- [ ] Mobile responsive refinements
+- [x] Mobile responsive refinements
 - [ ] AI-powered skill gap analysis
 - [ ] Company-specific interview question banks
 - [ ] Community resume templates

@@ -339,7 +339,7 @@ export default function CareerPage() {
     : 0;
 
   return (
-    <div className="flex flex-col gap-10 max-w-5xl mx-auto py-4 select-none">
+    <div className="flex flex-col gap-10 max-w-5xl mx-auto py-4">
       {/* Header section */}
       <div className="flex items-center gap-4">
         <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-emerald-400 text-2xl shadow-inner">
@@ -365,7 +365,7 @@ export default function CareerPage() {
             <select
               value={eduKey}
               onChange={(e) => setEduKey(e.target.value)}
-              className="w-full bg-slate-950/80 border border-slate-855 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm transition-all"
+              className="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm transition-all"
             >
               {Object.keys(EDU_LEVELS).map((key) => (
                 <option key={key} value={key}>
@@ -380,7 +380,7 @@ export default function CareerPage() {
             )}
           </div>
 
-          <div className="border-t border-slate-850 my-1" />
+          <div className="border-t border-slate-800 my-1" />
 
           {/* Step 2 */}
           <div className="flex flex-col gap-4">
@@ -397,7 +397,7 @@ export default function CareerPage() {
                 value={extraInfo}
                 onChange={(e) => setExtraInfo(e.target.value)}
                 placeholder={ctx.ph}
-                className="w-full bg-slate-950/80 border border-slate-855 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm transition-all"
+                className="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm transition-all"
               />
             </div>
 
@@ -409,7 +409,7 @@ export default function CareerPage() {
                   value={skills}
                   onChange={(e) => setSkills(e.target.value)}
                   placeholder="e.g. Java, SQL, Communications"
-                  className="w-full bg-slate-950/80 border border-slate-855 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm transition-all"
+                  className="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm transition-all"
                 />
               </div>
 
@@ -420,7 +420,7 @@ export default function CareerPage() {
                   value={interests}
                   onChange={(e) => setInterests(e.target.value)}
                   placeholder="e.g. Open-source, Design, Finance"
-                  className="w-full bg-slate-950/80 border border-slate-855 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm transition-all"
+                  className="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm transition-all"
                 />
               </div>
             </div>
@@ -431,7 +431,7 @@ export default function CareerPage() {
                 <select
                   value={goal}
                   onChange={(e) => setGoal(e.target.value)}
-                  className="w-full bg-slate-950/80 border border-slate-855 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm transition-all"
+                  className="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm transition-all"
                 >
                   {ctx.goals && ctx.goals.map((g: string) => (
                     <option key={g} value={g}>
@@ -449,7 +449,7 @@ export default function CareerPage() {
                     value={locationInput}
                     onChange={(e) => setLocationInput(e.target.value)}
                     placeholder="e.g. Hyderabad, TS"
-                    className="w-full bg-slate-950/80 border border-slate-855 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm transition-all"
+                    className="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm transition-all"
                   />
                 </div>
               )}
@@ -460,7 +460,7 @@ export default function CareerPage() {
               <button
                 type="button"
                 onClick={() => setShowAdvanced(!showAdvanced)}
-                className="flex items-center justify-between w-full text-xs font-bold text-slate-350 hover:text-white transition-all"
+                className="flex items-center justify-between w-full text-xs font-bold text-slate-400 hover:text-white transition-all"
               >
                 <span className="flex items-center gap-1.5 uppercase tracking-wider">
                   <Sliders size={14} className="text-emerald-400" />
@@ -472,7 +472,7 @@ export default function CareerPage() {
               </button>
 
               {showAdvanced && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 pt-4 border-t border-slate-850/80 animate-fadeIn">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 pt-4 border-t border-slate-800/80 animate-fadeIn">
                   <div className="flex flex-col gap-1">
                     <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">CGPA / Percentage Marks</label>
                     <input
@@ -480,7 +480,7 @@ export default function CareerPage() {
                       value={cgpa}
                       onChange={(e) => setCgpa(e.target.value)}
                       placeholder="e.g. 8.4 CGPA or 88%"
-                      className="bg-slate-950/80 border border-slate-855 text-white rounded-lg p-2 outline-none text-xs"
+                      className="bg-slate-950/80 border border-slate-800 text-white rounded-lg p-2 outline-none text-xs"
                     />
                   </div>
 
@@ -491,7 +491,7 @@ export default function CareerPage() {
                       value={languages}
                       onChange={(e) => setLanguages(e.target.value)}
                       placeholder="e.g. Java, Python, TypeScript"
-                      className="bg-slate-950/80 border border-slate-855 text-white rounded-lg p-2 outline-none text-xs"
+                      className="bg-slate-950/80 border border-slate-800 text-white rounded-lg p-2 outline-none text-xs"
                     />
                   </div>
 
@@ -502,7 +502,7 @@ export default function CareerPage() {
                       value={dreamJob}
                       onChange={(e) => setDreamJob(e.target.value)}
                       placeholder="e.g. AI Researcher, VP of Finance"
-                      className="bg-slate-950/80 border border-slate-855 text-white rounded-lg p-2 outline-none text-xs"
+                      className="bg-slate-950/80 border border-slate-800 text-white rounded-lg p-2 outline-none text-xs"
                     />
                   </div>
 
@@ -513,7 +513,7 @@ export default function CareerPage() {
                       value={expectedSalary}
                       onChange={(e) => setExpectedSalary(e.target.value)}
                       placeholder="e.g. ₹6-10 LPA"
-                      className="bg-slate-950/80 border border-slate-855 text-white rounded-lg p-2 outline-none text-xs"
+                      className="bg-slate-950/80 border border-slate-800 text-white rounded-lg p-2 outline-none text-xs"
                     />
                   </div>
 
@@ -524,7 +524,7 @@ export default function CareerPage() {
                       value={targetCompany}
                       onChange={(e) => setTargetCompany(e.target.value)}
                       placeholder="e.g. TCS, Infosys, SBI, Microsoft"
-                      className="bg-slate-950/80 border border-slate-855 text-white rounded-lg p-2 outline-none text-xs"
+                      className="bg-slate-950/80 border border-slate-800 text-white rounded-lg p-2 outline-none text-xs"
                     />
                   </div>
 
@@ -535,7 +535,7 @@ export default function CareerPage() {
                       value={preferredCountry}
                       onChange={(e) => setPreferredCountry(e.target.value)}
                       placeholder="e.g. India, USA, Germany"
-                      className="bg-slate-950/80 border border-slate-855 text-white rounded-lg p-2 outline-none text-xs"
+                      className="bg-slate-950/80 border border-slate-800 text-white rounded-lg p-2 outline-none text-xs"
                     />
                   </div>
 
@@ -546,7 +546,7 @@ export default function CareerPage() {
                       value={studyHours}
                       onChange={(e) => setStudyHours(e.target.value)}
                       placeholder="e.g. 3-4 hours"
-                      className="bg-slate-950/80 border border-slate-855 text-white rounded-lg p-2 outline-none text-xs"
+                      className="bg-slate-950/80 border border-slate-800 text-white rounded-lg p-2 outline-none text-xs"
                     />
                   </div>
 
@@ -557,7 +557,7 @@ export default function CareerPage() {
                       value={timeline}
                       onChange={(e) => setTimeline(e.target.value)}
                       placeholder="e.g. 6 Months, 1 Year"
-                      className="bg-slate-950/80 border border-slate-855 text-white rounded-lg p-2 outline-none text-xs"
+                      className="bg-slate-950/80 border border-slate-800 text-white rounded-lg p-2 outline-none text-xs"
                     />
                   </div>
 
@@ -569,14 +569,14 @@ export default function CareerPage() {
                         value={linkedin}
                         onChange={(e) => setLinkedin(e.target.value)}
                         placeholder="LinkedIn"
-                        className="bg-slate-950/80 border border-slate-855 text-white rounded-lg p-1.5 outline-none text-[10px]"
+                        className="bg-slate-950/80 border border-slate-800 text-white rounded-lg p-1.5 outline-none text-[10px]"
                       />
                       <input
                         type="text"
                         value={github}
                         onChange={(e) => setGithub(e.target.value)}
                         placeholder="GitHub"
-                        className="bg-slate-950/80 border border-slate-855 text-white rounded-lg p-1.5 outline-none text-[10px]"
+                        className="bg-slate-950/80 border border-slate-800 text-white rounded-lg p-1.5 outline-none text-[10px]"
                       />
                     </div>
                   </div>
@@ -588,7 +588,7 @@ export default function CareerPage() {
                       value={certificates}
                       onChange={(e) => setCertificates(e.target.value)}
                       placeholder="e.g. AWS Certified, Node project"
-                      className="bg-slate-950/80 border border-slate-855 text-white rounded-lg p-2 outline-none text-xs"
+                      className="bg-slate-950/80 border border-slate-800 text-white rounded-lg p-2 outline-none text-xs"
                     />
                   </div>
 
@@ -601,7 +601,7 @@ export default function CareerPage() {
                           value={strengths}
                           onChange={(e) => setStrengths(e.target.value)}
                           placeholder="e.g. Fast learner, problem solver"
-                          className="bg-slate-950/80 border border-slate-855 text-white rounded-lg p-2 outline-none text-xs"
+                          className="bg-slate-950/80 border border-slate-800 text-white rounded-lg p-2 outline-none text-xs"
                         />
                       </div>
                       <div className="flex flex-col gap-0.5">
@@ -611,7 +611,7 @@ export default function CareerPage() {
                           value={weaknesses}
                           onChange={(e) => setWeaknesses(e.target.value)}
                           placeholder="e.g. Stage fear, bad writing"
-                          className="bg-slate-950/80 border border-slate-855 text-white rounded-lg p-2 outline-none text-xs"
+                          className="bg-slate-950/80 border border-slate-800 text-white rounded-lg p-2 outline-none text-xs"
                         />
                       </div>
                     </div>
@@ -627,7 +627,7 @@ export default function CareerPage() {
                 onChange={(e) => setNote(e.target.value)}
                 placeholder="e.g. Need low-budget study options, part-time jobs..."
                 rows={3}
-                className="w-full bg-slate-950/80 border border-slate-855 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm transition-all resize-none"
+                className="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm transition-all resize-none"
               />
             </div>
 
@@ -637,7 +637,7 @@ export default function CareerPage() {
                 <span className="text-slate-400 uppercase tracking-wider">📊 Profiling Score</span>
                 <span className="text-emerald-400">{completeness()}%</span>
               </div>
-              <div className="w-full h-1.5 bg-slate-950 rounded-full overflow-hidden border border-slate-850">
+              <div className="w-full h-1.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
                 <div
                   className="h-full bg-emerald-500 transition-all duration-300 shadow-md shadow-emerald-500/30"
                   style={{ width: `${completeness()}%` }}
@@ -656,7 +656,7 @@ export default function CareerPage() {
             {TRENDING[trendingKey]?.map((item) => (
               <div
                 key={item}
-                className="p-4 bg-slate-900/60 border border-slate-850 hover:border-emerald-500/30 rounded-2xl hover:translate-x-1 transition-all duration-200"
+                className="p-4 bg-slate-900/60 border border-slate-800 hover:border-emerald-500/30 rounded-2xl hover:translate-x-1 transition-all duration-200"
               >
                 <div className="font-bold text-emerald-400 text-xs mb-1">{item}</div>
                 <div className="text-[11px] text-slate-400 leading-normal">{TRENDING_DESC[item]}</div>
@@ -673,13 +673,13 @@ export default function CareerPage() {
       )}
 
       {/* Action button row */}
-      <div className="flex flex-col md:flex-row items-center gap-6 border-t border-slate-850 pt-6">
+      <div className="flex flex-col md:flex-row items-center gap-6 border-t border-slate-800 pt-6">
         <div className="w-full md:w-auto flex items-center gap-3">
           <label className="text-xs font-bold text-slate-400 uppercase tracking-wider whitespace-nowrap">🌐 Language:</label>
           <select
             value={language}
             onChange={(e) => setLanguage(e.target.value)}
-            className="bg-slate-950 border border-slate-855 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg px-4 py-2 outline-none text-xs transition-all font-semibold cursor-pointer"
+            className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg px-4 py-2 outline-none text-xs transition-all font-semibold cursor-pointer"
           >
             {Object.keys(SUPPORTED_LANGUAGES).map((langName) => (
               <option key={langName} value={langName}>
@@ -710,7 +710,7 @@ export default function CareerPage() {
 
       {/* AI Recommendation Output Result */}
       {result && (
-        <div className="flex flex-col gap-8 mt-6 border-t border-slate-850 pt-10">
+        <div className="flex flex-col gap-8 mt-6 border-t border-slate-800 pt-10">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <h3 className="text-xl font-bold text-white flex items-center gap-2">
               <span>🌱</span> Your Personalised Guidance
@@ -721,7 +721,7 @@ export default function CareerPage() {
                 className={`flex-1 md:flex-initial flex items-center justify-center gap-2 px-4 py-2 rounded-xl border text-xs font-bold transition-all duration-200 ${
                   showRoadmap
                     ? 'bg-purple-500/10 text-purple-400 border-purple-500/40 shadow-sm'
-                    : 'bg-slate-950 border-slate-850 hover:border-slate-750 text-slate-350 hover:text-white'
+                    : 'bg-slate-950 border-slate-800 hover:border-slate-700 text-slate-400 hover:text-white'
                 }`}
               >
                 <Map size={14} />
@@ -729,7 +729,7 @@ export default function CareerPage() {
               </button>
               <button
                 onClick={handleClear}
-                className="p-2 rounded-xl bg-slate-950 border border-slate-850 hover:border-red-500/40 text-slate-400 hover:text-red-400 transition-all duration-200"
+                className="p-2 rounded-xl bg-slate-950 border border-slate-800 hover:border-red-500/40 text-slate-400 hover:text-red-400 transition-all duration-200"
                 title="Clear results"
               >
                 <Trash2 size={16} />
@@ -739,8 +739,8 @@ export default function CareerPage() {
 
           {/* Premium Timeline Roadmap visualizer */}
           {showRoadmap && milestones.length > 0 && (
-            <div className="bg-slate-950 border border-slate-850 rounded-3xl p-6 flex flex-col gap-6 shadow-2xl animate-fadeIn">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-850 pb-4 gap-4">
+            <div className="bg-slate-950 border border-slate-800 rounded-3xl p-6 flex flex-col gap-6 shadow-2xl animate-fadeIn">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-800 pb-4 gap-4">
                 <div className="flex items-center gap-2.5">
                   <span className="text-2xl">🗺️</span>
                   <div>
@@ -755,7 +755,7 @@ export default function CareerPage() {
                     <span className="text-[8px] font-bold text-slate-500 uppercase tracking-widest leading-none">Overall Progress</span>
                     <span className="text-xs font-extrabold text-white">{roadmapProgress}% Complete</span>
                   </div>
-                  <div className="w-16 h-1.5 bg-slate-950 border border-slate-850 rounded-full overflow-hidden shrink-0">
+                  <div className="w-16 h-1.5 bg-slate-950 border border-slate-800 rounded-full overflow-hidden shrink-0">
                     <div 
                       className="h-full bg-emerald-500 transition-all duration-300 shadow-md shadow-emerald-500/35"
                       style={{ width: `${roadmapProgress}%` }}
@@ -794,7 +794,7 @@ export default function CareerPage() {
                             className={`p-1 rounded-lg border transition-all ${
                               isCompleted 
                                 ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' 
-                                : 'bg-slate-950 border-slate-850 text-slate-500 hover:text-slate-300'
+                                : 'bg-slate-950 border-slate-800 text-slate-500 hover:text-slate-300'
                             }`}
                             title={isCompleted ? 'Mark as incomplete' : 'Mark as complete'}
                           >
@@ -813,7 +813,7 @@ export default function CareerPage() {
                         </div>
 
                         {/* Expandable Resource checkpoint info */}
-                        <div className="pt-2 border-t border-slate-850/80 flex items-center justify-between text-[9px] font-semibold text-slate-500 uppercase">
+                        <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[9px] font-semibold text-slate-500 uppercase">
                           <span>Timeline Stage</span>
                           <span className={isCompleted ? 'text-emerald-400' : 'text-slate-400'}>
                             {isCompleted ? 'Completed' : 'Action Pending'}
@@ -823,7 +823,7 @@ export default function CareerPage() {
                       
                       {idx < milestones.length - 1 && (
                         <div className="flex flex-col items-center justify-center shrink-0 mx-2">
-                          <ArrowRight size={16} className={isCompleted ? 'text-emerald-500/50' : 'text-slate-850'} />
+                          <ArrowRight size={16} className={isCompleted ? 'text-emerald-500/50' : 'text-slate-800'} />
                         </div>
                       )}
                     </div>
@@ -834,7 +834,7 @@ export default function CareerPage() {
           )}
 
           {/* Markdown advice display */}
-          <div className="p-8 bg-slate-900/60 border border-slate-855 rounded-3xl text-slate-200 text-sm leading-relaxed font-sans shadow-2xl">
+          <div className="p-8 bg-slate-900/60 border border-slate-800 rounded-3xl text-slate-200 text-sm leading-relaxed font-sans shadow-2xl">
             <MarkdownRenderer content={result} />
           </div>
         </div>

@@ -14,11 +14,7 @@ export class GeminiProvider implements AiProvider {
     this.config = {
       name: 'gemini',
       apiKey: this.apiKey,
-      models: {
-        chat: process.env.GEMINI_CHAT_MODEL || 'gemini-1.5-flash',
-        json: process.env.GEMINI_JSON_MODEL || 'gemini-1.5-flash',
-        streaming: process.env.GEMINI_STREAM_MODEL || 'gemini-1.5-flash',
-      },
+      model: process.env.GEMINI_MODEL || 'gemini-1.5-flash',
       priority: 2,
     };
   }
@@ -27,12 +23,12 @@ export class GeminiProvider implements AiProvider {
     return !!this.apiKey;
   }
 
-  private buildUrl(model: string): string {
-    return `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${this.apiKey}`;
+  private buildUrl(): string {
+    return `https://generativelanguage.googleapis.com/v1beta/models/${this.config.model}:generateContent?key=${this.apiKey}`;
   }
 
-  private buildStreamUrl(model: string): string {
-    return `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?alt=sse&key=${this.apiKey}`;
+  private buildStreamUrl(): string {
+    return `https://generativelanguage.googleapis.com/v1beta/models/${this.config.model}:streamGenerateContent?alt=sse&key=${this.apiKey}`;
   }
 
   private buildContents(systemPrompt: string, userPrompt: string, historyMessages: ChatMessage[] = []) {
@@ -51,12 +47,10 @@ export class GeminiProvider implements AiProvider {
     systemPrompt: string,
     userPrompt: string,
     temperature = 0.4,
-    model?: string,
     historyMessages: ChatMessage[] = [],
     maxTokens = 2048,
   ): Promise<string> {
-    const m = model || this.config.models.chat;
-    const url = this.buildUrl(m);
+    const url = this.buildUrl();
 
     const response = await fetch(url, {
       method: 'POST',
@@ -80,12 +74,10 @@ export class GeminiProvider implements AiProvider {
     systemPrompt: string,
     userPrompt: string,
     temperature = 0.7,
-    model?: string,
     historyMessages: ChatMessage[] = [],
     maxTokens = 2048,
   ): Promise<ReadableStream> {
-    const m = model || this.config.models.streaming;
-    const url = this.buildStreamUrl(m);
+    const url = this.buildStreamUrl();
 
     const response = await fetch(url, {
       method: 'POST',
@@ -137,11 +129,9 @@ export class GeminiProvider implements AiProvider {
     systemPrompt: string,
     userPrompt: string,
     temperature = 0.1,
-    model?: string,
     maxTokens = 4096,
   ): Promise<T> {
-    const m = model || this.config.models.json;
-    const url = this.buildUrl(m);
+    const url = this.buildUrl();
 
     const response = await fetch(url, {
       method: 'POST',

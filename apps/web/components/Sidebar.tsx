@@ -63,7 +63,7 @@ export default function Sidebar() {
     <motion.div
       animate={{ width: isOpen ? 250 : 72 }}
       transition={{ duration: 0.3, ease: 'easeInOut' }}
-      className="h-screen bg-slate-900 border-r border-slate-800 text-slate-200 flex flex-col justify-between p-4 relative select-none shrink-0"
+      className="h-screen bg-slate-900 border-r border-slate-800 text-slate-200 flex flex-col justify-between p-4 relative select-none shrink-0 hidden lg:flex"
     >
       <div className="flex flex-col gap-6 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-800">
         <div className="flex items-center justify-between h-10 px-2">
@@ -113,7 +113,7 @@ export default function Sidebar() {
                 aria-current={isActive ? 'page' : undefined}
                 aria-label={item.label}
               >
-                <Icon size={18} className={`shrink-0 ${isActive ? item.color : 'text-slate-500 group-hover:text-slate-350'}`} />
+                <Icon size={18} className={`shrink-0 ${isActive ? item.color : 'text-slate-500 group-hover:text-slate-400'}`} />
                 {isOpen && (
                   <motion.span
                     initial={{ opacity: 0 }}
@@ -158,7 +158,7 @@ export default function Sidebar() {
         )}
 
         {isOpen && (
-          <div className="text-[10px] text-slate-650 text-center font-mono">
+          <div className="text-[10px] text-slate-600 text-center font-mono">
             VidyGuideAI v3.1.1
           </div>
         )}

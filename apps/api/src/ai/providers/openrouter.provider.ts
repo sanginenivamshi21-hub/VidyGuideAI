@@ -14,11 +14,7 @@ export class OpenRouterProvider implements AiProvider {
     this.config = {
       name: 'openrouter',
       apiKey: this.apiKey,
-      models: {
-        chat: process.env.OPENROUTER_CHAT_MODEL || 'openai/gpt-4o-mini',
-        json: process.env.OPENROUTER_JSON_MODEL || 'openai/gpt-4o-mini',
-        streaming: process.env.OPENROUTER_STREAM_MODEL || 'openai/gpt-4o-mini',
-      },
+      model: process.env.OPENROUTER_MODEL || 'openai/gpt-4o-mini',
       priority: 3,
     };
   }
@@ -31,12 +27,9 @@ export class OpenRouterProvider implements AiProvider {
     systemPrompt: string,
     userPrompt: string,
     temperature = 0.4,
-    model?: string,
     historyMessages: ChatMessage[] = [],
     maxTokens = 2048,
   ): Promise<string> {
-    const m = model || this.config.models.chat;
-
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -46,7 +39,7 @@ export class OpenRouterProvider implements AiProvider {
         'X-Title': 'VidyGuideAI',
       },
       body: JSON.stringify({
-        model: m,
+        model: this.config.model,
         messages: [
           { role: 'system', content: systemPrompt },
           ...historyMessages,
@@ -70,12 +63,9 @@ export class OpenRouterProvider implements AiProvider {
     systemPrompt: string,
     userPrompt: string,
     temperature = 0.7,
-    model?: string,
     historyMessages: ChatMessage[] = [],
     maxTokens = 2048,
   ): Promise<ReadableStream> {
-    const m = model || this.config.models.streaming;
-
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -85,7 +75,7 @@ export class OpenRouterProvider implements AiProvider {
         'X-Title': 'VidyGuideAI',
       },
       body: JSON.stringify({
-        model: m,
+        model: this.config.model,
         messages: [
           { role: 'system', content: systemPrompt },
           ...historyMessages,
@@ -140,11 +130,8 @@ export class OpenRouterProvider implements AiProvider {
     systemPrompt: string,
     userPrompt: string,
     temperature = 0.1,
-    model?: string,
     maxTokens = 4096,
   ): Promise<T> {
-    const m = model || this.config.models.json;
-
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -154,7 +141,7 @@ export class OpenRouterProvider implements AiProvider {
         'X-Title': 'VidyGuideAI',
       },
       body: JSON.stringify({
-        model: m,
+        model: this.config.model,
         messages: [
           { role: 'system', content: systemPrompt + '\nEnsure output is strictly JSON.' },
           { role: 'user', content: userPrompt },

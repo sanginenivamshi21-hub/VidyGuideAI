@@ -32,16 +32,13 @@ export class MentorController {
     async askMentor(@Body() body: any) {
         const question = body.question || '';
         const replyLang = body.reply_language || 'en';
-        const model = body.model || 'llama-3.3-70b-versatile';
         const temperature = body.temperature ?? 0.7;
 
         const responseText = await this.aiService.generateText(
             this.buildMentorPrompt(replyLang),
             question,
             temperature,
-            model,
             [],
-            3,
             2048,
             'groq',
         );
@@ -52,7 +49,6 @@ export class MentorController {
     async askMentorStream(@Body() body: any, @Res() res: Response) {
         const question = body.question || '';
         const replyLang = body.reply_language || 'en';
-        const model = body.model || 'llama-3.3-70b-versatile';
         const temperature = body.temperature ?? 0.7;
         const maxTokens = body.maxTokens ?? 2048;
         const messages = body.messages || [];
@@ -71,7 +67,6 @@ export class MentorController {
                 this.buildMentorPrompt(replyLang),
                 question,
                 temperature,
-                model,
                 historyMessages,
                 maxTokens,
                 'groq',
@@ -101,7 +96,6 @@ export class MentorController {
         const experienceLevel = body.experience_level || 'Entry Level';
         const skills = body.skills || 'General technical skills';
         const difficulty = body.difficulty || 'Medium';
-        const model = body.model || 'llama-3.3-70b-versatile';
         const temperature = body.temperature ?? 0.8;
 
         const systemPrompt = `You are an expert corporate recruiter and interviewer for Indian companies. Generate exactly 5 highly relevant, realistic, and challenging interview questions for the following candidate profile:
@@ -117,9 +111,7 @@ Format each question with Markdown. Use emojis naturally. Return exactly 5 quest
             systemPrompt,
             'Generate the questions.',
             temperature,
-            model,
             [],
-            3,
             2048,
             'groq',
         );
@@ -135,7 +127,6 @@ Format each question with Markdown. Use emojis naturally. Return exactly 5 quest
     @Post('interview/feedback')
     async getInterviewFeedback(@Body() body: any) {
         const items = body.items || [];
-        const model = body.model || 'llama-3.3-70b-versatile';
         const temperature = body.temperature ?? 0.6;
 
         let promptContent =
@@ -157,9 +148,7 @@ Provide feedback in a premium, beautifully formatted conversational markdown lay
             systemPrompt,
             promptContent,
             temperature,
-            model,
             [],
-            3,
             2048,
             'groq',
         );
