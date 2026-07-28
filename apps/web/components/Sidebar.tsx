@@ -23,6 +23,7 @@ import {
   LogIn,
   UserPlus,
 } from 'lucide-react';
+import Logo from './Logo';
 import { useAuth } from '@/hooks/useAuth';
 import { ROUTES } from '@/lib/routes';
 
@@ -38,12 +39,13 @@ export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(true);
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     setIsOpen(localStorage.getItem('vidyguide_sidebar') !== 'collapsed');
     setMounted(true);
   }, []);
-  const router = useRouter();
+
   const { isAuthenticated, isGuest, logout } = useAuth();
 
   const allItems: SidebarItem[] = [
@@ -66,38 +68,37 @@ export default function Sidebar() {
     <motion.div
       animate={{ width: isOpen ? 250 : 72 }}
       transition={{ duration: 0.3, ease: 'easeInOut' }}
-      className="h-screen bg-slate-900 border-r border-slate-800 text-slate-200 flex flex-col justify-between p-4 relative select-none shrink-0 hidden lg:flex"
+      className="h-screen border-r shrink-0 hidden lg:flex flex-col justify-between p-4 relative select-none"
+      style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-default)' }}
     >
       <div className="flex flex-col gap-6 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-800">
         <div className="flex items-center justify-between h-10 px-2">
-          {isOpen ? (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex items-center gap-2 cursor-pointer"
-              onClick={() => router.push(ROUTES.HOME)}
-            >
-              <span className="text-xl">🌿</span>
-              <h1 className="text-md font-bold text-emerald-400 tracking-wider">
-                VidyGuideAI
-              </h1>
-            </motion.div>
-          ) : (
-            <div className="w-8 h-8 rounded bg-emerald-500 mx-auto flex items-center justify-center cursor-pointer" onClick={() => router.push(ROUTES.HOME)}>
-              <span className="text-sm">🌿</span>
-            </div>
-          )}
-            <button
-              onClick={() => {
-                const next = !isOpen;
-                setIsOpen(next);
-                localStorage.setItem('vidyguide_sidebar', next ? 'expanded' : 'collapsed');
-              }}
-              className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-400 absolute -right-3 top-5 border border-slate-700 z-50 transition-all duration-200"
-              aria-label={isOpen ? 'Collapse sidebar' : 'Expand sidebar'}
-            >
-              {isOpen ? <ChevronLeft size={16} /> : <Menu size={16} />}
-            </button>
+          <button
+            onClick={() => router.push(ROUTES.HOME)}
+            className="flex items-center gap-2 cursor-pointer bg-transparent border-none outline-none"
+            aria-label="Home"
+          >
+            {isOpen ? (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2">
+                <Logo size={28} />
+                <span className="text-sm font-bold tracking-tight" style={{ color: 'var(--accent)' }}>VidyGuideAI</span>
+              </motion.div>
+            ) : (
+              <Logo size={28} />
+            )}
+          </button>
+          <button
+            onClick={() => {
+              const next = !isOpen;
+              setIsOpen(next);
+              localStorage.setItem('vidyguide_sidebar', next ? 'expanded' : 'collapsed');
+            }}
+            className="p-1 rounded absolute -right-3 top-5 z-50 transition-all duration-200"
+            style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-muted)', borderColor: 'var(--border-default)' }}
+            aria-label={isOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+          >
+            {isOpen ? <ChevronLeft size={16} /> : <Menu size={16} />}
+          </button>
         </div>
 
         <nav className="flex flex-col gap-1">
@@ -110,19 +111,16 @@ export default function Sidebar() {
                 href={item.href}
                 className={`flex items-center gap-3 p-2.5 rounded-lg w-full transition-all duration-200 group ${
                   isActive
-                    ? 'bg-emerald-500/10 text-emerald-400 border-l-4 border-emerald-500 font-medium'
+                    ? 'border-l-4 font-medium'
                     : 'hover:bg-slate-800/60 text-slate-400 hover:text-slate-200'
                 }`}
+                style={isActive ? { backgroundColor: 'var(--accent-10)', color: 'var(--accent)', borderColor: 'var(--accent)' } : {}}
                 aria-current={isActive ? 'page' : undefined}
                 aria-label={item.label}
               >
                 <Icon size={18} className={`shrink-0 ${isActive ? item.color : 'text-slate-500 group-hover:text-slate-400'}`} />
                 {isOpen && (
-                  <motion.span
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="text-xs tracking-wide"
-                  >
+                  <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-xs tracking-wide">
                     {item.label}
                   </motion.span>
                 )}
@@ -132,7 +130,7 @@ export default function Sidebar() {
         </nav>
       </div>
 
-      <div className="flex flex-col gap-3 pt-3 border-t border-slate-800">
+      <div className="flex flex-col gap-3 pt-3" style={{ borderTopWidth: 1, borderTopStyle: 'solid', borderColor: 'var(--border-default)' }}>
         {mounted && isAuthenticated ? (
           <button
             onClick={logout}
@@ -161,7 +159,7 @@ export default function Sidebar() {
         )}
 
         {isOpen && (
-          <div className="text-[10px] text-slate-600 text-center font-mono">
+          <div className="text-[10px] text-center font-mono" style={{ color: 'var(--text-muted)' }}>
             VidyGuideAI v3.1.1
           </div>
         )}

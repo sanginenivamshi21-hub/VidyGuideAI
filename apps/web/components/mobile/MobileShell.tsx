@@ -6,12 +6,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Home, LayoutDashboard, Bot, Compass, FileText, ScanSearch,
   Briefcase, Languages, Clock, User, Settings, LogOut,
-  Sun, Moon, Monitor, Sparkles, X, ChevronRight, Star, Search,
+  Sun, Moon, Monitor, X, ChevronRight, Search,
   SquarePen,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { ROUTES } from '@/lib/routes';
+import Logo from '../Logo';
+import { changeTheme, changeAccent } from '../ThemeInit';
 
 interface DrawerContextType {
   isOpen: boolean;
@@ -57,33 +59,19 @@ const THEME_OPTIONS = [
   { value: 'system', icon: Monitor, label: 'System' },
 ];
 
-const MOTION_VARIANTS = {
-  backdrop: {
-    initial: { opacity: 0 },
-    animate: { opacity: 1 },
-    exit: { opacity: 0 },
-    transition: { duration: 0.2 },
-  },
-  drawer: {
-    initial: { x: '-100%' },
-    animate: { x: 0 },
-    exit: { x: '-100%' },
-    transition: { type: 'spring', damping: 28, stiffness: 300, mass: 0.8 },
-  },
-};
-
-function LauncherButton({ onClick }: { onClick: () => void }) {
+function HamburgerButton({ onClick }: { onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg active:scale-95 transition-transform"
+      className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg active:scale-95 transition-transform bg-transparent border-none outline-none"
       aria-label="Open navigation"
     >
-      <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
-        <path d="M16 2L28 10V22L16 30L4 22V10L16 2Z" stroke="var(--accent)" strokeWidth="1.5" fill="var(--accent-10)" />
-        <text x="16" y="21" textAnchor="middle" fill="var(--accent)" fontSize="14" fontWeight="800" fontFamily="system-ui">V</text>
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <rect x="2" y="4" width="16" height="1.5" rx="0.75" fill="currentColor" style={{ color: 'var(--text-primary)' }} />
+        <rect x="2" y="9.25" width="16" height="1.5" rx="0.75" fill="currentColor" style={{ color: 'var(--text-primary)' }} />
+        <rect x="2" y="14.5" width="16" height="1.5" rx="0.75" fill="currentColor" style={{ color: 'var(--text-primary)' }} />
       </svg>
-      <span className="text-xs font-bold text-white tracking-tight">VidyGuideAI</span>
+      <Logo size={18} mono />
     </button>
   );
 }
@@ -92,6 +80,7 @@ export default function MobileShell({ children }: { children: React.ReactNode })
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentTheme, setCurrentTheme] = useState('dark');
+  const [currentAccent, setCurrentAccent] = useState('emerald');
   const pathname = usePathname();
   const router = useRouter();
   const { isAuthenticated, logout } = useAuth();
@@ -100,7 +89,9 @@ export default function MobileShell({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     const saved = localStorage.getItem('vidyguide_theme') || 'dark';
+    const accent = localStorage.getItem('vidyguide_accent') || 'emerald';
     setCurrentTheme(saved);
+    setCurrentAccent(accent);
   }, []);
 
   const open = useCallback(() => setIsOpen(true), []);
@@ -123,15 +114,12 @@ export default function MobileShell({ children }: { children: React.ReactNode })
 
   const handleThemeChange = (theme: string) => {
     setCurrentTheme(theme);
-    localStorage.setItem('vidyguide_theme', theme);
-    const root = document.documentElement;
-    root.classList.remove('dark', 'light');
-    if (theme === 'system') {
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      root.classList.add(prefersDark ? 'dark' : 'light');
-    } else {
-      root.classList.add(theme);
-    }
+    changeTheme(theme);
+  };
+
+  const handleAccentChange = (accent: string) => {
+    setCurrentAccent(accent);
+    changeAccent(accent);
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -174,30 +162,39 @@ export default function MobileShell({ children }: { children: React.ReactNode })
       ),
   })).filter((group) => group.items.length > 0);
 
-  const useBackdrop = pathname === ROUTES.MENTOR;
+  const handleSwipeOpen = (e: React.TouchEvent) => {
+    if (isOpen) return;
+    const start = touchStartX.current;
+    const end = e.changedTouches[0].clientX;
+    if (start < 15 && end - start > 60) open();
+  };
 
   return (
     <DrawerContext.Provider value={{ isOpen, open, close }}>
-      <div className="flex flex-col h-screen overflow-hidden bg-slate-950 safe-area-top">
-        {/* Header - hide on mentor page since mentor has its own header */}
+      <div
+        className="flex flex-col h-screen overflow-hidden safe-area-top"
+        style={{ backgroundColor: 'var(--bg-primary)' }}
+        onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
+        onTouchEnd={handleSwipeOpen}
+      >
         {!isMentor && (
-          <header className="flex items-center justify-between px-3 py-2 border-b border-slate-800/50 shrink-0 bg-slate-950/95 backdrop-blur-lg z-10">
-            <LauncherButton onClick={open} />
-            <span className="text-xs font-semibold text-slate-400 truncate max-w-[160px]">
+          <header className="flex items-center justify-between px-3 py-2 shrink-0 z-10" style={{ borderBottom: '1px solid var(--border-default)', backgroundColor: 'var(--bg-primary)' }}>
+            <HamburgerButton onClick={open} />
+            <span className="text-xs font-semibold truncate max-w-[160px]" style={{ color: 'var(--text-secondary)' }}>
               {getPageTitle()}
             </span>
             <div className="w-[72px]" />
           </header>
         )}
 
-        {/* Mentor page gets its own minimal header with just the launcher */}
         {isMentor && (
-          <header className="flex items-center justify-between px-3 py-2 border-b border-slate-800/50 shrink-0 bg-slate-950/95 backdrop-blur-lg z-10">
-            <LauncherButton onClick={open} />
-            <span className="text-xs font-bold text-white">AI Mentor</span>
+          <header className="flex items-center justify-between px-3 py-2 shrink-0 z-10" style={{ borderBottom: '1px solid var(--border-default)', backgroundColor: 'var(--bg-primary)' }}>
+            <HamburgerButton onClick={open} />
+            <span className="text-xs font-bold" style={{ color: 'var(--text-primary)' }}>AI Mentor</span>
             <button
               onClick={() => navigateAndClose(ROUTES.MENTOR)}
-              className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400"
+              className="p-1.5 rounded-lg hover:bg-slate-800 transition-colors"
+              style={{ color: 'var(--text-secondary)' }}
               aria-label="New chat"
             >
               <SquarePen size={16} />
@@ -205,7 +202,6 @@ export default function MobileShell({ children }: { children: React.ReactNode })
           </header>
         )}
 
-        {/* Content area with page transitions */}
         <main className="flex-1 overflow-y-auto relative">
           <motion.div
             key={pathname}
@@ -217,64 +213,66 @@ export default function MobileShell({ children }: { children: React.ReactNode })
           </motion.div>
         </main>
 
-        {/* Drawer overlay */}
         <AnimatePresence>
           {isOpen && (
             <>
               <motion.div
                 key="drawer-backdrop"
-                {...MOTION_VARIANTS.backdrop}
-                className={`fixed inset-0 z-40 ${useBackdrop ? 'backdrop-blur-sm bg-black/60' : 'bg-black/50'}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="fixed inset-0 z-40"
+                style={{ backgroundColor: 'var(--overlay)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}
                 onClick={close}
               />
               <motion.div
                 key="drawer-panel"
                 ref={drawerRef}
-                {...MOTION_VARIANTS.drawer}
+                initial={{ x: '-100%' }}
+                animate={{ x: 0 }}
+                exit={{ x: '-100%' }}
+                transition={{ type: 'spring', damping: 28, stiffness: 300, mass: 0.8 }}
                 onTouchStart={handleTouchStart}
                 onTouchEnd={handleTouchEnd}
-                className="fixed left-0 top-0 bottom-0 w-[280px] max-w-[85vw] z-50 flex flex-col bg-slate-950 border-r border-slate-800 shadow-2xl"
-                style={{ WebkitBackdropFilter: 'blur(20px)', backdropFilter: 'blur(20px)' }}
+                className="fixed left-0 top-0 bottom-0 w-[280px] max-w-[85vw] z-50 flex flex-col shadow-2xl"
+                style={{ backgroundColor: 'var(--bg-primary)', borderRight: '1px solid var(--border-default)' }}
               >
-                {/* Drawer Header */}
-                <div className="flex items-center justify-between px-4 py-4 border-b border-slate-800/50 shrink-0">
+                <div className="flex items-center justify-between px-4 py-4 shrink-0" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
                   <div className="flex items-center gap-2.5">
-                    <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
-                      <path d="M16 2L28 10V22L16 30L4 22V10L16 2Z" stroke="var(--accent)" strokeWidth="1.5" fill="var(--accent-10)" />
-                      <text x="16" y="21" textAnchor="middle" fill="var(--accent)" fontSize="14" fontWeight="800" fontFamily="system-ui">V</text>
-                    </svg>
+                    <Logo size={28} />
                     <div>
-                      <h2 className="text-sm font-bold text-white">VidyGuideAI</h2>
-                      <p className="text-[10px] text-slate-500">AI Career Platform</p>
+                      <div className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>VidyGuideAI</div>
+                      <div className="text-[10px]" style={{ color: 'var(--text-tertiary)' }}>AI Career Platform</div>
                     </div>
                   </div>
                   <button
                     onClick={close}
-                    className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 transition-colors"
+                    className="p-1.5 rounded-lg transition-colors"
+                    style={{ color: 'var(--text-secondary)' }}
                     aria-label="Close navigation"
                   >
                     <X size={18} />
                   </button>
                 </div>
 
-                {/* Search */}
                 <div className="px-3 py-2.5">
                   <div className="relative">
-                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-tertiary)' }} />
                     <input
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Search pages..."
-                      className="w-full text-xs bg-slate-900 rounded-xl pl-8 pr-3 py-2.5 outline-none border border-slate-800 text-white placeholder:text-slate-500 transition-colors focus:border-slate-700"
+                      className="w-full text-xs rounded-xl pl-8 pr-3 py-2.5 outline-none border transition-colors"
+                      style={{ backgroundColor: 'var(--bg-tertiary)', borderColor: 'var(--border-default)', color: 'var(--text-primary)' }}
                     />
                   </div>
                 </div>
 
-                {/* Navigation items */}
                 <div className="flex-1 overflow-y-auto px-2 pb-4 scrollbar-thin">
                   {filteredNav.map((group) => (
                     <div key={group.label} className="mb-2">
-                      <div className="text-[10px] font-semibold text-slate-600 uppercase tracking-wider px-3 py-1.5">
+                      <div className="text-[10px] font-semibold uppercase tracking-wider px-3 py-1.5" style={{ color: 'var(--text-muted)' }}>
                         {group.label}
                       </div>
                       {group.items.map((item) => {
@@ -284,17 +282,16 @@ export default function MobileShell({ children }: { children: React.ReactNode })
                           <button
                             key={item.href}
                             onClick={() => navigateAndClose(item.href)}
-                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs transition-all mb-0.5 ${
-                              isActive
-                                ? 'text-white font-semibold'
-                                : 'text-slate-400 hover:text-slate-200'
-                            }`}
-                            style={isActive ? { backgroundColor: 'var(--accent-10)' } : {}}
+                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs transition-all mb-0.5"
+                            style={{
+                              color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
+                              backgroundColor: isActive ? 'var(--accent-10)' : 'transparent',
+                            }}
                           >
-                            <Icon size={17} className={isActive ? item.color : 'text-slate-500'} />
+                            <Icon size={17} className={isActive ? item.color : ''} style={{ color: isActive ? undefined : 'var(--text-muted)' }} />
                             <span className="flex-1 text-left truncate">{item.label}</span>
                             {isActive && (
-                              <ChevronRight size={14} className="text-slate-500 shrink-0" />
+                              <ChevronRight size={14} style={{ color: 'var(--text-tertiary)' }} />
                             )}
                           </button>
                         );
@@ -303,8 +300,7 @@ export default function MobileShell({ children }: { children: React.ReactNode })
                   ))}
                 </div>
 
-                {/* Footer: Theme + Logout */}
-                <div className="border-t border-slate-800/50 px-3 py-3 shrink-0">
+                <div className="px-3 py-3 shrink-0" style={{ borderTop: '1px solid var(--border-subtle)' }}>
                   <div className="flex items-center gap-1 mb-3 px-1">
                     {THEME_OPTIONS.map((opt) => {
                       const Icon = opt.icon;
@@ -313,12 +309,11 @@ export default function MobileShell({ children }: { children: React.ReactNode })
                         <button
                           key={opt.value}
                           onClick={() => handleThemeChange(opt.value)}
-                          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px] font-semibold transition-all ${
-                            isActive
-                              ? 'text-white'
-                              : 'text-slate-500 hover:text-slate-300'
-                          }`}
-                          style={isActive ? { backgroundColor: 'var(--accent-10)', color: 'var(--accent)' } : {}}
+                          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px] font-semibold transition-all"
+                          style={{
+                            backgroundColor: isActive ? 'var(--accent-10)' : 'transparent',
+                            color: isActive ? 'var(--accent)' : 'var(--text-muted)',
+                          }}
                         >
                           <Icon size={13} />
                           {opt.label}
@@ -326,10 +321,28 @@ export default function MobileShell({ children }: { children: React.ReactNode })
                       );
                     })}
                   </div>
+
+                  <div className="flex flex-wrap gap-1 mb-3 px-1">
+                    {['emerald', 'blue', 'purple', 'orange', 'pink', 'cyan'].map((accent) => (
+                      <button
+                        key={accent}
+                        onClick={() => handleAccentChange(accent)}
+                        className="w-5 h-5 rounded-full transition-all"
+                        style={{
+                          backgroundColor: `var(--accent-${accent === currentAccent ? '20' : '10'})`,
+                          outline: accent === currentAccent ? '2px solid var(--accent)' : 'none',
+                          outlineOffset: '2px',
+                        }}
+                        aria-label={`${accent} accent`}
+                      />
+                    ))}
+                  </div>
+
                   {isAuthenticated ? (
                     <button
                       onClick={() => { logout(); close(); }}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs text-slate-400 hover:text-red-400 hover:bg-red-500/5 transition-all"
+                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs transition-all"
+                      style={{ color: 'var(--text-secondary)' }}
                     >
                       <LogOut size={16} />
                       <span>Log Out</span>
@@ -337,7 +350,8 @@ export default function MobileShell({ children }: { children: React.ReactNode })
                   ) : (
                     <button
                       onClick={() => navigateAndClose(ROUTES.AUTH)}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs text-slate-400 hover:text-emerald-400 hover:bg-emerald-500/5 transition-all"
+                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs transition-all"
+                      style={{ color: 'var(--text-secondary)' }}
                     >
                       <LogOut size={16} />
                       <span>Sign In</span>

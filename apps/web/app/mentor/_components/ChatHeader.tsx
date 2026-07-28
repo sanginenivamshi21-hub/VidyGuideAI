@@ -1,4 +1,7 @@
+'use client';
+
 import { Menu, SquarePen, Keyboard, PanelLeftClose, PanelLeft } from 'lucide-react';
+import Logo from '@/components/Logo';
 
 interface ChatHeaderProps {
   onToggleDrawer: () => void;
@@ -19,33 +22,50 @@ export default function ChatHeader({
 }: ChatHeaderProps) {
   return (
     <div
-      className="flex items-center justify-between px-4 py-2 lg:py-3 border-b shrink-0 safe-area-top"
-      style={{ backgroundColor: 'rgba(15,23,42,0.8)', borderColor: 'rgba(51,65,85,0.5)' }}
+      className="flex items-center justify-between px-4 py-2 lg:py-3 shrink-0 safe-area-top z-20"
+      style={{ backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-default)' }}
     >
       <div className="flex items-center gap-2">
         <button
           onClick={onToggleDrawer}
-          className="lg:hidden p-2 -ml-1 rounded-lg hover:bg-slate-800 text-slate-400 active:bg-slate-700 transition-colors touch-manipulation"
+          className="lg:hidden p-2 -ml-1 rounded-lg transition-colors touch-manipulation"
+          style={{ color: 'var(--text-secondary)' }}
           aria-label="Open conversations"
         >
-          <Menu size={20} />
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <rect x="2" y="4" width="16" height="1.5" rx="0.75" fill="currentColor" />
+            <rect x="2" y="9.25" width="16" height="1.5" rx="0.75" fill="currentColor" />
+            <rect x="2" y="14.5" width="16" height="1.5" rx="0.75" fill="currentColor" />
+          </svg>
+        </button>
+        <button
+          onClick={onToggleDrawer}
+          className="lg:hidden p-1 -ml-2 rounded-lg transition-colors"
+          aria-label="Logo"
+        >
+          <Logo size={22} />
         </button>
         {onToggleSidebar && (
           <button
             onClick={onToggleSidebar}
-            className="hidden lg:flex p-2 -ml-1 rounded-lg hover:bg-slate-800 text-slate-400 transition-colors"
+            className="hidden lg:flex p-2 -ml-1 rounded-lg transition-colors"
+            style={{ color: 'var(--text-secondary)' }}
             aria-label={showSidebar ? 'Hide sidebar' : 'Show sidebar'}
           >
             {showSidebar ? <PanelLeftClose size={18} /> : <PanelLeft size={18} />}
           </button>
         )}
-        <h1 className="hidden lg:block text-sm font-bold text-white tracking-wide">AI Mentor</h1>
+        <div className="hidden lg:flex items-center gap-2">
+          <Logo size={20} />
+          <span className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>AI Mentor</span>
+        </div>
       </div>
       <div className="flex items-center gap-1">
         {hasMessages && (
           <button
             onClick={onNewChat}
-            className="hidden lg:block p-2 rounded-lg hover:bg-slate-800 text-slate-400 active:bg-slate-700 transition-colors touch-manipulation"
+            className="hidden lg:block p-2 rounded-lg transition-colors touch-manipulation"
+            style={{ color: 'var(--text-secondary)' }}
             title="New chat"
           >
             <SquarePen size={16} />
@@ -53,7 +73,8 @@ export default function ChatHeader({
         )}
         <button
           onClick={onToggleShortcuts}
-          className="p-2 rounded-lg hover:bg-slate-800 text-slate-400 active:bg-slate-700 transition-colors touch-manipulation"
+          className="p-2 rounded-lg transition-colors touch-manipulation"
+          style={{ color: 'var(--text-secondary)' }}
           title="Keyboard shortcuts"
         >
           <Keyboard size={16} />

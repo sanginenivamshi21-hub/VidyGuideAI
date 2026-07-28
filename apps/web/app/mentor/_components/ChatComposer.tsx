@@ -1,3 +1,5 @@
+'use client';
+
 import { useRef, useEffect, useCallback } from 'react';
 import { Mic, Paperclip, Square, SendHorizonal, Plus } from 'lucide-react';
 import AttachmentCard from '@/components/AttachmentCard';
@@ -50,7 +52,7 @@ export default function ChatComposer({
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      onSend();
+      if (!isStreaming) onSend();
     }
   };
 
@@ -75,18 +77,17 @@ export default function ChatComposer({
 
   return (
     <div
-      className="shrink-0 border-t border-slate-800 safe-area-bottom bg-slate-950/95"
+      className="shrink-0 safe-area-bottom z-20"
+      style={{ borderTop: '1px solid var(--border-default)', backgroundColor: 'var(--bg-primary)' }}
     >
       {fileError && (
-        <div className="px-4 py-2 bg-red-500/10">
-          <p className="text-xs text-red-400">{fileError}</p>
+        <div className="px-4 py-2" style={{ backgroundColor: 'rgba(239,68,68,0.1)' }}>
+          <p className="text-xs" style={{ color: '#ef4444' }}>{fileError}</p>
         </div>
       )}
 
       {attachments.length > 0 && (
-        <div
-          className="px-4 py-2.5 flex gap-2 overflow-x-auto scrollbar-thin border-b border-slate-800/30"
-        >
+        <div className="px-4 py-2.5 flex gap-2 overflow-x-auto scrollbar-thin" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
           {attachments.map((file, i) => (
             <AttachmentCard
               key={`${file.name}-${i}`}
@@ -101,18 +102,20 @@ export default function ChatComposer({
 
       <div className="px-3 sm:px-4 py-3 max-w-3xl mx-auto">
         <div
-          className="flex items-end gap-2 rounded-2xl px-3 py-2 border border-slate-800 transition-colors focus-within:border-slate-600 bg-slate-800"
+          className="flex items-end gap-2 rounded-2xl px-3 py-2 transition-colors border"
+          style={{ backgroundColor: 'var(--bg-tertiary)', borderColor: 'var(--border-default)' }}
         >
           <button
             type="button"
             onClick={onVoiceInput}
-            className="p-2 rounded-xl hover:bg-slate-700/50 text-slate-400 shrink-0 transition-colors touch-manipulation hidden sm:block"
+            className="p-2 rounded-xl shrink-0 transition-colors touch-manipulation hidden sm:block"
+            style={{ color: 'var(--text-tertiary)' }}
             aria-label="Voice input"
           >
             <Mic size={19} />
           </button>
 
-          <label className="p-2 rounded-xl hover:bg-slate-700/50 text-slate-400 cursor-pointer shrink-0 transition-colors touch-manipulation hidden sm:block">
+          <label className="p-2 rounded-xl shrink-0 cursor-pointer transition-colors touch-manipulation hidden sm:block" style={{ color: 'var(--text-tertiary)' }}>
             <Paperclip size={19} />
             <input
               type="file"
@@ -128,10 +131,8 @@ export default function ChatComposer({
             <button
               type="button"
               onClick={onToolPaletteToggle}
-              className={`p-2 rounded-xl shrink-0 transition-colors touch-manipulation ${
-                toolPaletteOpen ? 'text-white' : 'text-slate-400 hover:text-slate-200'
-              }`}
-              style={toolPaletteOpen ? { backgroundColor: 'var(--accent-10)' } : {}}
+              className="p-2 rounded-xl shrink-0 transition-colors touch-manipulation"
+              style={{ color: toolPaletteOpen ? 'var(--accent)' : 'var(--text-tertiary)', backgroundColor: toolPaletteOpen ? 'var(--accent-10)' : 'transparent' }}
               aria-label="Open tools"
             >
               <Plus size={19} />
@@ -146,33 +147,25 @@ export default function ChatComposer({
             onPaste={handlePaste}
             rows={1}
             placeholder="Ask anything..."
-            className="flex-1 bg-transparent text-sm text-slate-200 outline-none resize-none max-h-[160px] py-1.5 px-1 placeholder:text-slate-500 leading-relaxed"
-            style={{ scrollbarWidth: 'thin' }}
+            className="flex-1 bg-transparent text-sm outline-none resize-none max-h-[160px] py-1.5 px-1 leading-relaxed"
+            style={{ color: 'var(--text-primary)', scrollbarWidth: 'thin' }}
           />
 
-          {isStreaming ? (
-            <button
-              type="button"
-              onClick={onStop}
-              className="p-2 rounded-xl shrink-0 transition-colors touch-manipulation bg-red-500/15 text-red-400"
-              aria-label="Stop generating"
-            >
-              <Square size={16} />
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={onSend}
-              disabled={!hasContent}
-              className="p-2 rounded-xl transition-all shrink-0 disabled:opacity-30 disabled:cursor-not-allowed touch-manipulation"
-              style={{ backgroundColor: hasContent ? 'var(--accent)' : 'rgba(51,65,85,0.4)', color: hasContent ? 'white' : 'rgba(148,163,184,0.5)' }}
-              aria-label="Send message"
-            >
-              <SendHorizonal size={17} />
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={isStreaming ? onStop : onSend}
+            disabled={!isStreaming && !hasContent}
+            className="p-2 rounded-xl transition-all shrink-0 disabled:opacity-30 disabled:cursor-not-allowed touch-manipulation active:scale-90"
+            style={{
+              backgroundColor: isStreaming ? 'rgba(239,68,68,0.15)' : hasContent ? 'var(--accent)' : 'var(--bg-tertiary)',
+              color: isStreaming ? '#ef4444' : hasContent ? 'white' : 'var(--text-muted)',
+            }}
+            aria-label={isStreaming ? 'Stop generating' : 'Send message'}
+          >
+            {isStreaming ? <Square size={16} /> : <SendHorizonal size={17} />}
+          </button>
         </div>
-        <p className="text-[10px] text-slate-600 mt-1.5 text-center">
+        <p className="text-[10px] mt-1.5 text-center" style={{ color: 'var(--text-muted)' }}>
           AI can make mistakes. Verify important information.
         </p>
       </div>

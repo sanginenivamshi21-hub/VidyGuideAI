@@ -20,11 +20,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full">
-      <body className={`${inter.className} min-h-full bg-slate-950 text-slate-200`}>
+    <html lang="en" className="h-full" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{
+          __html: `(function(){try{var t=localStorage.getItem('vidyguide_theme')||'dark',a=localStorage.getItem('vidyguide_accent')||'emerald',r=document.documentElement;if(t==='system'){t=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'}r.classList.add(t);r.setAttribute('data-accent',a);var n=localStorage.getItem('vidyguide_animations');if(n!==null)r.setAttribute('data-animations',n)}catch(e){}})();`}} />
+      </head>
+      <body className={`${inter.className} min-h-full`}>
         <ThemeInit />
         <AuthProvider>
-          {/* Desktop layout */}
           <div className="hidden lg:flex h-screen overflow-hidden">
             <Sidebar />
             <main className="flex-1 h-screen overflow-y-auto relative flex flex-col safe-area-bottom">
@@ -35,7 +38,6 @@ export default function RootLayout({
             </main>
           </div>
 
-          {/* Mobile layout */}
           <div className="lg:hidden">
             <MobileShell>{children}</MobileShell>
           </div>

@@ -22,6 +22,7 @@ export default function MentorPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
+  const [thinking, setThinking] = useState(false);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConvId, setActiveConvId] = useState<number | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -58,6 +59,7 @@ export default function MentorPage() {
     setAttachments([]);
     setAttachmentPreviews({});
     setFileError('');
+    setThinking(false);
     if (streamAbortRef.current) {
       streamAbortRef.current.abort();
       streamAbortRef.current = null;
@@ -149,7 +151,7 @@ export default function MentorPage() {
     setMessages((prev) => [...prev, {
       role: 'assistant',
       content: text,
-      timestamp: getTimestamp(),
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     }]);
     if (activeConvId && settings.chatHistory) saveMessage('assistant', text);
   }, [activeConvId, settings.chatHistory]);
@@ -160,6 +162,7 @@ export default function MentorPage() {
       streamAbortRef.current = null;
     }
     setIsStreaming(false);
+    setThinking(false);
   }, []);
 
   const toggleAutoSpeak = () => updateSettings({ autoSpeak: !settings.autoSpeak });
@@ -189,9 +192,6 @@ export default function MentorPage() {
   }, [settings.speechRate, settings.speechPitch, settings.voiceName]);
 
   const copyToClipboard = useCallback((text: string) => navigator.clipboard.writeText(text), []);
-
-  const getTimestamp = useCallback(() =>
-    new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), []);
 
   const validateFile = useCallback((file: File): string | null => {
     if (file.size > MAX_FILE_SIZE) return `${file.name} exceeds the 20MB limit`;
@@ -306,10 +306,13 @@ export default function MentorPage() {
         } catch { /* ignore */ }
       }
 
+      const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
       const userMessage: ChatMessage = {
         role: 'user',
         content: fullText,
-        timestamp: getTimestamp(),
+        timestamp,
+        sendState: 'sending',
         attachments: fileInfo.length > 0 ? fileInfo : undefined,
       };
       setMessages((prev) => [...prev, userMessage]);
@@ -320,9 +323,21 @@ export default function MentorPage() {
 
       if (convId && settings.chatHistory) saveMessage('user', fullText);
 
+      setMessages((prev) => {
+        const next = [...prev];
+        next[next.length - 1] = { ...next[next.length - 1], sendState: 'sent' as const };
+        return next;
+      });
+
       setIsStreaming(true);
+      setThinking(true);
       const controller = new AbortController();
       streamAbortRef.current = controller;
+
+      setMessages((prev) => [
+        ...prev,
+        { role: 'assistant', content: '', timestamp, sendState: 'sending' },
+      ]);
 
       try {
         const historyMessages = messages.map((m) => ({ role: m.role, content: m.content }));
@@ -344,12 +359,17 @@ export default function MentorPage() {
         const reader = res.body?.getReader();
         if (!reader) throw new Error('No reader');
 
+        setThinking(false);
+
         const decoder = new TextDecoder();
         let fullContent = '';
-        setMessages((prev) => [
-          ...prev,
-          { role: 'assistant', content: '', timestamp: getTimestamp() },
-        ]);
+
+        setMessages((prev) => {
+          const next = [...prev];
+          next[next.length - 1] = { role: 'assistant', content: '', timestamp, sendState: 'streaming' as const };
+          return next;
+        });
+
         let buffer = '';
 
         while (true) {
@@ -371,7 +391,8 @@ export default function MentorPage() {
                     next[next.length - 1] = {
                       role: 'assistant',
                       content: fullContent,
-                      timestamp: next[next.length - 1].timestamp,
+                      timestamp,
+                      sendState: 'streaming',
                     };
                     return next;
                   });
@@ -385,6 +406,14 @@ export default function MentorPage() {
           saveMessage('assistant', fullContent);
         }
 
+        if (fullContent) {
+          setMessages((prev) => {
+            const next = [...prev];
+            next[next.length - 1] = { ...next[next.length - 1], sendState: 'done' as const };
+            return next;
+          });
+        }
+
         if (settings.autoSpeak && fullContent) speakText(fullContent);
       } catch (err: any) {
         if (err.name !== 'AbortError') {
@@ -394,13 +423,23 @@ export default function MentorPage() {
               role: 'assistant',
               content:
                 '❌ **Unable to generate response.**\n\nPossible reasons: network issue, API quota exceeded, or service unavailable.\n\n> Try again or check your connection.',
-              timestamp: next[next.length - 1]?.timestamp,
+              timestamp,
+              sendState: 'done',
             };
+            return next;
+          });
+        } else {
+          setMessages((prev) => {
+            const next = [...prev];
+            if (next[next.length - 1]?.content === '' && next[next.length - 1]?.role === 'assistant') {
+              next.pop();
+            }
             return next;
           });
         }
       }
       setIsStreaming(false);
+      setThinking(false);
       streamAbortRef.current = null;
     },
     [messages, attachments, activeConvId, isStreaming, settings]
@@ -446,73 +485,73 @@ export default function MentorPage() {
         onRename={renameConversation}
       />
 
-      <div className="flex h-full overflow-hidden lg:-mx-8 lg:w-[calc(100%+4rem)]">
-        <div className="flex-1 flex flex-col h-full overflow-hidden relative">
-          <ChatHeader
-            onToggleDrawer={() => setDrawerOpen((s) => !s)}
-            onNewChat={handleNewChat}
-            onToggleShortcuts={() => setShowShortcuts((s) => !s)}
-            hasMessages={messages.length > 0}
-          />
+      <div className="flex flex-col h-full overflow-hidden">
+        <ChatHeader
+          onToggleDrawer={() => setDrawerOpen((s) => !s)}
+          onNewChat={handleNewChat}
+          onToggleShortcuts={() => setShowShortcuts((s) => !s)}
+          hasMessages={messages.length > 0}
+        />
 
-          <div
-            ref={chatRef}
-            className="flex-1 overflow-y-auto scrollbar-thin"
-            onDragOver={(e) => { e.preventDefault(); }}
-            onDrop={(e) => {
-              e.preventDefault();
-              if (e.dataTransfer.files) addFiles(e.dataTransfer.files);
-            }}
-          >
-            <ChatMessages
-              messages={messages}
-              isStreaming={isStreaming}
-              showScrollBtn={showScrollBtn}
-              onScrollToBottom={scrollToBottom}
-              onSuggestionSelect={(q) => sendMessage(q)}
-              onRegenerate={regenerateLast}
-              onContinue={continueLast}
-              onSpeak={speakText}
-            />
-          </div>
-
-          <ChatComposer
-            input={input}
-            onInputChange={setInput}
-            onSend={() => sendMessage(input)}
-            onStop={stopStreaming}
+        <div
+          ref={chatRef}
+          className="flex-1 overflow-y-auto scrollbar-thin"
+          onDragOver={(e) => { e.preventDefault(); }}
+          onDrop={(e) => {
+            e.preventDefault();
+            if (e.dataTransfer.files) addFiles(e.dataTransfer.files);
+          }}
+        >
+          <ChatMessages
+            messages={messages}
             isStreaming={isStreaming}
-            attachments={attachments}
-            attachmentPreviews={attachmentPreviews}
-            onAttachmentsChange={setAttachments}
-            onAttachmentRemove={removeAttachment}
-            onFileSelect={handleFileSelect}
-            onVoiceInput={startVoiceInput}
-            fileError={fileError}
-            fileInputRef={fileInputRef}
-            toolPaletteOpen={toolPaletteOpen}
-            onToolPaletteToggle={() => setToolPaletteOpen((s) => !s)}
-          />
-
-          <ToolPalette
-            onResult={insertToolResult}
-            isOpen={toolPaletteOpen}
-            onClose={() => setToolPaletteOpen(false)}
-            onOpen={() => setToolPaletteOpen(true)}
+            thinking={thinking}
+            showScrollBtn={showScrollBtn}
+            onScrollToBottom={scrollToBottom}
+            onSuggestionSelect={(q) => sendMessage(q)}
+            onRegenerate={regenerateLast}
+            onContinue={continueLast}
+            onSpeak={speakText}
           />
         </div>
+
+        <ChatComposer
+          input={input}
+          onInputChange={setInput}
+          onSend={() => sendMessage(input)}
+          onStop={stopStreaming}
+          isStreaming={isStreaming}
+          attachments={attachments}
+          attachmentPreviews={attachmentPreviews}
+          onAttachmentsChange={setAttachments}
+          onAttachmentRemove={removeAttachment}
+          onFileSelect={handleFileSelect}
+          onVoiceInput={startVoiceInput}
+          fileError={fileError}
+          fileInputRef={fileInputRef}
+          toolPaletteOpen={toolPaletteOpen}
+          onToolPaletteToggle={() => setToolPaletteOpen((s) => !s)}
+        />
+
+        <ToolPalette
+          onResult={insertToolResult}
+          isOpen={toolPaletteOpen}
+          onClose={() => setToolPaletteOpen(false)}
+          onOpen={() => setToolPaletteOpen(true)}
+        />
       </div>
 
       {showShortcuts && (
         <div
-          className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center"
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          style={{ backgroundColor: 'var(--overlay)' }}
           onClick={() => setShowShortcuts(false)}
         >
           <div
             className="surface-modal p-6 max-w-sm w-full mx-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-sm font-bold text-white mb-4">Keyboard Shortcuts</h3>
+            <h3 className="text-sm font-bold mb-4" style={{ color: 'var(--text-primary)' }}>Keyboard Shortcuts</h3>
             <div className="space-y-2.5">
               {[
                 { keys: 'Ctrl + /', label: 'Toggle shortcuts' },
@@ -524,9 +563,10 @@ export default function MentorPage() {
                 { keys: 'Shift + Enter', label: 'New line' },
               ].map((s, i) => (
                 <div key={i} className="flex items-center justify-between text-xs">
-                  <span className="text-slate-400">{s.label}</span>
+                  <span style={{ color: 'var(--text-secondary)' }}>{s.label}</span>
                   <kbd
-                    className="px-2 py-0.5 border border-slate-800 rounded text-slate-300 font-mono text-[10px] bg-slate-800"
+                    className="px-2 py-0.5 rounded text-[10px] font-mono border"
+                    style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-tertiary)', borderColor: 'var(--border-default)' }}
                   >
                     {s.keys}
                   </kbd>

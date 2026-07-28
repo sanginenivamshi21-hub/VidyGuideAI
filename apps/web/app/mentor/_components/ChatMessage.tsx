@@ -1,5 +1,7 @@
+'use client';
+
 import { memo, useState } from 'react';
-import { Copy, RefreshCw, Volume2, ChevronDown, Check } from 'lucide-react';
+import { Copy, RefreshCw, Volume2, ChevronDown, Check, Clock, CircleCheck } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import type { ChatMessage as ChatMessageType } from '../types';
 
@@ -33,13 +35,15 @@ const ChatMessage = memo(function ChatMessage({
     onCopy?.(message.content);
   };
 
+  const sendState = message.sendState || (message.role === 'assistant' ? (message.content ? 'sent' : isStreaming ? 'streaming' : 'sending') : 'sent');
+
   return (
     <div className={`mb-3 message-enter flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
       <div
-        className={`max-w-[88%] sm:max-w-[80%] min-w-0 ${message.role === 'assistant' ? 'bg-slate-800/30 border border-slate-800/30' : ''}`}
+        className={`max-w-[88%] sm:max-w-[80%] min-w-0 ${message.role === 'assistant' ? '' : ''}`}
         style={{
-          backgroundColor: message.role === 'user' ? 'var(--accent-10)' : undefined,
-          border: message.role === 'user' ? '1px solid var(--accent-20)' : undefined,
+          backgroundColor: message.role === 'user' ? 'var(--accent-10)' : 'var(--bg-card)',
+          border: message.role === 'user' ? '1px solid var(--accent-20)' : '1px solid var(--border-default)',
           borderRadius: message.role === 'user' ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
           padding: '12px 16px',
         }}
@@ -51,41 +55,65 @@ const ChatMessage = memo(function ChatMessage({
                 {message.attachments.map((att, ai) => (
                   <div
                     key={ai}
-                    className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px] bg-slate-800/60 border border-slate-800/40"
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px]"
+                    style={{ backgroundColor: 'var(--bg-tertiary)', border: '1px solid var(--border-default)' }}
                   >
-                    <span className={att.type.startsWith('image/') ? 'text-blue-400' : 'text-slate-400'}>
+                    <span style={{ color: att.type.startsWith('image/') ? '#3b82f6' : 'var(--text-tertiary)' }}>
                       {att.type.startsWith('image/') ? '🖼️' : att.type === 'application/pdf' ? '📄' : '📎'}
                     </span>
-                    <span className="text-slate-400 truncate max-w-[120px]">{att.name}</span>
+                    <span className="truncate max-w-[120px]" style={{ color: 'var(--text-secondary)' }}>{att.name}</span>
                   </div>
                 ))}
               </div>
             )}
-            <p className="text-sm text-slate-200 whitespace-pre-wrap leading-relaxed">{message.content}</p>
+            <p className="text-sm whitespace-pre-wrap leading-relaxed" style={{ color: 'var(--text-primary)' }}>{message.content}</p>
           </div>
         ) : (
-          <div className="text-sm text-slate-200 leading-relaxed">
-            <MarkdownRenderer content={message.content} />
+          <div className="text-sm leading-relaxed" style={{ color: 'var(--text-primary)' }}>
+            {message.content ? (
+              <MarkdownRenderer content={message.content} />
+            ) : sendState === 'streaming' ? (
+              <div className="flex items-center gap-1.5 py-1">
+                <span className="w-2 h-2 rounded-full thinking-dot" style={{ backgroundColor: 'var(--accent)' }} />
+                <span className="w-2 h-2 rounded-full thinking-dot" style={{ backgroundColor: 'var(--accent)' }} />
+                <span className="w-2 h-2 rounded-full thinking-dot" style={{ backgroundColor: 'var(--accent)' }} />
+              </div>
+            ) : (
+              <span style={{ color: 'var(--text-muted)' }}>...</span>
+            )}
           </div>
         )}
-        {message.timestamp && (
-          <div className="text-[10px] text-slate-500 mt-1.5 text-right opacity-60">{message.timestamp}</div>
-        )}
+        <div className="flex items-center justify-end gap-1.5 mt-1.5">
+          {message.timestamp && (
+            <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{message.timestamp}</span>
+          )}
+          {message.role === 'user' && sendState === 'sending' && (
+            <span className="text-[10px] status-enter flex items-center gap-1" style={{ color: 'var(--text-tertiary)' }}>
+              <Clock size={10} /> Sending...
+            </span>
+          )}
+          {message.role === 'user' && sendState === 'sent' && (
+            <CircleCheck size={10} style={{ color: 'var(--accent)' }} />
+          )}
+        </div>
         {message.role === 'assistant' && message.content && isLast && !isStreaming && (
           <div
-            className="flex items-center gap-1 mt-2 pt-2 border-t border-slate-800/25"
+            className="flex items-center gap-1 mt-2 pt-2"
+            style={{ borderTop: '1px solid var(--border-subtle)' }}
           >
             <button
               onClick={handleCopy}
-              className="p-1.5 rounded-lg hover:bg-slate-700/50 text-slate-500 hover:text-slate-300 transition-colors touch-manipulation"
+              className="p-1.5 rounded-lg transition-colors touch-manipulation"
+              style={{ color: 'var(--text-tertiary)' }}
               title="Copy response"
             >
-              {copied ? <Check size={13} className="text-emerald-400" /> : <Copy size={13} />}
+              {copied ? <Check size={13} style={{ color: 'var(--accent)' }} /> : <Copy size={13} />}
             </button>
             {onRegenerate && (
               <button
                 onClick={onRegenerate}
-                className="p-1.5 rounded-lg hover:bg-slate-700/50 text-slate-500 hover:text-slate-300 transition-colors touch-manipulation"
+                className="p-1.5 rounded-lg transition-colors touch-manipulation"
+                style={{ color: 'var(--text-tertiary)' }}
                 title="Regenerate"
               >
                 <RefreshCw size={13} />
@@ -94,7 +122,8 @@ const ChatMessage = memo(function ChatMessage({
             {onContinue && (
               <button
                 onClick={onContinue}
-                className="p-1.5 rounded-lg hover:bg-slate-700/50 text-slate-500 hover:text-slate-300 transition-colors touch-manipulation"
+                className="p-1.5 rounded-lg transition-colors touch-manipulation"
+                style={{ color: 'var(--text-tertiary)' }}
                 title="Continue"
               >
                 <ChevronDown size={13} />
@@ -103,7 +132,8 @@ const ChatMessage = memo(function ChatMessage({
             {onSpeak && (
               <button
                 onClick={() => onSpeak(message.content)}
-                className="p-1.5 rounded-lg hover:bg-slate-700/50 text-slate-500 hover:text-slate-300 transition-colors touch-manipulation"
+                className="p-1.5 rounded-lg transition-colors touch-manipulation"
+                style={{ color: 'var(--text-tertiary)' }}
                 title="Read aloud"
               >
                 <Volume2 size={13} />

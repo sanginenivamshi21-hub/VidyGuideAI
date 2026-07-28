@@ -3,6 +3,7 @@ export interface ChatMessage {
   content: string;
   timestamp?: string;
   attachments?: { name: string; type: string; size: number }[];
+  sendState?: 'sending' | 'sent' | 'streaming' | 'done';
 }
 
 export interface Conversation {
