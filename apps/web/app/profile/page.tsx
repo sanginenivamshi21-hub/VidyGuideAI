@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { User, ShieldAlert, Sparkles, RefreshCw, Award, BookOpen, MessageSquare, Save } from 'lucide-react';
+import { User, RefreshCw, Save } from 'lucide-react';
 import { API_BASE } from '@/lib/api';
 import { ROUTES } from '@/lib/routes';
+import { useAuth, useRequireRegistered } from '@/hooks/useAuth';
 
 interface UserProfile {
   id: number;
@@ -22,6 +23,8 @@ interface Stats {
 
 export default function ProfilePage() {
   const router = useRouter();
+  const { user, isGuest, isAuthenticated, loading: authLoading } = useAuth();
+  const { loading: reqLoading } = useRequireRegistered();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -31,55 +34,34 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
-  const [isGuest, setIsGuest] = useState(false);
+  const [guest, setGuest] = useState(false);
 
   const fetchProfile = async () => {
     setError('');
     setLoading(true);
-
     try {
       const resp = await fetch(`${API_BASE}/users/profile`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
       });
-
-      if (resp.status === 401) {
-        setIsGuest(true);
-        setLoading(false);
-        return;
-      }
-
+      if (resp.status === 401) { setGuest(true); setLoading(false); return; }
       const data = await resp.json();
-      if (!resp.ok) {
-        throw new Error(data.message || 'Failed to retrieve profile data.');
-      }
-
+      if (!resp.ok) throw new Error(data.message || 'Failed to retrieve profile data.');
       setProfile(data.user);
       setStats(data.stats);
       setFullName(data.user.fullName || '');
     } catch (err: any) {
       setError(err.message || 'Connection error.');
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
   useEffect(() => {
-    const userStr = localStorage.getItem('user');
-    if (!userStr) {
-      router.push(ROUTES.AUTH);
-      return;
-    }
-
-    const user = JSON.parse(userStr);
-    if (user.id === null) {
-      setIsGuest(true);
-      setLoading(false);
-    } else {
-      fetchProfile();
-    }
-  }, [router]);
+    if (authLoading || reqLoading) return;
+    if (!isAuthenticated) { router.push(ROUTES.AUTH); return; }
+    if (isGuest) { setGuest(true); setLoading(false); return; }
+    fetchProfile();
+  }, [authLoading, reqLoading, isAuthenticated, isGuest, router]);
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -126,7 +108,7 @@ export default function ProfilePage() {
     }
   };
 
-  if (isGuest) {
+  if (guest) {
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center max-w-md mx-auto gap-4 min-h-[50vh]">
         <div className="p-3.5 bg-slate-900 border border-slate-800 text-slate-500 rounded-full text-2xl">
@@ -137,10 +119,7 @@ export default function ProfilePage() {
           You are currently signed in as a Guest. Profile settings and user stats dashboards are only available for registered student accounts.
         </p>
         <button
-          onClick={() => {
-            localStorage.removeItem('user');
-            router.push(ROUTES.AUTH);
-          }}
+          onClick={() => { router.push(ROUTES.AUTH); }}
           className="mt-2 px-5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-lg transition-all"
         >
           Sign In / Register

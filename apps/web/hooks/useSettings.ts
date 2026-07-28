@@ -49,6 +49,8 @@ export function useSettings() {
   const fetchSettings = useCallback(async () => {
     const user = localStorage.getItem('user');
     if (!user) { setLoading(false); return; }
+    const parsedUser = JSON.parse(user);
+    if (parsedUser.id === null) { setLoading(false); return; }
     try {
       const data = await api<any>('/settings');
       setSettings({ ...DEFAULTS, ...data });

@@ -7,8 +7,7 @@ import {
   Compass,
   Map,
   FileText,
-  FileEdit,
-  ScanLine,
+  ScanSearch,
   Bot,
   Languages,
   Briefcase,
@@ -17,6 +16,7 @@ import {
 } from 'lucide-react';
 import { ROUTES, DASHBOARD_CARDS } from '@/lib/routes';
 import { API_BASE } from '@/lib/api';
+import { useAuth, useRequireAuth } from '@/hooks/useAuth';
 
 interface Stats {
   career_count: number;
@@ -26,43 +26,23 @@ interface Stats {
 
 export default function DashboardPage() {
   const router = useRouter();
+  const { isAuthenticated, isGuest, user } = useAuth();
+  const { loading: authLoading } = useRequireAuth();
   const [userName, setUserName] = useState('');
   const [stats, setStats] = useState<Stats>({ career_count: 0, resume_count: 0, mentor_count: 0 });
-  const [isGuest, setIsGuest] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const userStr = localStorage.getItem('user');
-    if (!userStr) {
-      router.push(ROUTES.AUTH);
-      return;
-    }
-
-    const user = JSON.parse(userStr);
+    if (authLoading) return;
+    if (!user) { router.push(ROUTES.AUTH); return; }
     setUserName(user.fullName || user.username || 'Candidate');
-    if (user.id === null) {
-      setIsGuest(true);
-      setLoading(false);
-    } else {
-      fetch(`${API_BASE}/users/profile`, {
-        credentials: 'include',
-      })
-        .then((r) => {
-          if (r.status === 401) {
-            setIsGuest(true);
-            return null;
-          }
-          return r.json();
-        })
-        .then((data) => {
-          if (data && data.stats) {
-            setStats(data.stats);
-          }
-        })
-        .catch((e) => console.error('Stats fetch error:', e))
-        .finally(() => setLoading(false));
-    }
-  }, [router]);
+    if (isGuest) { setLoading(false); return; }
+    fetch(`${API_BASE}/users/profile`, { credentials: 'include' })
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => { if (data?.stats) setStats(data.stats); })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [authLoading, user, isGuest, router]);
 
   return (
     <div className="flex flex-col gap-10 max-w-6xl mx-auto py-4">
@@ -107,8 +87,7 @@ export default function DashboardPage() {
               Compass,
               Map,
               FileText,
-              FileEdit,
-              ScanLine,
+              ScanSearch,
               Bot,
               Languages,
               Briefcase,

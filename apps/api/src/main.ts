@@ -13,13 +13,24 @@ async function bootstrap() {
     const logger = new Logger('Bootstrap');
 
     // 1. Enable CORS first to handle OPTIONS preflight correctly before any other middleware
+    const localDevOrigins = [
+        'http://localhost:3000',
+        'http://localhost:3001',
+        'http://localhost:8501',
+        'http://127.0.0.1:3000',
+        'http://127.0.0.1:3001',
+        'http://127.0.0.1:8501',
+    ];
+
+    const corsOrigins = [
+        'https://vidyguideai-web.onrender.com',
+        ...localDevOrigins,
+        process.env.CLIENT_URL,
+        process.env.APP_BASE_URL,
+    ].filter(Boolean) as string[];
+
     app.enableCors({
-        origin: [
-            'https://vidyguideai-web.onrender.com',
-            'http://localhost:3000',
-            'http://localhost:3001',
-            process.env.CLIENT_URL,
-        ].filter(Boolean),
+        origin: corsOrigins,
         credentials: true,
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
         allowedHeaders: 'Content-Type, Accept, Authorization, Cookie, X-Requested-With',
@@ -45,11 +56,10 @@ async function bootstrap() {
                     ],
                     mediaSrc: ["'self'", 'blob:', 'https:'],
                     frameAncestors: [
-                        'https://vidyguideai-web.onrender.com',
-                        process.env.CLIENT_URL || '',
-                        'http://localhost:3000',
-                        'http://localhost:3001',
                         "'self'",
+                        'https://vidyguideai-web.onrender.com',
+                        ...localDevOrigins,
+                        process.env.CLIENT_URL || '',
                     ].filter(Boolean),
                     upgradeInsecureRequests: null,
                 },

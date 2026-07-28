@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Clock, Search, Trash2, ChevronRight, Eye, Calendar, AlertCircle } from 'lucide-react';
+import { Clock, Search, Trash2, Eye, Calendar } from 'lucide-react';
 import { API_BASE } from '@/lib/api';
 import { ROUTES } from '@/lib/routes';
+import { useAuth, useRequireRegistered } from '@/hooks/useAuth';
 
 interface HistoryItem {
   id: number;
@@ -17,60 +18,37 @@ interface HistoryItem {
 
 export default function HistoryPage() {
   const router = useRouter();
+  const { isAuthenticated, isGuest } = useAuth();
+  const { loading: authLoading } = useRequireRegistered();
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [selectedItem, setSelectedItem] = useState<HistoryItem | null>(null);
   const [error, setError] = useState('');
-  const [isGuest, setIsGuest] = useState(false);
+  const [guest, setGuest] = useState(false);
 
   const fetchHistory = async () => {
     setError('');
     setLoading(true);
-
     try {
       const resp = await fetch(`${API_BASE}/history`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+        method: 'GET', headers: { 'Content-Type': 'application/json' }, credentials: 'include',
       });
-
-      if (resp.status === 401) {
-        // Unauthorized
-        setIsGuest(true);
-        setLoading(false);
-        return;
-      }
-
+      if (resp.status === 401) { setGuest(true); setLoading(false); return; }
       const data = await resp.json();
-      if (!resp.ok) {
-        throw new Error(data.message || 'Failed to fetch history logs.');
-      }
-
+      if (!resp.ok) throw new Error(data.message || 'Failed to fetch history logs.');
       setHistory(data || []);
     } catch (err: any) {
       setError(err.message || 'Connection error.');
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
   useEffect(() => {
-    // Check if user object exists in localStorage
-    const userStr = localStorage.getItem('user');
-    if (!userStr) {
-      router.push(ROUTES.AUTH);
-      return;
-    }
-
-    const user = JSON.parse(userStr);
-    if (user.id === null) {
-      setIsGuest(true);
-      setLoading(false);
-    } else {
-      fetchHistory();
-    }
-  }, [router]);
+    if (authLoading) return;
+    if (!isAuthenticated) { router.push(ROUTES.AUTH); return; }
+    if (isGuest) { setGuest(true); setLoading(false); return; }
+    fetchHistory();
+  }, [authLoading, isAuthenticated, isGuest, router]);
 
   const handleDeleteItem = async (id: number) => {
     if (!confirm('Are you sure you want to delete this log?')) return;
@@ -120,7 +98,7 @@ export default function HistoryPage() {
       item.actionType.toLowerCase().includes(search.toLowerCase())
   );
 
-  if (isGuest) {
+  if (guest) {
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center max-w-md mx-auto gap-4 min-h-[50vh]">
         <div className="p-3.5 bg-slate-900 border border-slate-800 text-slate-500 rounded-full text-2xl">
@@ -130,13 +108,8 @@ export default function HistoryPage() {
         <p className="text-xs text-slate-405 leading-relaxed">
           You are currently signed in as a Guest. History logging, career roadmap persistence, and user profiles are only available for registered student accounts.
         </p>
-        <button
-          onClick={() => {
-            localStorage.removeItem('user');
-            router.push(ROUTES.AUTH);
-          }}
-          className="mt-2 px-5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-lg transition-all"
-        >
+        <button onClick={() => { router.push(ROUTES.AUTH); }}
+          className="mt-2 px-5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-lg transition-all">
           Sign In / Register
         </button>
       </div>

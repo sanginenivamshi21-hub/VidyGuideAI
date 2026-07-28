@@ -1,31 +1,44 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useSettings } from '@/hooks/useSettings';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useRouter } from 'next/navigation';
 import { API_BASE } from '@/lib/api';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
+import AttachmentCard from '@/components/AttachmentCard';
+import { useAuth, useRequireAuth } from '@/hooks/useAuth';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
   timestamp?: string;
+  attachments?: { name: string; type: string; size: number }[];
 }
 
 interface Conversation {
   id: number;
   title: string;
   pinned: boolean;
-  archived?: boolean;
   _count?: { messages: number };
   updatedAt: string;
   createdAt: string;
 }
 
+const MAX_FILE_SIZE = 20 * 1024 * 1024;
+const ALLOWED_TYPES = [
+  'application/pdf', 'text/plain', 'text/markdown', 'text/csv',
+  'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'image/png', 'image/jpeg', 'image/gif', 'image/webp',
+  'text/javascript', 'text/typescript', 'text/x-python', 'text/x-java',
+  'text/html', 'text/css',
+];
+
 export default function MentorPage() {
   const { settings, updateSettings } = useSettings();
   const router = useRouter();
+  const { isAuthenticated } = useAuth();
+  useRequireAuth();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
@@ -40,19 +53,19 @@ export default function MentorPage() {
   const [attachments, setAttachments] = useState<File[]>([]);
   const [showAttachments, setShowAttachments] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [fileError, setFileError] = useState('');
+  const [attachmentPreviews, setAttachmentPreviews] = useState<Record<number, string>>({});
 
   const chatRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const streamAbortRef = useRef<AbortController | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const speechRecRef = useRef<any>(null);
 
   useEffect(() => {
-    const user = localStorage.getItem('user');
-    if (user) fetchConversations();
-    if (settings.notifications && 'Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission();
-    }
-  }, [settings.notifications]);
+    if (isAuthenticated) fetchConversations();
+  }, [isAuthenticated]);
 
   useEffect(() => {
     const chatEl = chatRef.current;
@@ -69,18 +82,14 @@ export default function MentorPage() {
     { key: 'Escape', handler: () => { stopStreaming(); setShowShortcuts(false); }, description: 'Stop/Close' },
     { key: 'Enter', ctrl: true, handler: () => { if (input.trim() && !isStreaming) sendMessage(input.trim()); }, description: 'Send message' },
     { key: 'm', ctrl: true, shift: true, handler: () => toggleAutoSpeak(), description: 'Toggle speech' },
-    { key: 'k', ctrl: true, handler: () => inputRef.current?.focus(), description: 'Search' },
+    { key: 'k', ctrl: true, handler: () => inputRef.current?.focus(), description: 'Focus input' },
     { key: 'n', ctrl: true, shift: true, handler: () => handleNewChat(), description: 'New chat' },
-    { key: ',', ctrl: true, handler: () => router.push('/settings'), description: 'Open settings' },
   ]);
 
   const fetchConversations = async () => {
     try {
       const res = await fetch(`${API_BASE}/conversations`, { credentials: 'include' });
-      if (res.ok) {
-        const data = await res.json();
-        setConversations(Array.isArray(data) ? data : []);
-      }
+      if (res.ok) { const data = await res.json(); setConversations(Array.isArray(data) ? data : []); }
     } catch {}
   };
 
@@ -90,6 +99,8 @@ export default function MentorPage() {
     setInput('');
     setAttachments([]);
     setShowAttachments(false);
+    setAttachmentPreviews({});
+    setFileError('');
     if (streamAbortRef.current) { streamAbortRef.current.abort(); streamAbortRef.current = null; }
     setIsStreaming(false);
   };
@@ -117,9 +128,7 @@ export default function MentorPage() {
         const conv = await res.json();
         setActiveConvId(conv.id);
         setMessages((conv.messages || []).map((m: any) => ({
-          role: m.role,
-          content: m.content,
-          timestamp: m.createdAt,
+          role: m.role, content: m.content, timestamp: m.createdAt,
         })));
         if (window.innerWidth < 768) setShowSidebar(false);
       }
@@ -175,66 +184,110 @@ export default function MentorPage() {
   };
 
   const stopStreaming = () => {
-    if (streamAbortRef.current) {
-      streamAbortRef.current.abort();
-      streamAbortRef.current = null;
-    }
+    if (streamAbortRef.current) { streamAbortRef.current.abort(); streamAbortRef.current = null; }
     setIsStreaming(false);
   };
 
-  const toggleAutoSpeak = () => {
-    updateSettings({ autoSpeak: !settings.autoSpeak });
-  };
+  const toggleAutoSpeak = () => updateSettings({ autoSpeak: !settings.autoSpeak });
 
-  const regenerateMessage = async () => {
-    if (messages.length < 2) return;
-    const lastUserMsg = [...messages].reverse().find(m => m.role === 'user');
-    if (lastUserMsg) {
-      setMessages(prev => prev.slice(0, -1));
-      sendMessage(lastUserMsg.content);
-    }
-  };
-
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-  };
+  const copyToClipboard = (text: string) => navigator.clipboard.writeText(text);
 
   const getTimestamp = () => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
+  const validateFile = (file: File): string | null => {
+    if (file.size > MAX_FILE_SIZE) return `${file.name} exceeds the 20MB limit`;
+    return null;
+  };
+
+  const addFiles = useCallback((files: FileList | File[]) => {
+    const fileArray = Array.from(files);
+    const errors: string[] = [];
+    const validFiles: File[] = [];
+
+    for (const file of fileArray) {
+      const error = validateFile(file);
+      if (error) errors.push(error);
+      else validFiles.push(file);
+    }
+
+    if (errors.length > 0) setFileError(errors.join('\n'));
+    if (validFiles.length > 0) {
+      setAttachments(prev => {
+        const newAttachments = [...prev, ...validFiles];
+        return newAttachments;
+      });
+      setShowAttachments(true);
+
+      const previews: Record<number, string> = {};
+      validFiles.forEach((file, idx) => {
+        if (file.type.startsWith('image/')) {
+          previews[attachments.length + idx] = URL.createObjectURL(file);
+        }
+      });
+      setAttachmentPreviews(prev => ({ ...prev, ...previews }));
+    }
+  }, [attachments.length]);
+
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    setAttachments(prev => [...prev, ...files]);
-    setShowAttachments(true);
+    if (e.target.files) addFiles(e.target.files);
     e.target.value = '';
   };
 
   const removeAttachment = (index: number) => {
-    setAttachments(prev => prev.filter((_, i) => i !== index));
+    setAttachments(prev => {
+      const newAttachments = prev.filter((_, i) => i !== index);
+      return newAttachments;
+    });
+    if (attachmentPreviews[index]) {
+      URL.revokeObjectURL(attachmentPreviews[index]);
+    }
+    const newPreviews = { ...attachmentPreviews };
+    delete newPreviews[index];
+    setAttachmentPreviews(newPreviews);
     if (attachments.length <= 1) setShowAttachments(false);
   };
 
-  const getFileIcon = (name: string) => {
-    const ext = name.split('.').pop()?.toLowerCase() || '';
-    if (['pdf'].includes(ext)) return '📄';
-    if (['doc', 'docx'].includes(ext)) return '📝';
-    if (['png', 'jpg', 'jpeg', 'gif', 'webp'].includes(ext)) return '🖼️';
-    if (['py', 'js', 'ts', 'java', 'cpp', 'c'].includes(ext)) return '💻';
-    if (['csv', 'xlsx', 'xls'].includes(ext)) return '📊';
-    if (['zip', 'tar', 'gz'].includes(ext)) return '📦';
-    return '📎';
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
   };
 
-  const formatFileSize = (bytes: number) => {
-    if (bytes < 1024) return bytes + ' B';
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
   };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    if (e.dataTransfer.files) addFiles(e.dataTransfer.files);
+  };
+
+  const handlePaste = useCallback(async (e: React.ClipboardEvent) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    const imageFiles: File[] = [];
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (item.type.startsWith('image/')) {
+        const file = item.getAsFile();
+        if (file) imageFiles.push(file);
+      }
+    }
+    if (imageFiles.length > 0) {
+      e.preventDefault();
+      addFiles(imageFiles);
+    }
+  }, [addFiles]);
 
   const processAttachments = async (): Promise<string> => {
     if (attachments.length === 0) return '';
     let extraText = '\n\n[Attachments:\n';
     for (const file of attachments) {
-      if (file.type === 'application/pdf' || file.type.startsWith('image/')) {
+      if (file.type === 'application/pdf' || file.type.startsWith('image/') || file.type.startsWith('text/')) {
         const fd = new FormData();
         fd.append('file', file);
         try {
@@ -249,12 +302,10 @@ export default function MentorPage() {
           extraText += `--- ${file.name} ---\n(upload error)\n`;
         }
       } else {
-        extraText += `--- ${file.name} ---\n(attached file: ${file.name}, ${formatFileSize(file.size)})\n`;
+        extraText += `--- ${file.name} ---\n(attached file: ${file.name}, ${file.size} bytes)\n`;
       }
     }
     extraText += ']';
-    setAttachments([]);
-    setShowAttachments(false);
     return extraText;
   };
 
@@ -265,6 +316,8 @@ export default function MentorPage() {
     const attachmentText = await processAttachments();
     const fullText = text + attachmentText;
     if (!fullText.trim()) return;
+
+    const fileInfo = attachments.map(f => ({ name: f.name, type: f.type, size: f.size }));
 
     let convId = activeConvId;
     if (!convId) {
@@ -283,13 +336,18 @@ export default function MentorPage() {
       } catch {}
     }
 
-    const userMessage: ChatMessage = { role: 'user', content: fullText, timestamp: getTimestamp() };
+    const userMessage: ChatMessage = {
+      role: 'user', content: fullText, timestamp: getTimestamp(),
+      attachments: fileInfo.length > 0 ? fileInfo : undefined,
+    };
     setMessages(prev => [...prev, userMessage]);
     setInput('');
+    setAttachments([]);
+    setShowAttachments(false);
+    setAttachmentPreviews({});
+    setFileError('');
 
-    if (convId && settings.chatHistory) {
-      saveMessage('user', fullText);
-    }
+    if (convId && settings.chatHistory) saveMessage('user', fullText);
 
     setIsStreaming(true);
     const controller = new AbortController();
@@ -346,17 +404,9 @@ export default function MentorPage() {
         }
       }
 
-      if (convId && fullContent && settings.chatHistory) {
-        saveMessage('assistant', fullContent);
-      }
+      if (convId && fullContent && settings.chatHistory) saveMessage('assistant', fullContent);
 
-      if (settings.autoSpeak && fullContent) {
-        speakText(fullContent);
-      }
-
-      if (settings.notifications && fullContent && 'Notification' in window && Notification.permission === 'granted') {
-        new Notification('AI Mentor Response', { body: fullContent.slice(0, 120) + (fullContent.length > 120 ? '...' : '') });
-      }
+      if (settings.autoSpeak && fullContent) speakText(fullContent);
     } catch (err: any) {
       if (err.name !== 'AbortError') {
         setMessages(prev => {
@@ -392,14 +442,7 @@ export default function MentorPage() {
 
   const startVoiceInput = () => {
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SR) {
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: '⚠️ **Speech recognition not supported.** Please use Chrome, Edge, or Safari.',
-        timestamp: getTimestamp(),
-      }]);
-      return;
-    }
+    if (!SR) return;
     const recognition = new SR();
     recognition.continuous = false;
     recognition.interimResults = false;
@@ -409,7 +452,6 @@ export default function MentorPage() {
       setInput(prev => prev + ' ' + event.results[0][0].transcript);
       inputRef.current?.focus();
     };
-    recognition.onerror = () => {};
     recognition.start();
   };
 
@@ -419,15 +461,10 @@ export default function MentorPage() {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      if (input.trim() && !isStreaming) sendMessage(input.trim());
-    }
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (input.trim() && !isStreaming) sendMessage(input.trim()); }
   };
 
-  const filteredConversations = conversations.filter(c =>
-    c.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredConversations = conversations.filter(c => c.title.toLowerCase().includes(searchQuery.toLowerCase()));
   const pinnedConvs = filteredConversations.filter(c => c.pinned);
   const otherConvs = filteredConversations.filter(c => !c.pinned);
 
@@ -457,14 +494,10 @@ export default function MentorPage() {
                 <div className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider px-2 py-1">Pinned</div>
                 {pinnedConvs.map(conv => (
                   <ConvItem key={conv.id} conv={conv} active={activeConvId === conv.id}
-                    onClick={() => loadConversation(conv.id)}
-                    onDelete={() => deleteConversation(conv.id)}
-                    onPin={() => togglePin(conv)}
-                    editing={editingTitle === conv.id}
-                    editValue={editTitleValue}
+                    onClick={() => loadConversation(conv.id)} onDelete={() => deleteConversation(conv.id)}
+                    onPin={() => togglePin(conv)} editing={editingTitle === conv.id} editValue={editTitleValue}
                     onStartEdit={() => { setEditingTitle(conv.id); setEditTitleValue(conv.title); }}
-                    onEditChange={v => setEditTitleValue(v)}
-                    onSaveEdit={() => renameConversation(conv.id, editTitleValue)}
+                    onEditChange={v => setEditTitleValue(v)} onSaveEdit={() => renameConversation(conv.id, editTitleValue)}
                     onCancelEdit={() => setEditingTitle(null)} />
                 ))}
               </div>
@@ -473,14 +506,10 @@ export default function MentorPage() {
               {pinnedConvs.length > 0 && <div className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider px-2 py-1">Recent</div>}
               {otherConvs.map(conv => (
                 <ConvItem key={conv.id} conv={conv} active={activeConvId === conv.id}
-                  onClick={() => loadConversation(conv.id)}
-                  onDelete={() => deleteConversation(conv.id)}
-                  onPin={() => togglePin(conv)}
-                  editing={editingTitle === conv.id}
-                  editValue={editTitleValue}
+                  onClick={() => loadConversation(conv.id)} onDelete={() => deleteConversation(conv.id)}
+                  onPin={() => togglePin(conv)} editing={editingTitle === conv.id} editValue={editTitleValue}
                   onStartEdit={() => { setEditingTitle(conv.id); setEditTitleValue(conv.title); }}
-                  onEditChange={v => setEditTitleValue(v)}
-                  onSaveEdit={() => renameConversation(conv.id, editTitleValue)}
+                  onEditChange={v => setEditTitleValue(v)} onSaveEdit={() => renameConversation(conv.id, editTitleValue)}
                   onCancelEdit={() => setEditingTitle(null)} />
               ))}
               {filteredConversations.length === 0 && (
@@ -493,7 +522,22 @@ export default function MentorPage() {
         </div>
       )}
 
-      <div className="flex-1 flex flex-col h-full overflow-hidden relative">
+      <div className="flex-1 flex flex-col h-full overflow-hidden relative"
+        onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
+        {isDragging && (
+          <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm border-2 border-dashed border-emerald-500/50 rounded-2xl m-2">
+            <div className="text-center">
+              <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-3">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-emerald-400">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+              </div>
+              <p className="text-lg font-bold text-white">Drop files here</p>
+              <p className="text-xs text-slate-400 mt-1">PDF, DOCX, Images, Code, CSV (max 20MB)</p>
+            </div>
+          </div>
+        )}
+
         <div className="flex items-center justify-between px-4 py-2.5 border-b" style={{ backgroundColor: 'rgba(15,23,42,0.5)', borderColor: 'rgba(51,65,85,0.5)' }}>
           <div className="flex items-center gap-2">
             <button onClick={() => setShowSidebar(s => !s)} className="p-1.5 rounded hover:bg-slate-800 text-slate-400">
@@ -536,6 +580,9 @@ export default function MentorPage() {
                     </button>
                   ))}
                 </div>
+                <p className="text-[10px] text-slate-600 mt-6">
+                  Drop files anywhere or paste images to attach
+                </p>
               </div>
             </div>
           ) : (
@@ -549,7 +596,22 @@ export default function MentorPage() {
                     padding: '10px 14px',
                   }}>
                     {msg.role === 'user' ? (
-                      <p className="text-sm text-slate-200 whitespace-pre-wrap">{msg.content}</p>
+                      <div>
+                        {msg.attachments && msg.attachments.length > 0 && (
+                          <div className="flex flex-wrap gap-2 mb-2">
+                            {msg.attachments.map((att, ai) => (
+                              <div key={ai} className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px]"
+                                style={{ backgroundColor: 'rgba(30,41,59,0.6)', border: '1px solid rgba(51,65,85,0.4)' }}>
+                                <span className={att.type.startsWith('image/') ? 'text-blue-400' : 'text-slate-400'}>
+                                  {att.type.startsWith('image/') ? '🖼️' : att.type === 'application/pdf' ? '📄' : '📎'}
+                                </span>
+                                <span className="text-slate-400">{att.name}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        <p className="text-sm text-slate-200 whitespace-pre-wrap">{msg.content}</p>
+                      </div>
                     ) : (
                       <div className="text-sm text-slate-200">
                         {msg.content ? <MarkdownRenderer content={msg.content} /> : (
@@ -566,14 +628,11 @@ export default function MentorPage() {
                     )}
                     {msg.role === 'assistant' && msg.content && i === messages.length - 1 && !isStreaming && (
                       <div className="flex items-center gap-1 mt-1.5 pt-1.5 border-t" style={{ borderColor: 'rgba(51,65,85,0.3)' }}>
-                        <button onClick={() => speakText(msg.content)} className="p-1 rounded hover:bg-slate-700 text-slate-500 hover:text-slate-300" title="Read aloud">
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
-                        </button>
-                        <button onClick={regenerateMessage} className="p-1 rounded hover:bg-slate-700 text-slate-500 hover:text-slate-300" title="Regenerate">
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
-                        </button>
                         <button onClick={() => copyToClipboard(msg.content)} className="p-1 rounded hover:bg-slate-700 text-slate-500 hover:text-slate-300" title="Copy">
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        </button>
+                        <button onClick={() => speakText(msg.content)} className="p-1 rounded hover:bg-slate-700 text-slate-500 hover:text-slate-300" title="Read aloud">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
                         </button>
                       </div>
                     )}
@@ -603,16 +662,17 @@ export default function MentorPage() {
           </button>
         )}
 
+        {fileError && (
+          <div className="px-4 py-2 border-t" style={{ backgroundColor: 'rgba(239,68,68,0.1)', borderColor: 'rgba(239,68,68,0.3)' }}>
+            <p className="text-xs text-red-400">{fileError}</p>
+          </div>
+        )}
+
         {showAttachments && attachments.length > 0 && (
           <div className="px-4 py-2 border-t flex gap-2 overflow-x-auto scrollbar-thin" style={{ backgroundColor: 'rgba(15,23,42,0.8)', borderColor: 'rgba(51,65,85,0.5)' }}>
             {attachments.map((file, i) => (
-              <div key={i} className="flex items-center gap-1.5 px-2 py-1 rounded-lg border text-xs shrink-0"
-                style={{ backgroundColor: 'rgba(30,41,59,0.5)', borderColor: 'rgba(51,65,85,0.5)' }}>
-                <span>{getFileIcon(file.name)}</span>
-                <span className="text-slate-300 max-w-[100px] truncate">{file.name}</span>
-                <span className="text-slate-500">{formatFileSize(file.size)}</span>
-                <button onClick={() => removeAttachment(i)} className="text-slate-500 hover:text-red-400 ml-1">&times;</button>
-              </div>
+              <AttachmentCard key={i} file={file} index={i} onRemove={removeAttachment}
+                preview={attachmentPreviews[i]} />
             ))}
           </div>
         )}
@@ -630,9 +690,9 @@ export default function MentorPage() {
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
                 </svg>
-                <input type="file" multiple onChange={handleFileSelect} className="hidden" accept=".pdf,.doc,.docx,.txt,.py,.js,.ts,.java,.cpp,.c,.png,.jpg,.jpeg,.csv,.zip" />
+                <input type="file" multiple onChange={handleFileSelect} className="hidden" accept=".pdf,.doc,.docx,.txt,.py,.js,.ts,.java,.cpp,.c,.png,.jpg,.jpeg,.csv,.zip,.md,.html,.css,.rs,.go,.rb" ref={fileInputRef} />
               </label>
-              <textarea ref={inputRef} value={input} onChange={e => setInput(e.target.value)} onKeyDown={handleKeyDown}
+              <textarea ref={inputRef} value={input} onChange={e => setInput(e.target.value)} onKeyDown={handleKeyDown} onPaste={handlePaste}
                 rows={1} placeholder="Ask anything about careers, resumes, interviews or education..."
                 className="flex-1 bg-transparent text-sm text-slate-200 outline-none resize-none max-h-32 py-1 placeholder:text-slate-500" />
               {isStreaming ? (
@@ -641,15 +701,18 @@ export default function MentorPage() {
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
                 </button>
               ) : (
-                <button type="submit" disabled={!input.trim()}
+                <button type="submit" disabled={!input.trim() && attachments.length === 0}
                   className="p-1.5 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0 text-white"
-                  style={{ backgroundColor: input.trim() ? 'var(--accent)' : 'rgba(51,65,85,0.5)' }}>
+                  style={{ backgroundColor: input.trim() || attachments.length > 0 ? 'var(--accent)' : 'rgba(51,65,85,0.5)' }}>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
                   </svg>
                 </button>
               )}
             </div>
+            <p className="text-[10px] text-slate-600 mt-1.5 text-center">
+              Drop files anywhere or paste images to attach. Press Enter to send, Shift+Enter for new line.
+            </p>
           </form>
         </div>
       </div>
@@ -664,10 +727,11 @@ export default function MentorPage() {
                 { keys: 'Ctrl + /', label: 'Toggle shortcuts' },
                 { keys: 'Ctrl + Enter', label: 'Send message' },
                 { keys: 'Ctrl + Shift + N', label: 'New chat' },
-                { keys: 'Ctrl + K', label: 'Focus search / input' },
-                { keys: 'Ctrl + Shift + M', label: 'Toggle auto-speak' },
+                { keys: 'Ctrl + K', label: 'Focus input' },
                 { keys: 'Esc', label: 'Stop generation' },
+                { keys: 'Ctrl + Shift + M', label: 'Toggle auto-speak' },
                 { keys: 'Shift + Enter', label: 'New line in input' },
+                { keys: 'Ctrl + V (image)', label: 'Paste image from clipboard' },
               ].map((s, i) => (
                 <div key={i} className="flex items-center justify-between text-xs">
                   <span className="text-slate-400">{s.label}</span>

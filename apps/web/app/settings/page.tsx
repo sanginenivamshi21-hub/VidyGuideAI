@@ -5,9 +5,12 @@ import { useSettings, GROQ_MODELS, LANGUAGES, ACCENT_COLORS, applyTheme, applyAc
 import { useRouter } from 'next/navigation';
 import { API_BASE } from '@/lib/api';
 import { Palette, Volume2, Bell, Shield, Keyboard, Eye, GripVertical, Sun, Moon, Monitor, Check, Upload, Trash2, Download, LogOut, AlertTriangle } from 'lucide-react';
+import { useAuth, useRequireRegistered } from '@/hooks/useAuth';
 
 export default function SettingsPage() {
   const { settings, updateSettings, loading, saving } = useSettings();
+  const { isAuthenticated } = useAuth();
+  useRequireRegistered();
   const router = useRouter();
   const [password, setPassword] = useState('');
   const [passwordMsg, setPasswordMsg] = useState('');

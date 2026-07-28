@@ -72,19 +72,53 @@ export interface SocialLink {
   url: string;
 }
 
-export type ResumeTemplate = 'professional' | 'modern' | 'minimal';
+export type ResumeTemplate = 'professional' | 'modern' | 'minimal' | 'google' | 'microsoft';
+
+export interface ResumeTarget {
+  role: string;
+  industry: string;
+  experienceLevel: string;
+  country: string;
+}
+
+export interface CategorizedSkills {
+  programmingLanguages: string[];
+  frameworks: string[];
+  libraries: string[];
+  databases: string[];
+  cloud: string[];
+  devops: string[];
+  aiMl: string[];
+  softSkills: string[];
+}
+
+export interface EnhancedExperience extends Experience {
+  achievements: string;
+  technologies: string;
+}
+
+export interface EnhancedProject extends Project {
+  techStack: string;
+  liveDemo: string;
+  contributions: string;
+  results: string;
+}
 
 export interface ResumeData {
   personalInfo: PersonalInfo;
   education: Education[];
-  experience: Experience[];
+  experience: EnhancedExperience[];
   skills: Skill[];
-  projects: Project[];
+  projects: EnhancedProject[];
   certifications: Certification[];
   achievements: Achievement[];
   languages: Language[];
   socialLinks: SocialLink[];
   template: ResumeTemplate;
+  target: ResumeTarget;
+  interests: string[];
+  colorTheme: string;
+  fontFamily: string;
 }
 
 export function createEmptyResume(): ResumeData {
@@ -106,6 +140,10 @@ export function createEmptyResume(): ResumeData {
     languages: [],
     socialLinks: [],
     template: 'professional',
+    target: { role: '', industry: '', experienceLevel: '', country: '' },
+    interests: [],
+    colorTheme: 'emerald',
+    fontFamily: 'sans',
   };
 }
 
@@ -130,4 +168,32 @@ export function loadResume(): ResumeData {
     /* corrupted data */
   }
   return createEmptyResume();
+}
+
+export function createEmptyEnhancedExperience(): EnhancedExperience {
+  return {
+    id: crypto.randomUUID(), company: '', role: '', location: '',
+    startDate: '', endDate: '', current: false, description: '',
+    achievements: '', technologies: '',
+  };
+}
+
+export function createEmptyEnhancedProject(): EnhancedProject {
+  return {
+    id: crypto.randomUUID(), title: '', description: '', technologies: '',
+    techStack: '', link: '', liveDemo: '', contributions: '', results: '',
+    startDate: '', endDate: '',
+  };
+}
+
+export function createEmptyEducation(): Education {
+  return { id: crypto.randomUUID(), degree: '', institution: '', field: '', startYear: '', endYear: '', grade: '' };
+}
+
+export function createEmptyCertification(): Certification {
+  return { id: crypto.randomUUID(), name: '', issuer: '', date: '', link: '' };
+}
+
+export function createEmptyAchievement(): Achievement {
+  return { id: crypto.randomUUID(), title: '', description: '', date: '' };
 }

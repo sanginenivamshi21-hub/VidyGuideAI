@@ -29,12 +29,12 @@ export class OcrController {
 
         const projectRoot = resolve(process.cwd(), '..', '..');
         const venvPython = resolve(projectRoot, '.venv', 'bin', 'python');
-        const scriptPath = resolve(projectRoot, 'resume_scanner.py');
+        const scriptPath = resolve(projectRoot, 'python', 'resume_scanner.py');
 
         const pythonPath = existsSync(venvPython) ? venvPython : 'python3';
         const script = existsSync(scriptPath)
             ? scriptPath
-            : resolve(process.cwd(), 'resume_scanner.py');
+            : resolve(process.cwd(), 'python', 'resume_scanner.py');
 
         const tempDir = os.tmpdir();
         const tempFilePath = resolve(

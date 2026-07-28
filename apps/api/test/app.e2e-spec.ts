@@ -15,7 +15,6 @@ describe('AppController (e2e)', () => {
         app = moduleFixture.createNestApplication();
         app.enableCors({
             origin: [
-                'https://vidyguideai-web.onrender.com',
                 'http://localhost:3000',
                 'http://localhost:3001',
             ],

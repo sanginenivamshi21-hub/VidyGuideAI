@@ -8,10 +8,8 @@ import type { LucideIcon } from 'lucide-react';
 import {
   LayoutDashboard,
   Compass,
-  Map,
   FileText,
-  FileEdit,
-  ScanLine,
+  ScanSearch,
   Bot,
   Languages,
   Briefcase,
@@ -21,34 +19,20 @@ import {
   LogOut,
   Menu,
   ChevronLeft,
+  Home,
+  LogIn,
+  UserPlus,
 } from 'lucide-react';
-import { API_BASE } from '@/lib/api';
-import { ROUTES, SIDEBAR_ITEMS } from '@/lib/routes';
+import { useAuth } from '@/hooks/useAuth';
+import { ROUTES } from '@/lib/routes';
 
 interface SidebarItem {
   icon: LucideIcon;
   label: string;
   href: string;
   color: string;
+  requiresAuth?: boolean;
 }
-
-const ICON_MAP: Record<string, LucideIcon> = {
-  LayoutDashboard,
-  Compass,
-  Map,
-  FileText,
-  FileEdit,
-  ScanLine,
-  Bot,
-  Languages,
-  Briefcase,
-  Clock,
-  User,
-  Settings,
-  LogOut,
-  Menu,
-  ChevronLeft,
-};
 
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(() => {
@@ -57,26 +41,23 @@ export default function Sidebar() {
   });
   const pathname = usePathname();
   const router = useRouter();
+  const { isAuthenticated, isGuest, logout } = useAuth();
 
-  const menuItems: SidebarItem[] = SIDEBAR_ITEMS.map((item) => ({
-    ...item,
-    icon: ICON_MAP[item.icon],
-  }));
+  const allItems: SidebarItem[] = [
+    { icon: Home, label: 'Home', href: ROUTES.HOME, color: 'text-sky-400' },
+    { icon: LayoutDashboard, label: 'Dashboard', href: ROUTES.DASHBOARD, color: 'text-blue-400', requiresAuth: true },
+    { icon: Compass, label: 'Career Guidance', href: ROUTES.CAREER, color: 'text-emerald-400' },
+    { icon: FileText, label: 'Resume Builder', href: ROUTES.RESUME_BUILDER, color: 'text-indigo-400' },
+    { icon: ScanSearch, label: 'Resume Review', href: ROUTES.RESUME_REVIEW, color: 'text-indigo-400' },
+    { icon: Bot, label: 'AI Mentor', href: ROUTES.MENTOR, color: 'text-cyan-400' },
+    { icon: Languages, label: 'Translator', href: ROUTES.TRANSLATOR, color: 'text-orange-400' },
+    { icon: Briefcase, label: 'Interview Prep', href: ROUTES.INTERVIEW_PREP, color: 'text-violet-400' },
+    { icon: Clock, label: 'History', href: ROUTES.HISTORY, color: 'text-teal-400', requiresAuth: true },
+    { icon: User, label: 'Profile', href: ROUTES.PROFILE, color: 'text-yellow-400', requiresAuth: true },
+    { icon: Settings, label: 'Settings', href: ROUTES.SETTINGS, color: 'text-slate-400', requiresAuth: true },
+  ];
 
-  const handleLogout = async () => {
-    try {
-      await fetch(`${API_BASE}/auth/logout`, {
-        method: 'POST',
-        credentials: 'include',
-      });
-    } catch (e) {
-      console.error(e);
-    }
-    localStorage.removeItem('user');
-    router.push(ROUTES.AUTH);
-  };
-
-  const isLoggedIn = typeof window !== 'undefined' && localStorage.getItem('user');
+  const menuItems = isAuthenticated ? allItems : allItems.filter(item => !item.requiresAuth);
 
   return (
     <motion.div
@@ -108,11 +89,6 @@ export default function Sidebar() {
               const next = !isOpen;
               setIsOpen(next);
               localStorage.setItem('vidyguide_sidebar', next ? 'expanded' : 'collapsed');
-              fetch(`${API_BASE}/settings`, {
-                method: 'PUT', credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ sidebarCollapsed: !next }),
-              }).catch(() => {});
             }}
             className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-400 absolute -right-3 top-5 border border-slate-700 z-50 transition-all duration-200"
           >
@@ -151,22 +127,31 @@ export default function Sidebar() {
       </div>
 
       <div className="flex flex-col gap-3 pt-3 border-t border-slate-800">
-        {isOpen ? (
+        {isAuthenticated ? (
           <button
-            onClick={handleLogout}
+            onClick={logout}
             className="flex items-center gap-3 p-2.5 rounded-lg w-full text-slate-400 hover:bg-red-500/10 hover:text-red-400 transition-all duration-200"
           >
             <LogOut size={18} className="shrink-0 text-slate-500" />
-            <span className="text-xs tracking-wide">Log Out</span>
+            {isOpen && <span className="text-xs tracking-wide">Log Out</span>}
           </button>
         ) : (
-          <button
-            onClick={handleLogout}
-            className="p-2.5 rounded-lg w-full text-slate-400 hover:bg-red-500/10 hover:text-red-400 transition-all duration-200 flex justify-center"
-            title="Log Out"
-          >
-            <LogOut size={18} />
-          </button>
+          <>
+            <Link
+              href={ROUTES.AUTH}
+              className="flex items-center gap-3 p-2.5 rounded-lg w-full text-slate-400 hover:bg-emerald-500/10 hover:text-emerald-400 transition-all duration-200"
+            >
+              <LogIn size={18} className="shrink-0 text-slate-500" />
+              {isOpen && <span className="text-xs tracking-wide">Sign In</span>}
+            </Link>
+            <Link
+              href={ROUTES.AUTH + '?mode=register'}
+              className="flex items-center gap-3 p-2.5 rounded-lg w-full text-slate-400 hover:bg-emerald-500/10 hover:text-emerald-400 transition-all duration-200"
+            >
+              <UserPlus size={18} className="shrink-0 text-slate-500" />
+              {isOpen && <span className="text-xs tracking-wide">Register</span>}
+            </Link>
+          </>
         )}
 
         {isOpen && (

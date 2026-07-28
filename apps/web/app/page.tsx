@@ -1,22 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Compass, FileText, MessageSquare, ShieldAlert, Sparkles, ArrowRight } from 'lucide-react';
 import { ROUTES } from '@/lib/routes';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function Home() {
   const router = useRouter();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    const user = localStorage.getItem('user');
-    if (user) {
-      setIsLoggedIn(true);
-    }
-  }, []);
+  const { isAuthenticated } = useAuth();
 
   const cards = [
     {
@@ -56,15 +49,15 @@ export default function Home() {
           <Sparkles size={14} />
           <span>VidyGuideAI V3 Foundation Active</span>
         </div>
-        <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
-          Welcome to VidyGuideAI
+                <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
+          {isAuthenticated ? 'Welcome back to VidyGuideAI' : 'Welcome to VidyGuideAI'}
         </h1>
         <p className="text-slate-400 max-w-2xl text-lg">
           Transforming career counseling for Indian students through localized, context-aware AI mentorship. Select a service from the sidebar or choose a panel below to begin.
         </p>
 
         <div className="mt-2">
-          {isLoggedIn ? (
+          {isAuthenticated ? (
             <Link
               href={ROUTES.DASHBOARD}
               className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm rounded-lg shadow-lg shadow-emerald-500/20 transition-all active:scale-[0.98]"

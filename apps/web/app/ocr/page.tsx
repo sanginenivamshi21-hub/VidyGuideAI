@@ -53,9 +53,8 @@ export default function OcrScannerPage() {
   };
 
   const handleSendToFeedback = () => {
-    // Save to session or local storage temporarily and redirect
     localStorage.setItem('temp_ocr_text', extractedText);
-    router.push(ROUTES.RESUME_FEEDBACK);
+    router.push(ROUTES.RESUME_REVIEW);
   };
 
   const handleClear = () => {

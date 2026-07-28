@@ -13,6 +13,6 @@ FROM base AS runner
 RUN apk add --no-cache python3 py3-pip tesseract-ocr poppler-utils build-base jpeg-dev zlib-dev
 WORKDIR /usr/src/app
 COPY --from=build /usr/src/app /usr/src/app
-RUN python3 -m venv .venv && .venv/bin/pip install --upgrade pip && .venv/bin/pip install -r requirements.txt
+RUN python3 -m venv .venv && .venv/bin/pip install --upgrade pip && .venv/bin/pip install -r python/requirements.txt
 EXPOSE 8000
 CMD ["pnpm", "--filter", "api", "start:prod"]

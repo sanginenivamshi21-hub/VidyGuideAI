@@ -1,8 +1,8 @@
 <div align="center">
 
-# 🌿 VidyGuideAI
+# VidyGuideAI
 
-**AI-Powered Career Counseling Platform for Indian Students**
+**AI-Powered Career Preparation Platform**
 
 [![Next.js](https://img.shields.io/badge/Next.js-15.1-000000?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![NestJS](https://img.shields.io/badge/NestJS-11-E0234E?style=for-the-badge&logo=nestjs)](https://nestjs.com/)
@@ -11,304 +11,357 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=for-the-badge&logo=postgresql)](https://www.postgresql.org/)
 [![Groq AI](https://img.shields.io/badge/Groq%20AI-Llama%203-FF6600?style=for-the-badge)](https://groq.com/)
 [![MIT License](https://img.shields.io/badge/License-MIT-3DDC84?style=for-the-badge)](LICENSE)
-[![Build](https://img.shields.io/badge/Build-Passing-22c55e?style=for-the-badge)](https://github.com/sanginenivamshi21-hub/VidyGuideAI/actions)
 [![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-8A2BE2?style=for-the-badge)](CONTRIBUTING.md)
 
-<sub>Empowering 250M+ Indian students with AI-driven career guidance in 10+ regional languages</sub>
+<sub>Empowering students with AI-driven career guidance — Resume Builder, ATS Resume Review, AI Mentor, Career Guidance, and more.</sub>
 
 ---
 
-[Features](#-features) • [Screenshots](#-screenshots) • [Architecture](#-architecture) • [Tech Stack](#-tech-stack) • [Quick Start](#-quick-start) • [API Overview](#-api-overview) • [Documentation](#-documentation) • [Roadmap](#-roadmap)
+[Features](#features) • [Screenshots](#screenshots) • [Tech Stack](#tech-stack) • [Architecture](#architecture) • [Quick Start](#quick-start) • [API Overview](#api-overview) • [Roadmap](#roadmap) • [Contributing](#contributing)
 
 </div>
 
 ---
 
-## ✨ Features
+## Overview
+
+VidyGuideAI is a full-stack, AI-powered career preparation platform built for students and job seekers. It combines a modern Next.js frontend with a NestJS backend, PostgreSQL database, and Groq AI (LLaMA 3) to deliver:
+
+- **Resume Builder** — 10-step guided wizard with 5 ATS-optimized templates, role-specific skill suggestions, and live preview
+- **Resume Review** — Unified ATS scoring, keyword analysis, grammar/formatting check, AI feedback, and enhanced resume generation
+- **AI Mentor** — Chat-based career assistant with streaming responses, file attachments (drag & drop, paste), voice input, keyboard shortcuts, and conversation management
+- **Career Guidance** — Role recommendations, industry insights, and personalized career roadmaps
+- **OCR Processing** — Extract text from PDF and image resumes using EasyOCR + Tesseract
+- **PDF Export** — Generate professional PDF resumes via ReportLab
+- **Translator** — Multilingual support across 10+ Indian languages
+- **Interview Preparation** — Mock technical and behavioral interviews with AI feedback
+
+---
+
+## Features
 
 | Module | Description |
 |--------|-------------|
-| **🔐 Authentication** | JWT-based registration/login with OTP email verification, forgot/reset password, guest access |
-| **🎯 Career Guidance** | Personalized recommendations for 10th/12th/ITI/diploma/graduate students with detailed roadmaps |
-| **🗺️ Career Roadmap** | Visual milestone timeline with scroll-triggered animations |
-| **📝 Resume Builder** | ATS-compliant plaintext resumes generated via Groq AI |
-| **📄 Resume Feedback** | ATS scoring with section-by-section improvement suggestions in multiple languages |
-| **🖨️ PDF Export** | Professional PDF generation via ReportLab with Indian formatting standards |
-| **🔍 OCR Scanner** | Text extraction from PDF and images via Tesseract OCR engine |
-| **🤖 AI Mentor** | Regional language counseling (10+ Indian languages) with streaming responses |
-| **🎤 Voice Mentor** | Speech-to-text Q&A with browser SpeechSynthesis output |
-| **💼 Interview Prep** | Mock technical and behavioral interviews for top Indian companies with feedback |
-| **🌐 Translator** | Career article translation across English + 9 Indian regional languages |
-| **⚙️ Settings Sync** | Full user preferences (theme, accent color, AI model, voice, notifications) synced with backend |
-| **📊 Dashboard** | Usage analytics, interaction stats, and progress tracking |
-| **📜 History** | Complete audit trail of all user interactions with search and delete |
+| **Resume Builder** | 10-step guided wizard with 5 templates, role-specific skill suggestions, live preview, auto-save, ATS quality checks, and PDF export |
+| **Resume Review** | One-click ATS score analysis, keyword density, formatting issues, grammar suggestions, missing skills, strengths/improvements, AI coach feedback, and enhanced resume generation |
+| **AI Mentor** | Real-time streaming chat with Groq AI, drag-and-drop file attachments, image paste, voice input, keyboard shortcuts (Ctrl+/, Ctrl+Enter, etc.), conversation search/pin/rename, and markdown rendering |
+| **Career Guidance** | AI-driven role validation, industry-specific suggestions, personalized career roadmaps with visual timelines |
+| **OCR Scanner** | Extract text from uploaded PDF and image resumes using EasyOCR with Tesseract fallback |
+| **Translator** | Translate career content between English and Telugu, Hindi, Tamil, Kannada, Malayalam, Bengali, Marathi, Gujarati, and more |
+| **Interview Prep** | Practice mock interviews with role-specific questions, AI-generated feedback, and performance tracking |
+| **Dashboard** | Central hub with usage stats, quick-access cards for all modules, and activity history |
+| **Settings** | Theme (dark/light), accent color, AI model selection, voice configuration, and notification preferences |
+| **Authentication** | Email/password registration with OTP verification, JWT cookie-based sessions, forgot/reset password, and guest mode |
 
 ---
 
-## 📸 Screenshots
+## Screenshots
 
 <div align="center">
-
-### Landing Page
-<img src="screenshots/landing-page.jpg" alt="Landing Page" width="700" style="border-radius: 12px; border: 1px solid #1e293b;" />
-
-### Dashboard
-<img src="screenshots/dashboard.jpg" alt="Dashboard" width="700" style="border-radius: 12px; border: 1px solid #1e293b;" />
-
-### Career Guidance
-<img src="screenshots/career-guidance.jpg" alt="Career Guidance" width="700" style="border-radius: 12px; border: 1px solid #1e293b;" />
-
-### AI Mentor Chat
-<img src="screenshots/ai-mentor.jpg" alt="AI Mentor" width="700" style="border-radius: 12px; border: 1px solid #1e293b;" />
-
-### Resume Builder
-<img src="screenshots/resume-builder.jpg" alt="Resume Builder" width="700" style="border-radius: 12px; border: 1px solid #1e293b;" />
-
-### Resume Feedback
-<img src="screenshots/resume-feedback.jpg" alt="Resume Feedback" width="700" style="border-radius: 12px; border: 1px solid #1e293b;" />
-
-### Interview Preparation
-<img src="screenshots/interview-prep.jpg" alt="Interview Prep" width="700" style="border-radius: 12px; border: 1px solid #1e293b;" />
-
-### History
-<img src="screenshots/history.jpg" alt="History" width="700" style="border-radius: 12px; border: 1px solid #1e293b;" />
-
-### Profile
-<img src="screenshots/profile.jpg" alt="Profile" width="700" style="border-radius: 12px; border: 1px solid #1e293b;" />
-
-### Settings
-<img src="screenshots/settings.jpg" alt="Settings" width="700" style="border-radius: 12px; border: 1px solid #1e293b;" />
-
-### Translator
-<img src="screenshots/translator.jpg" alt="Translator" width="700" style="border-radius: 12px; border: 1px solid #1e293b;" />
-
+  <img src="assets/screenshots/landing-page.jpg" alt="Landing Page" width="700" style="border-radius: 12px; border: 1px solid #1e293b;" />
+  <p><em>Landing page</em></p>
+  <img src="assets/screenshots/dashboard.jpg" alt="Dashboard" width="700" style="border-radius: 12px; border: 1px solid #1e293b;" />
+  <p><em>Career dashboard</em></p>
+  <img src="assets/screenshots/resume-builder.jpg" alt="Resume Builder" width="700" style="border-radius: 12px; border: 1px solid #1e293b;" />
+  <p><em>Resume Builder with live preview</em></p>
+  <img src="assets/screenshots/resume-feedback.jpg" alt="Resume Review" width="700" style="border-radius: 12px; border: 1px solid #1e293b;" />
+  <p><em>Resume Review with ATS scoring and AI feedback</em></p>
+  <img src="assets/screenshots/ai-mentor.jpg" alt="AI Mentor" width="700" style="border-radius: 12px; border: 1px solid #1e293b;" />
+  <p><em>AI Mentor chat interface</em></p>
+  <img src="assets/screenshots/career-guidance.jpg" alt="Career Guidance" width="700" style="border-radius: 12px; border: 1px solid #1e293b;" />
+  <p><em>Career guidance recommendations</em></p>
+  <img src="assets/screenshots/interview-prep.jpg" alt="Interview Prep" width="700" style="border-radius: 12px; border: 1px solid #1e293b;" />
+  <p><em>Interview preparation module</em></p>
+  <img src="assets/screenshots/history.jpg" alt="History" width="700" style="border-radius: 12px; border: 1px solid #1e293b;" />
+  <p><em>Activity history</em></p>
+  <img src="assets/screenshots/profile.jpg" alt="Profile" width="700" style="border-radius: 12px; border: 1px solid #1e293b;" />
+  <p><em>User profile</em></p>
+  <img src="assets/screenshots/settings.jpg" alt="Settings" width="700" style="border-radius: 12px; border: 1px solid #1e293b;" />
+  <p><em>Settings panel</em></p>
+  <img src="assets/screenshots/translator.jpg" alt="Translator" width="700" style="border-radius: 12px; border: 1px solid #1e293b;" />
+  <p><em>Multilingual translator</em></p>
 </div>
 
 ---
 
-## 🏗️ Architecture
+## Tech Stack
+
+### Frontend
+- **Framework:** Next.js 15 (App Router), React 19
+- **Language:** TypeScript 5.7
+- **Styling:** Tailwind CSS 4, Framer Motion
+- **Icons:** Lucide React
+- **3D Graphics:** OGL (WebGL)
+
+### Backend
+- **Framework:** NestJS 11
+- **Language:** TypeScript
+- **ORM:** Prisma 5.21
+- **Database:** PostgreSQL 16
+- **Authentication:** JWT (HTTP-only cookies), bcryptjs, Passport
+- **Email:** Resend API
+- **Validation:** class-validator, class-transformer, Zod
+- **Security:** Helmet, Rate Limiting (@nestjs/throttler)
+
+### AI & ML
+- **AI Provider:** Groq (LLaMA 3 70B)
+- **OCR:** EasyOCR (PyTorch), Tesseract (pytesseract)
+- **PDF Generation:** ReportLab (Python)
+
+### Infrastructure
+- **Containerization:** Docker, Docker Compose
+- **CI/CD:** GitHub Actions
+- **File Storage:** Cloudinary
+- **Deployment:** Render (API), Neon (PostgreSQL)
+
+---
+
+## Architecture
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│                    Next.js 15 Frontend                    │
-│  (React 19, Tailwind CSS 4, Framer Motion, Lucide Icons)  │
+│                   Next.js 15 Frontend                    │
+│  (React 19, Tailwind CSS 4, Framer Motion, Lucide Icons) │
 └──────────────────┬───────────────────────────────────────┘
-                   │ HTTP/JSON with credentials (cookies)
+                   │ HTTP/JSON (credentials: include)
                    ▼
 ┌──────────────────────────────────────────────────────────┐
-│                   NestJS 11 API Gateway                    │
+│                   NestJS 11 API Gateway                   │
 │   Helmet · CORS · Rate Limiting · Validation · JWT Auth   │
 ├──────────────────────────────────────────────────────────┤
 │  Auth │ Career │ Resume │ Mentor │ OCR │ Translator        │
-│  Users │ History │ Conversations │ Settings │ AI │ Mail    │
+│  Users │ History │ Conversations │ Settings │ Prisma       │
 └───────┬──────────────────────────────────────┬───────────┘
         │                                      │
         ▼                                      ▼
 ┌──────────────────┐              ┌────────────────────────┐
 │   PostgreSQL 16   │              │   Groq AI (LLaMA 3)    │
-│   + Prisma ORM    │              │   + SMTP (Nodemailer)  │
+│   + Prisma ORM    │              │   + Resend (Email)     │
 │   + Migrations    │              │   + Cloudinary Files   │
 └──────────────────┘              └────────────────────────┘
 ```
 
 ---
 
-## 🛠️ Tech Stack
+## Project Structure
 
-| Layer | Technology |
-|-------|-----------|
-| **Frontend** | Next.js 15.1 (App Router), React 19, TypeScript, Tailwind CSS 4, Framer Motion, Lucide Icons |
-| **Backend** | NestJS 11, TypeScript, Passport JWT, Helmet, Throttler (60 req/min) |
-| **Database** | PostgreSQL 16, Prisma ORM 5.21 with migrations |
-| **AI/ML** | Groq SDK (llama3-70b, llama3-8b, Gemma 2, Mixtral, DeepSeek R1), Tesseract OCR |
-| **Infrastructure** | pnpm workspaces (monorepo), Docker Compose, GitHub Actions |
-| **Email** | Nodemailer with SMTP (Gmail, etc.) |
-| **File Uploads** | Cloudinary for profile pictures |
-| **Security** | bcryptjs, JWT access + refresh tokens, HTTP-only cookies, Helmet headers, rate limiting |
+```
+VidyGuide-ai/
+├── apps/
+│   ├── api/                     # NestJS backend
+│   │   ├── prisma/              # Schema + migrations
+│   │   └── src/                 # Controllers, services, modules
+│   │       ├── auth/            # Authentication module
+│   │       ├── career/          # Career guidance
+│   │       ├── conversations/   # AI Mentor conversations
+│   │       ├── history/         # User activity history
+│   │       ├── mentor/          # AI chat mentor
+│   │       ├── ocr/             # OCR processing
+│   │       ├── resume/          # Resume analysis/feedback/PDF
+│   │       ├── settings/        # User settings
+│   │       ├── translator/      # Language translation
+│   │       └── users/           # User profiles
+│   └── web/                     # Next.js frontend
+│       ├── app/                 # Pages (App Router)
+│       ├── components/          # Reusable components
+│       │   └── resume/          # Resume builder components
+│       ├── hooks/               # Custom React hooks
+│       ├── lib/                 # Utilities + config
+│       └── types/               # TypeScript declarations
+├── python/                      # Python scripts (OCR, PDF)
+│   ├── requirements.txt
+│   ├── resume_pdf.py
+│   └── resume_scanner.py
+├── assets/                      # Static assets
+│   ├── images/                  # Diagrams, logo
+│   └── screenshots/             # App screenshots
+├── docker/                      # Docker configs
+│   ├── Dockerfile.api
+│   └── Dockerfile.web
+├── docs/                        # Documentation
+│   ├── API.md
+│   ├── ARCHITECTURE.md
+│   ├── CHANGELOG.md
+│   └── DEPLOYMENT.md
+├── .github/                     # GitHub templates + CI
+│   ├── workflows/ci.yml
+│   ├── ISSUE_TEMPLATE/
+│   └── PULL_REQUEST_TEMPLATE.md
+├── docker-compose.yml
+├── package.json                 # Workspace root
+├── pnpm-workspace.yaml
+└── python/requirements.txt      # Python dependencies
+```
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
-- Node.js >= 18
-- pnpm (`npm install -g pnpm`)
-- PostgreSQL 16
-- Groq API key ([get one free](https://console.groq.com/))
+- **Node.js** 22.x
+- **pnpm** 10.x (`npm install -g pnpm@10`)
+- **Python** 3.11+
+- **PostgreSQL** 16+ (or [Neon](https://neon.tech) serverless)
+- **Groq API key** (free at [console.groq.com](https://console.groq.com))
 
-### Local Development
+### 1. Clone & Install
 
 ```bash
-# 1. Clone the repository
 git clone https://github.com/sanginenivamshi21-hub/VidyGuideAI.git
-cd VidyGuideAI
+cd VidyGuide-ai
 
-# 2. Install dependencies
+# Install all dependencies
 pnpm install
 
-# 3. Configure environment
-cp .env.example .env
-# Edit .env with your credentials (Groq API key, SMTP, DB URL)
-
-# 4. Set up the database
-cd apps/api
-npx prisma generate
-npx prisma migrate deploy
-cd ../..
-
-# 5. Start development servers
-pnpm dev
+# Set up Python virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r python/requirements.txt
 ```
 
-**API:** `http://localhost:8000` — **Web:** `http://localhost:3000`
-
-### Environment Variables
-
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `GROQ_API_KEY` | ✅ | Groq AI API key |
-| `DATABASE_URL` | ✅ | PostgreSQL connection string |
-| `JWT_SECRET` | ✅ | JWT signing secret (min 16 chars) |
-| `SMTP_HOST` | ✅ | SMTP server host |
-| `SMTP_USER` | ✅ | SMTP email address |
-| `SMTP_PASS` | ✅ | SMTP app password |
-| `APP_BASE_URL` | ❌ | Base URL for email links (default: `http://localhost:3000`) |
-| `NEXT_PUBLIC_API_URL` | ❌ | API URL for frontend (default: `http://localhost:8000`) |
-| `REDIS_URL` | ❌ | Redis connection string |
-| `CLOUDINARY_URL` | ❌ | Cloudinary for file uploads |
-
-### Docker
+### 2. Environment Variables
 
 ```bash
-# Build and run all services (PostgreSQL + Redis + API + Web)
+cp .env.example .env
+```
+
+Edit `.env` with your values (see [Environment Variables](#environment-variables) section below).
+
+### 3. Database Setup
+
+```bash
+# Generate Prisma client
+pnpm prisma:generate
+
+# Run migrations
+pnpm prisma:deploy
+```
+
+### 4. Start Development
+
+```bash
+# Start API (NestJS) — http://localhost:8000
+pnpm --filter api dev
+
+# Start Web (Next.js) — http://localhost:3000
+pnpm --filter web dev
+```
+
+---
+
+## Environment Variables
+
+| Variable | Required | Description | Example |
+|----------|----------|-------------|---------|
+| `GROQ_API_KEY` | Yes | Groq AI API key for LLM inference | `gsk_your_key` |
+| `DATABASE_URL` | Yes | PostgreSQL connection string | `postgresql://user:pass@host:5432/vidyguide` |
+| `JWT_SECRET` | Yes | Secret for signing JWT tokens (min 16 chars) | `your_jwt_secret_min_16_chars` |
+| `RESEND_API_KEY` | Yes | Resend API key for email delivery | `re_your_resend_key` |
+| `RESEND_FROM_EMAIL` | Yes | Verified sender email for Resend | `noreply@yourdomain.com` |
+| `NEXT_PUBLIC_API_URL` | Yes | API base URL (used by frontend) | `http://localhost:8000` |
+| `APP_BASE_URL` | Yes | Frontend base URL | `http://localhost:3000` |
+| `REDIS_URL` | No | Redis connection string (optional) | `redis://127.0.0.1:6379` |
+
+> **Security:** Never commit `.env` to version control. All secret values are gitignored.
+
+---
+
+## Running in Production
+
+### Using Docker
+
+```bash
 docker compose up --build
 ```
 
----
-
-## 📖 API Overview
-
-Full API documentation: [`docs/API.md`](docs/API.md)
-
-| Category | Endpoints | Auth |
-|----------|-----------|------|
-| **Auth** | `POST /auth/register`, `/login`, `/verify-otp`, `/forgot-password`, `/reset-password`, `/logout` | - |
-| **Career** | `POST /career`, `/career/roadmap` | ✅ |
-| **Resume** | `POST /resume`, `/resume/feedback`, `/resume/pdf` | ✅ |
-| **OCR** | `POST /ocr/scan` | ✅ |
-| **Mentor** | `POST /mentor`, `/mentor/stream`, `/mentor/interview`, `/mentor/interview/feedback` | ✅ |
-| **Conversations** | `GET/POST /conversations`, `GET/PUT/DELETE /conversations/:id`, `POST /conversations/:id/messages` | ✅ |
-| **Translator** | `POST /translator` | ✅ |
-| **Settings** | `GET/PUT /settings` | ✅ |
-| **Users** | `GET/PUT /users/profile`, `POST/DELETE /users/profile/picture`, `DELETE /users/account`, `GET /users/export` | ✅ |
-| **History** | `GET/POST /history`, `DELETE /history/:id`, `DELETE /history` | ✅ |
-
----
-
-## 📂 Project Structure
-
-```
-VidyGuideAI/
-├── apps/
-│   ├── api/                    # NestJS backend (15 modules)
-│   │   ├── prisma/             # Schema, migrations, client
-│   │   ├── src/
-│   │   │   ├── auth/           # JWT auth, OTP, guards, strategies
-│   │   │   ├── career/         # Career guidance & roadmaps
-│   │   │   ├── mentor/         # AI mentor chat & interviews
-│   │   │   ├── resume/         # Resume generation, feedback, PDF
-│   │   │   ├── ocr/            # PDF/image text extraction
-│   │   │   ├── translator/     # Multilingual translation
-│   │   │   ├── conversations/  # Chat history CRUD
-│   │   │   ├── users/          # Profile management
-│   │   │   ├── settings/       # User preferences
-│   │   │   ├── history/        # Interaction audit trail
-│   │   │   ├── mail/           # SMTP email service
-│   │   │   ├── ai/             # Groq AI integration
-│   │   │   ├── database/       # Prisma ORM service
-│   │   │   ├── common/         # Shared utilities
-│   │   │   └── config/         # Environment validation
-│   │   └── test/               # E2E tests
-│   └── web/                    # Next.js frontend (14 pages)
-│       ├── app/                # App Router pages
-│       ├── components/         # Shared UI components
-│       ├── hooks/              # Custom React hooks
-│       ├── lib/                # API client & route constants
-│       └── types/              # TypeScript declarations
-├── docker/                     # Dockerfiles
-├── docs/                       # Documentation
-├── screenshots/                # App screenshots
-├── .github/                    # CI/CD, issue/PR templates
-├── resume_pdf.py               # Python PDF generator
-├── resume_scanner.py           # Python OCR scanner
-└── docker-compose.yml          # Full-stack orchestration
-```
-
----
-
-## 🧪 Testing
+### Manual Deployment
 
 ```bash
-# API unit and E2E tests
-cd apps/api
-pnpm test
-pnpm test:e2e
+# Build frontend
+pnpm --filter web build
 
-# Frontend build validation
-cd apps/web
-pnpm build
+# Build API
+pnpm --filter api build
 
-# Full repository lint
-pnpm lint
+# Start API (with Python deps)
+pnpm --filter api start:prod
+
+# Serve web
+pnpm --filter web start
 ```
 
 ---
 
-## 🗺️ Roadmap
+## API Overview
 
-- [x] V3 Architecture (NestJS + Next.js + PostgreSQL)
-- [x] JWT Auth with OTP email verification
-- [x] Groq AI integration (resume, mentor, career)
-- [x] AI Mentor with streaming responses
-- [x] PDF export via ReportLab
-- [x] OCR engine (Tesseract)
-- [x] 10+ Indian language support
-- [x] Mock interview system with feedback
-- [x] Voice input/output mentor
-- [x] Full settings synchronization
-- [x] Conversation history with pinning
-- [ ] OAuth (Google/GitHub login)
-- [ ] Admin dashboard
-- [ ] pgvector semantic search
-- [ ] CI/CD production deployment pipeline
-- [ ] Mobile-responsive PWA
-- [ ] Performance monitoring & analytics
+| Endpoint | Method | Description | Auth |
+|----------|--------|-------------|------|
+| `/auth/register` | POST | Create account | No |
+| `/auth/login` | POST | Sign in | No |
+| `/auth/verify-otp` | POST | Verify OTP | No |
+| `/auth/forgot-password` | POST | Request reset | No |
+| `/auth/reset-password` | POST | Reset password | No |
+| `/resume/analyze` | POST | ATS resume analysis | Yes |
+| `/resume/feedback` | POST | AI resume feedback | Yes |
+| `/resume/validate-role` | POST | Validate target role | No |
+| `/resume/pdf` | POST | Generate PDF resume | Yes |
+| `/resume` | POST | Generate AI resume | Yes |
+| `/ocr/scan` | POST | OCR text extraction | Yes |
+| `/mentor/chat` | POST | AI mentor streaming chat | Yes |
+| `/conversations/*` | CRUD | Conversation management | Yes |
+| `/career/*` | GET | Career recommendations | Yes |
+| `/translator/translate` | POST | Language translation | Yes |
+| `/users/profile` | GET | User profile | Yes |
+| `/settings/*` | CRUD | User settings | Yes |
+| `/history/*` | GET | Activity history | Yes |
 
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-- Report bugs via [GitHub Issues](https://github.com/sanginenivamshi21-hub/VidyGuideAI/issues)
-- Submit fixes via [Pull Requests](https://github.com/sanginenivamshi21-hub/VidyGuideAI/pulls)
-- View our [Code of Conduct](CODE_OF_CONDUCT.md)
-- Report security vulnerabilities in [SECURITY.md](SECURITY.md)
+See [docs/API.md](docs/API.md) for full documentation.
 
 ---
 
-## 📄 License
+## Roadmap
 
-MIT © [Vamshi Sangineni](https://github.com/sanginenivamshi21-hub)
+- [x] Resume Builder with 5 templates and live preview
+- [x] ATS Resume Review with AI feedback
+- [x] AI Mentor with streaming, attachments, and voice input
+- [x] Career Guidance and role validation
+- [x] OCR resume scanning (PDF + images)
+- [x] Multilingual translator (10+ Indian languages)
+- [x] Interview preparation simulator
+- [x] JWT authentication with OTP verification
+- [ ] Custom domain (vidyguide.is-a.dev)
+- [ ] Mobile responsive refinements
+- [ ] AI-powered skill gap analysis
+- [ ] Company-specific interview question banks
+- [ ] Community resume templates
+- [ ] Resume version history and comparison
+- [ ] Integration with LinkedIn API
+- [ ] Offline-first PWA support
+
+---
+
+## Contributing
+
+Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to get involved.
+
+---
+
+## License
+
+This project is licensed under the MIT License — see [LICENSE](LICENSE) for details.
+
+---
+
+## Author
+
+**Sangineni Vamshi**
+
+- GitHub: [@sanginenivamshi21-hub](https://github.com/sanginenivamshi21-hub)
+- LinkedIn: (add your LinkedIn URL)
 
 ---
 
 <div align="center">
-  <sub>Built with ❤️ using
-  <a href="https://nextjs.org/">Next.js</a> ·
-  <a href="https://nestjs.com/">NestJS</a> ·
-  <a href="https://www.prisma.io/">Prisma</a> ·
-  <a href="https://groq.com/">Groq AI</a>
-  </sub>
+  <sub>Built with ❤️ for students everywhere</sub>
 </div>

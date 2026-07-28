@@ -115,7 +115,7 @@ export class AiService {
         temperature = 0.1,
         model = 'llama-3.1-8b-instant',
         maxRetries = 3,
-        maxTokens = 1024,
+        maxTokens = 4096,
     ): Promise<T> {
         if (!this.groqClient) {
             this.logger.warn(

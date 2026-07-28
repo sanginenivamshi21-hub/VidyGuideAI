@@ -1,16 +1,18 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { RefreshCw, Lock, Mail, User as UserIcon, ShieldAlert } from 'lucide-react';
 import { ROUTES } from '@/lib/routes';
 import { API_BASE } from '@/lib/api';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function AuthPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const { isAuthenticated, login, register, loginAsGuest } = useAuth();
   const [mode, setMode] = useState<'login' | 'register' | 'otp' | 'forgot' | 'reset'>('login');
   
-  // Input fields
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -18,17 +20,17 @@ export default function AuthPage() {
   const [otpCode, setOtpCode] = useState('');
   const [otpPurpose, setOtpPurpose] = useState('register');
   
-  // Feedback states
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const user = localStorage.getItem('user');
-    if (user) {
-      router.push(ROUTES.DASHBOARD);
-    }
-  }, [router]);
+    if (searchParams.get('mode') === 'register') setMode('register');
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (isAuthenticated) router.push(ROUTES.DASHBOARD);
+  }, [isAuthenticated, router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,32 +38,16 @@ export default function AuthPage() {
     setMessage('');
     setLoading(true);
 
-    try {
-      const resp = await fetch(`${API_BASE}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await resp.json();
-      if (!resp.ok) {
-        if (data.requiresOtp || (data.message && data.message.includes('OTP'))) {
-          setOtpPurpose(data.purpose || 'login');
-          setMode('otp');
-          setMessage(data.message || 'Please complete your OTP verification to log in.');
-        } else {
-          throw new Error(data.message || 'Invalid credentials or login failed.');
-        }
+    const result = await login(email, password);
+    if (!result.success) {
+      if (result.requiresOtp) {
+        setMode('otp');
+        setMessage(result.error || 'Please complete your OTP verification to log in.');
       } else {
-        localStorage.setItem('user', JSON.stringify(data.user));
-        router.push(ROUTES.DASHBOARD);
+        setError(result.error || 'Invalid credentials or login failed.');
       }
-    } catch (err: any) {
-      setError(err.message || '🚫 Something went wrong. We couldn\'t process your request. Please try again.');
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -70,27 +56,15 @@ export default function AuthPage() {
     setMessage('');
     setLoading(true);
 
-    try {
-      const resp = await fetch(`${API_BASE}/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ username, email, password, fullName }),
-      });
-
-      const data = await resp.json();
-      if (!resp.ok) {
-        throw new Error(data.message || 'Registration failed.');
-      } else {
-        setOtpPurpose('register');
-        setMode('otp');
-        setMessage('Registration successful! A 6-digit OTP code has been dispatched to your email.');
-      }
-    } catch (err: any) {
-      setError(err.message || '🚫 Registration failed. Email or username might already exist.');
-    } finally {
-      setLoading(false);
+    const result = await register(username, email, password, fullName);
+    if (result.success) {
+      setOtpPurpose('register');
+      setMode('otp');
+      setMessage('Registration successful! A 6-digit OTP code has been dispatched to your email.');
+    } else {
+      setError(result.error || 'Registration failed. Email or username might already exist.');
     }
+    setLoading(false);
   };
 
   const handleVerifyOtp = async (e: React.FormEvent) => {
@@ -189,14 +163,7 @@ export default function AuthPage() {
   };
 
   const handleGuest = () => {
-    const guestUser = {
-      id: null,
-      username: 'Guest',
-      fullName: 'Guest Candidate',
-      email: '',
-      isVerified: true
-    };
-    localStorage.setItem('user', JSON.stringify(guestUser));
+    loginAsGuest();
     router.push(ROUTES.CAREER);
   };
 
