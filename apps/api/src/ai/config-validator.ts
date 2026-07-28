@@ -1,36 +1,44 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 
+interface ProviderConfig {
+  key: string;
+  modelEnv: string;
+  name: string;
+  defaultModel: string;
+  docs: string;
+}
+
+const PROVIDERS: ProviderConfig[] = [
+  { key: 'GROQ_API_KEY', modelEnv: 'GROQ_MODEL', name: 'Groq', defaultModel: 'llama-3.3-70b-versatile', docs: 'https://console.groq.com/keys' },
+  { key: 'GEMINI_API_KEY', modelEnv: 'GEMINI_MODEL', name: 'Gemini', defaultModel: 'gemini-2.5-flash', docs: 'https://aistudio.google.com/apikey' },
+  { key: 'OPENROUTER_API_KEY', modelEnv: 'OPENROUTER_MODEL', name: 'OpenRouter', defaultModel: 'openai/gpt-4o-mini', docs: 'https://openrouter.ai/keys' },
+];
+
 @Injectable()
 export class ConfigValidator implements OnModuleInit {
   private readonly logger = new Logger(ConfigValidator.name);
 
   onModuleInit() {
-    const errors: string[] = [];
+    const anyConfigured = PROVIDERS.some((p) => !!process.env[p.key]);
 
-    const configs = [
-      { key: 'GROQ_API_KEY', model: 'GROQ_MODEL', name: 'Groq' },
-      { key: 'GEMINI_API_KEY', model: 'GEMINI_MODEL', name: 'Gemini' },
-      { key: 'OPENROUTER_API_KEY', model: 'OPENROUTER_MODEL', name: 'OpenRouter' },
-    ];
+    if (!anyConfigured) {
+      this.logger.error('No AI providers configured. Set GROQ_API_KEY, GEMINI_API_KEY, or OPENROUTER_API_KEY in .env');
+      return;
+    }
 
-    for (const c of configs) {
-      if (process.env[c.key]) {
-        if (!process.env[c.model]) {
-          this.logger.warn(`[${c.name}] API key set but ${c.model} not specified. Using default model.`);
-        } else {
-          this.logger.log(`[${c.name}] configured with model=${process.env[c.model]}`);
-        }
+    for (const p of PROVIDERS) {
+      const hasKey = !!process.env[p.key];
+      const model = process.env[p.modelEnv] || p.defaultModel;
+
+      if (!hasKey) {
+        this.logger.warn(`⚠ ${p.name} disabled — no API key (${p.docs})`);
+        continue;
       }
-    }
 
-    const anyKeySet = configs.some((c) => !!process.env[c.key]);
-    if (!anyKeySet) {
-      errors.push('No AI provider API keys set (GROQ_API_KEY, GEMINI_API_KEY, or OPENROUTER_API_KEY)');
-    }
-
-    if (errors.length > 0) {
-      for (const err of errors) {
-        this.logger.error(err);
+      if (!process.env[p.modelEnv]) {
+        this.logger.log(`✓ ${p.name} Ready (model=${model}, default)`);
+      } else {
+        this.logger.log(`✓ ${p.name} Ready (model=${model})`);
       }
     }
   }

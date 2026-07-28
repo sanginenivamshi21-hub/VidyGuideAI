@@ -3,8 +3,6 @@ import {
     Post,
     Body,
     Res,
-    HttpException,
-    HttpStatus,
 } from '@nestjs/common';
 import { AiService } from '../ai/ai.service';
 import type { Response } from 'express';
@@ -13,35 +11,13 @@ import type { Response } from 'express';
 export class MentorController {
     constructor(private readonly aiService: AiService) {}
 
-    private langInstructions: Record<string, string> = {
-        en: 'Reply in English.',
-        te: 'IMPORTANT: Reply ONLY in Telugu (తెలుగు). Do not use English at all.',
-        hi: 'IMPORTANT: Reply ONLY in Hindi (हिन्दी). Do not use English at all.',
-        ta: 'IMPORTANT: Reply ONLY in Tamil (தமிழ்). Do not use English at all.',
-        kn: 'IMPORTANT: Reply ONLY in Kannada (ಕನ್ನಡ). Do not use English at all.',
-        ml: 'IMPORTANT: Reply ONLY in Malayalam (മലയാളം). Do not use English at all.',
-        mr: 'IMPORTANT: Reply ONLY in Marathi (मराठी). Do not use English at all.',
-    };
-
-    private buildMentorPrompt(replyLang: string): string {
-        const lang = this.langInstructions[replyLang] || this.langInstructions.en;
-        return `You are VidyGuide AI Mentor — a warm, experienced career counselor for Indian students and young professionals. Give clear, practical, actionable career advice. Be encouraging but honest. End with one concrete next step. Use Markdown with headers, lists, and emojis naturally. ${lang}`;
-    }
-
     @Post()
     async askMentor(@Body() body: any) {
         const question = body.question || '';
         const replyLang = body.reply_language || 'en';
         const temperature = body.temperature ?? 0.7;
 
-        const responseText = await this.aiService.generateText(
-            this.buildMentorPrompt(replyLang),
-            question,
-            temperature,
-            [],
-            2048,
-            'groq',
-        );
+        const responseText = await this.aiService.askMentor(question, replyLang, temperature);
         return { response: responseText };
     }
 
@@ -63,13 +39,12 @@ export class MentorController {
                 content: m.content,
             }));
 
-            const stream = await this.aiService.generateTextStream(
-                this.buildMentorPrompt(replyLang),
+            const stream = await this.aiService.askMentorStream(
                 question,
+                replyLang,
                 temperature,
                 historyMessages,
                 maxTokens,
-                'groq',
             );
 
             const reader = stream.getReader();
@@ -84,7 +59,8 @@ export class MentorController {
             res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
             res.end();
         } catch (err) {
-            res.write(`data: ${JSON.stringify({ error: err.message })}\n\n`);
+            const message = 'AI service temporarily unavailable. Please try again shortly.';
+            res.write(`data: ${JSON.stringify({ error: message })}\n\n`);
             res.end();
         }
     }
@@ -98,30 +74,11 @@ export class MentorController {
         const difficulty = body.difficulty || 'Medium';
         const temperature = body.temperature ?? 0.8;
 
-        const systemPrompt = `You are an expert corporate recruiter and interviewer for Indian companies. Generate exactly 5 highly relevant, realistic, and challenging interview questions for the following candidate profile:
-- Role: ${role}
-- Company: ${company}
-- Experience Level: ${experienceLevel}
-- Key Skills: ${skills}
-- Difficulty Level: ${difficulty}
-
-Format each question with Markdown. Use emojis naturally. Return exactly 5 questions numbered 1 to 5.`;
-
-        const responseText = await this.aiService.generateText(
-            systemPrompt,
-            'Generate the questions.',
-            temperature,
-            [],
-            2048,
-            'groq',
+        const questions = await this.aiService.generateInterviewQuestions(
+            role, company, experienceLevel, skills, difficulty, temperature,
         );
 
-        const questions = responseText
-            .split(/(?:\r?\n|^)\d+\.\s+/)
-            .map((q) => q.trim())
-            .filter((q) => q.length > 0);
-
-        return { questions: questions.slice(0, 5) };
+        return { questions };
     }
 
     @Post('interview/feedback')
@@ -129,29 +86,7 @@ Format each question with Markdown. Use emojis naturally. Return exactly 5 quest
         const items = body.items || [];
         const temperature = body.temperature ?? 0.6;
 
-        let promptContent =
-            'Provide comprehensive feedback, score (out of 10), strengths, weaknesses, and the ideal model response for the following answers:\n\n';
-        items.forEach((item: any, idx: number) => {
-            promptContent += `Q${idx + 1}: ${item.question}\nAnswer: ${item.answer}\n\n`;
-        });
-
-        const systemPrompt = `You are an elite corporate interviewer. Evaluate the candidate's interview responses.
-Provide feedback in a premium, beautifully formatted conversational markdown layout:
-- Use ## headers, bullet points, bold key terms, and emojis where appropriate.
-- Score each question out of 10 (format as "**Score:** X/10").
-- List distinct strengths and weaknesses.
-- Provide a concise, professional model answer that the candidate should use as a reference.
-- End with a brief, encouraging tip.
-- Include a final summary section with an overall score, hiring chance percentage, and radar chart data (strength, weakness categories).`;
-
-        const responseText = await this.aiService.generateText(
-            systemPrompt,
-            promptContent,
-            temperature,
-            [],
-            2048,
-            'groq',
-        );
-        return { feedback: responseText };
+        const feedback = await this.aiService.generateInterviewFeedback(items, temperature);
+        return { feedback };
     }
 }

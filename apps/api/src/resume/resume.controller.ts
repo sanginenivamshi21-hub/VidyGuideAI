@@ -139,13 +139,10 @@ export class ResumeController {
             'Output the complete resume in plain text format, ready to copy and use.',
         ].join('\n');
 
-        const result = await this.aiService.generateText(
+        const result = await this.aiService.generateResumeContent(
             systemPrompt,
             userPrompt,
             0.4,
-            [],
-            4096,
-            'gemini',
         );
         return { resume: result };
     }
@@ -265,13 +262,10 @@ export class ResumeController {
             langInstr,
         ].join('\n');
 
-        const result = await this.aiService.generateText(
+        const result = await this.aiService.generateResumeContent(
             systemPrompt,
             userPrompt,
             0.6,
-            [],
-            2048,
-            'gemini',
         );
         return { feedback: result };
     }
@@ -302,7 +296,7 @@ export class ResumeController {
             resumeText,
         ].join('\n');
 
-        const result = await this.aiService.generateStructuredJson<{
+        const result = await this.aiService.generateStructuredData<{
             atsScore: number;
             summary: string;
             keywords: { present: string[]; missing: string[]; density: string };
@@ -312,7 +306,7 @@ export class ResumeController {
             strengths: string[];
             improvements: string[];
             enhancedResume: string;
-        }>(systemPrompt, userPrompt, 0.1, 4096, 'gemini');
+        }>(systemPrompt, userPrompt, 0.1, 4096);
 
         return result;
     }

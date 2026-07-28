@@ -84,13 +84,10 @@ Provide a highly customized, comprehensive Career Guidance Report covering exact
 6. **Resume Advice** — Advice on what sections to highlight.
 7. **Final Action Plan** — A "Your Next 30 Days" plan with 3 concrete next steps. ${langInstr}`;
 
-        const result = await this.aiService.generateText(
+        const result = await this.aiService.generateCareerGuidance(
             systemPrompt,
             userPrompt,
             0.7,
-            [],
-            2048,
-            'groq',
         );
         return { career_suggestions: result };
     }
