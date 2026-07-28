@@ -40,6 +40,10 @@ export class MentorController {
             question,
             temperature,
             model,
+            [],
+            3,
+            2048,
+            'groq',
         );
         return { response: responseText };
     }
@@ -70,6 +74,7 @@ export class MentorController {
                 model,
                 historyMessages,
                 maxTokens,
+                'groq',
             );
 
             const reader = stream.getReader();
@@ -113,6 +118,10 @@ Format each question with Markdown. Use emojis naturally. Return exactly 5 quest
             'Generate the questions.',
             temperature,
             model,
+            [],
+            3,
+            2048,
+            'groq',
         );
 
         const questions = responseText
@@ -149,6 +158,10 @@ Provide feedback in a premium, beautifully formatted conversational markdown lay
             promptContent,
             temperature,
             model,
+            [],
+            3,
+            2048,
+            'groq',
         );
         return { feedback: responseText };
     }

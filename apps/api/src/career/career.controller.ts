@@ -88,6 +88,11 @@ Provide a highly customized, comprehensive Career Guidance Report covering exact
             systemPrompt,
             userPrompt,
             0.7,
+            undefined,
+            [],
+            3,
+            2048,
+            'groq',
         );
         return { career_suggestions: result };
     }

@@ -15,9 +15,9 @@ export class GeminiProvider implements AiProvider {
       name: 'gemini',
       apiKey: this.apiKey,
       models: {
-        chat: process.env.GEMINI_CHAT_MODEL || 'gemini-2.0-flash',
-        json: process.env.GEMINI_JSON_MODEL || 'gemini-2.0-flash',
-        streaming: process.env.GEMINI_STREAM_MODEL || 'gemini-2.0-flash',
+        chat: process.env.GEMINI_CHAT_MODEL || 'gemini-1.5-flash',
+        json: process.env.GEMINI_JSON_MODEL || 'gemini-1.5-flash',
+        streaming: process.env.GEMINI_STREAM_MODEL || 'gemini-1.5-flash',
       },
       priority: 2,
     };

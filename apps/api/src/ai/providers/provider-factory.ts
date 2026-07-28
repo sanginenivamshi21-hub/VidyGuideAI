@@ -8,6 +8,7 @@ import { OpenRouterProvider } from './openrouter.provider';
 export class ProviderFactory {
   private readonly logger = new Logger(ProviderFactory.name);
   private providers: AiProvider[] = [];
+  private providerMap: Map<string, AiProvider> = new Map();
 
   constructor(
     groq: GroqProvider,
@@ -17,6 +18,10 @@ export class ProviderFactory {
     this.providers = [groq, gemini, openrouter]
       .filter((p) => p.isAvailable())
       .sort((a, b) => a.priority - b.priority);
+
+    for (const p of this.providers) {
+      this.providerMap.set(p.name, p);
+    }
 
     if (this.providers.length === 0) {
       this.logger.warn('No AI providers configured. AI features will return mock data.');
@@ -35,6 +40,49 @@ export class ProviderFactory {
     return this.providers;
   }
 
+  getProviderByName(name: string): AiProvider | undefined {
+    return this.providerMap.get(name);
+  }
+
+  getRoutingTarget(route: string): string {
+    const routing: Record<string, string> = {
+      mentor: 'groq',
+      'resume/builder': 'gemini',
+      'resume/review': 'gemini',
+      career: 'groq',
+    };
+    return routing[route] || this.providers[0]?.name || '';
+  }
+
+  private shouldLogProviderCall(provider: AiProvider): boolean {
+    return this.providers.length > 1;
+  }
+
+  private async tryProvider<T>(
+    provider: AiProvider,
+    method: keyof AiProvider,
+    args: any[],
+    isFallback: boolean,
+  ): Promise<T> {
+    if (isFallback) {
+      this.logger.log(`Falling back to ${provider.name}`);
+    } else if (this.shouldLogProviderCall(provider)) {
+      this.logger.log(`Routing to ${provider.name}`);
+    }
+
+    const providerArgs = isFallback
+      ? this.stripModel(args)
+      : args;
+
+    return await (provider[method] as any)(...providerArgs);
+  }
+
+  private stripModel(args: any[]): any[] {
+    const stripped = [...args];
+    stripped[3] = undefined;
+    return stripped;
+  }
+
   async generateTextWithFallback(
     systemPrompt: string,
     userPrompt: string,
@@ -42,17 +90,26 @@ export class ProviderFactory {
     model?: string,
     historyMessages: ChatMessage[] = [],
     maxTokens = 2048,
+    preferredProvider?: string,
   ): Promise<string> {
     const errors: string[] = [];
-    for (const provider of this.providers) {
+    const ordered = this.buildCallOrder(preferredProvider);
+
+    for (let i = 0; i < ordered.length; i++) {
+      const provider = ordered[i];
       try {
-        this.logger.debug(`Attempting ${provider.name} for generateText`);
-        return await provider.generateText(systemPrompt, userPrompt, temperature, model, historyMessages, maxTokens);
+        return await this.tryProvider<string>(
+          provider, 'generateText',
+          [systemPrompt, userPrompt, temperature, model, historyMessages, maxTokens],
+          i > 0,
+        );
       } catch (err: any) {
+        const msg = `${provider.name}: ${err.message}`;
         this.logger.warn(`${provider.name} failed: ${err.message}`);
-        errors.push(`${provider.name}: ${err.message}`);
+        errors.push(msg);
       }
     }
+
     this.logger.error('All AI providers failed', errors.join('; '));
     throw new Error(`AI service unavailable. All providers failed: ${errors.join('; ')}`);
   }
@@ -64,17 +121,26 @@ export class ProviderFactory {
     model?: string,
     historyMessages: ChatMessage[] = [],
     maxTokens = 2048,
+    preferredProvider?: string,
   ): Promise<ReadableStream> {
     const errors: string[] = [];
-    for (const provider of this.providers) {
+    const ordered = this.buildCallOrder(preferredProvider);
+
+    for (let i = 0; i < ordered.length; i++) {
+      const provider = ordered[i];
       try {
-        this.logger.debug(`Attempting ${provider.name} for streaming`);
-        return await provider.generateTextStream(systemPrompt, userPrompt, temperature, model, historyMessages, maxTokens);
+        return await this.tryProvider<ReadableStream>(
+          provider, 'generateTextStream',
+          [systemPrompt, userPrompt, temperature, model, historyMessages, maxTokens],
+          i > 0,
+        );
       } catch (err: any) {
+        const msg = `${provider.name}: ${err.message}`;
         this.logger.warn(`${provider.name} streaming failed: ${err.message}`);
-        errors.push(`${provider.name}: ${err.message}`);
+        errors.push(msg);
       }
     }
+
     this.logger.error('All AI providers failed for streaming', errors.join('; '));
     throw new Error(`AI streaming unavailable. All providers failed: ${errors.join('; ')}`);
   }
@@ -85,18 +151,38 @@ export class ProviderFactory {
     temperature = 0.1,
     model?: string,
     maxTokens = 4096,
+    preferredProvider?: string,
   ): Promise<T> {
     const errors: string[] = [];
-    for (const provider of this.providers) {
+    const ordered = this.buildCallOrder(preferredProvider);
+
+    for (let i = 0; i < ordered.length; i++) {
+      const provider = ordered[i];
       try {
-        this.logger.debug(`Attempting ${provider.name} for structured JSON`);
-        return await provider.generateStructuredJson<T>(systemPrompt, userPrompt, temperature, model, maxTokens);
+        return await this.tryProvider<T>(
+          provider, 'generateStructuredJson',
+          [systemPrompt, userPrompt, temperature, model, maxTokens],
+          i > 0,
+        );
       } catch (err: any) {
+        const msg = `${provider.name}: ${err.message}`;
         this.logger.warn(`${provider.name} JSON failed: ${err.message}`);
-        errors.push(`${provider.name}: ${err.message}`);
+        errors.push(msg);
       }
     }
+
     this.logger.error('All AI providers failed for JSON', errors.join('; '));
     throw new Error(`AI structured JSON unavailable. All providers failed: ${errors.join('; ')}`);
+  }
+
+  private buildCallOrder(preferredProvider?: string): AiProvider[] {
+    if (!preferredProvider || !this.providerMap.has(preferredProvider)) {
+      return this.providers;
+    }
+
+    const preferred = this.providerMap.get(preferredProvider)!;
+    const others = this.providers.filter((p) => p.name !== preferredProvider);
+
+    return [preferred, ...others];
   }
 }

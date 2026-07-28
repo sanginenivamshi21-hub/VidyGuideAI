@@ -16,6 +16,7 @@ export class AiService {
     historyMessages: ChatMessage[] = [],
     maxRetries = 3,
     maxTokens = 2048,
+    preferredProvider?: string,
   ): Promise<string> {
     const primary = this.providerFactory.getPrimaryProvider();
     if (!primary) {
@@ -33,6 +34,7 @@ export class AiService {
           model,
           historyMessages,
           maxTokens,
+          preferredProvider,
         );
       } catch (err: any) {
         lastError = err;
@@ -42,7 +44,7 @@ export class AiService {
         }
       }
     }
-    throw lastError || new Error('AI service failed after retries');
+    throw lastError || new Error('AI service failed after all retries and provider fallbacks');
   }
 
   async generateTextStream(
@@ -52,6 +54,7 @@ export class AiService {
     model = 'llama-3.3-70b-versatile',
     historyMessages: ChatMessage[] = [],
     maxTokens = 2048,
+    preferredProvider?: string,
   ): Promise<ReadableStream> {
     const primary = this.providerFactory.getPrimaryProvider();
     if (!primary) {
@@ -65,6 +68,7 @@ export class AiService {
       model,
       historyMessages,
       maxTokens,
+      preferredProvider,
     );
   }
 
@@ -75,6 +79,7 @@ export class AiService {
     model = 'llama-3.1-8b-instant',
     maxRetries = 3,
     maxTokens = 4096,
+    preferredProvider?: string,
   ): Promise<T> {
     const primary = this.providerFactory.getPrimaryProvider();
     if (!primary) {
@@ -91,6 +96,7 @@ export class AiService {
           temperature,
           model,
           maxTokens,
+          preferredProvider,
         );
       } catch (err: any) {
         lastError = err;
@@ -100,6 +106,6 @@ export class AiService {
         }
       }
     }
-    throw lastError || new Error('AI JSON service failed after retries');
+    throw lastError || new Error('AI JSON service failed after all retries and provider fallbacks');
   }
 }
