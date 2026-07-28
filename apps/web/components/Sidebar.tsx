@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -35,11 +35,14 @@ interface SidebarItem {
 }
 
 export default function Sidebar() {
-  const [isOpen, setIsOpen] = useState(() => {
-    if (typeof window === 'undefined') return true;
-    return localStorage.getItem('vidyguide_sidebar') !== 'collapsed';
-  });
+  const [isOpen, setIsOpen] = useState(true);
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
+
+  useEffect(() => {
+    setIsOpen(localStorage.getItem('vidyguide_sidebar') !== 'collapsed');
+    setMounted(true);
+  }, []);
   const router = useRouter();
   const { isAuthenticated, isGuest, logout } = useAuth();
 
@@ -57,7 +60,7 @@ export default function Sidebar() {
     { icon: Settings, label: 'Settings', href: ROUTES.SETTINGS, color: 'text-slate-400', requiresAuth: true },
   ];
 
-  const menuItems = isAuthenticated ? allItems : allItems.filter(item => !item.requiresAuth);
+  const menuItems = mounted && isAuthenticated ? allItems : allItems.filter(item => !item.requiresAuth);
 
   return (
     <motion.div
@@ -130,7 +133,7 @@ export default function Sidebar() {
       </div>
 
       <div className="flex flex-col gap-3 pt-3 border-t border-slate-800">
-        {isAuthenticated ? (
+        {mounted && isAuthenticated ? (
           <button
             onClick={logout}
             className="flex items-center gap-3 p-2.5 rounded-lg w-full text-slate-400 hover:bg-red-500/10 hover:text-red-400 transition-all duration-200"

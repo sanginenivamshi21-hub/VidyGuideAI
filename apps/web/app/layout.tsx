@@ -1,15 +1,13 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import dynamic from 'next/dynamic';
 import './globals.css';
 import Sidebar from '../components/Sidebar';
 import ThemeInit from '../components/ThemeInit';
 import { AuthProvider } from '../hooks/useAuth';
 import MobileShell from '../components/mobile/MobileShell';
+import SoftAurora from '../components/SoftAuroraWrapper';
 
 const inter = Inter({ subsets: ['latin'] });
-
-const SoftAurora = dynamic(() => import('../components/SoftAurora'));
 
 export const metadata: Metadata = {
   title: 'VidyGuideAI - Production SaaS',

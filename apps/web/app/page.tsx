@@ -21,19 +21,20 @@ const QUICK_ACTIONS = [
   { icon: TrendingUp, label: 'Dashboard', href: ROUTES.DASHBOARD, color: 'text-cyan-400', gradient: 'from-cyan-500/20 to-cyan-500/5', border: 'border-cyan-500/20' },
 ];
 
-function Greeting() {
-  const hour = new Date().getHours();
-  if (hour < 12) return 'Good morning';
-  if (hour < 17) return 'Good afternoon';
-  return 'Good evening';
-}
-
 export default function Home() {
   const router = useRouter();
   const { isAuthenticated, user } = useAuth();
   const [stats, setStats] = useState<{ career_count: number; resume_count: number; mentor_count: number } | null>(null);
   const [recentChat, setRecentChat] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [greeting, setGreeting] = useState('Hello');
+
+  useEffect(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) setGreeting('Good morning');
+    else if (hour < 17) setGreeting('Good afternoon');
+    else setGreeting('Good evening');
+  }, []);
 
   useEffect(() => {
     if (!isAuthenticated) { setLoading(false); return; }
@@ -103,7 +104,7 @@ export default function Home() {
       {/* Greeting */}
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-extrabold text-white tracking-tight">
-          {Greeting()}, <span className="text-emerald-400">{name.split(' ')[0]}</span>
+          {greeting}, <span className="text-emerald-400">{name.split(' ')[0]}</span>
         </h1>
         <p className="text-sm text-slate-400">
           Here&apos;s your career snapshot

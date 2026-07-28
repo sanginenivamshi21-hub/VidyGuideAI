@@ -9,7 +9,7 @@ import { useAuth, useRequireRegistered } from '@/hooks/useAuth';
 
 export default function SettingsPage() {
   const { settings, updateSettings, loading, saving } = useSettings();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   useRequireRegistered();
   const router = useRouter();
   const [password, setPassword] = useState('');
@@ -190,7 +190,7 @@ export default function SettingsPage() {
                     <img src={profilePicture} alt="Profile" className="w-full h-full object-cover" />
                   ) : (
                     <span className="text-2xl text-slate-500 font-bold">
-                      {localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user') || '{}').fullName?.[0] || '?' : '?'}
+                      {user?.fullName?.[0] || '?'}
                     </span>
                   )}
                 </div>
