@@ -15,17 +15,18 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="min-h-[50vh] flex flex-col items-center justify-center gap-4">
-      <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400">
-        <AlertTriangle size={24} />
+    <div className="min-h-[50vh] flex flex-col items-center justify-center gap-4 px-4" style={{ backgroundColor: 'var(--bg-primary)' }}>
+      <div className="p-3 rounded-2xl" style={{ backgroundColor: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)' }}>
+        <AlertTriangle size={24} style={{ color: '#ef4444' }} />
       </div>
-      <h2 className="text-lg font-bold text-white">Something went wrong</h2>
-      <p className="text-sm text-slate-400 max-w-md text-center">
+      <h2 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>Something went wrong</h2>
+      <p className="text-sm max-w-md text-center" style={{ color: 'var(--text-secondary)' }}>
         {error.message || 'An unexpected error occurred. Please try again.'}
       </p>
       <button
         onClick={reset}
-        className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold rounded-xl transition-all active:scale-[0.98]"
+        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all active:scale-[0.97]"
+        style={{ backgroundColor: 'var(--accent)', color: 'white' }}
       >
         <RefreshCw size={14} />
         Try again

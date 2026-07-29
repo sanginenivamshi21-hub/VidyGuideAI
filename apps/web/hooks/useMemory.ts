@@ -30,7 +30,20 @@ const DEFAULT_MEMORY: AIMemory = {
   recentMentorTopics: [],
 };
 
-export function useMemory() {
+const LABELS: Record<keyof AIMemory, string> = {
+  language: 'Language',
+  careerGoal: 'Career goal',
+  preferredTone: 'Tone preference',
+  currentRoadmap: 'Current roadmap',
+  resumeVersion: 'Resume version',
+  interviewLevel: 'Interview level',
+  preferredLanguage: 'Programming language',
+  skills: 'Skills',
+  lastOpenedModule: 'Last module',
+  recentMentorTopics: 'Recent topics',
+};
+
+export function useMemory(onChange?: (label: string) => void) {
   const [memory, setMemoryState] = useState<AIMemory>(DEFAULT_MEMORY);
 
   useEffect(() => {
@@ -42,6 +55,10 @@ export function useMemory() {
       }
     } catch {}
   }, []);
+
+  const notify = useCallback((key: keyof AIMemory) => {
+    onChange?.(`${LABELS[key]} updated`);
+  }, [onChange]);
 
   const persist = useCallback((next: AIMemory) => {
     setMemoryState(next);
@@ -56,7 +73,8 @@ export function useMemory() {
       try { localStorage.setItem(MEMORY_KEY, JSON.stringify(next)); } catch {}
       return next;
     });
-  }, []);
+    notify(key);
+  }, [notify]);
 
   const clearMemory = useCallback(() => {
     setMemoryState(DEFAULT_MEMORY);

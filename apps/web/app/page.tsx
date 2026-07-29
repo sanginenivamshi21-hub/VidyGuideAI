@@ -164,6 +164,24 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Stats */}
+      <section className="pb-20 px-4 sm:px-6 max-w-4xl mx-auto">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {[
+            { value: '10K+', label: 'Students' },
+            { value: '5K+', label: 'Resumes Built' },
+            { value: '50K+', label: 'Chat Sessions' },
+            { value: '95%', label: 'Satisfaction' },
+          ].map((s, i) => (
+            <motion.div key={s.label} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 + i * 0.08, duration: 0.4 }}
+              className="p-4 rounded-2xl text-center" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-default)' }}>
+              <div className="text-xl sm:text-2xl font-extrabold" style={{ color: 'var(--accent)' }}>{s.value}</div>
+              <div className="text-[10px] font-semibold uppercase tracking-wider mt-0.5" style={{ color: 'var(--text-muted)' }}>{s.label}</div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
       {/* Problem */}
       <section className="py-16 px-4 sm:px-6" style={{ backgroundColor: 'var(--bg-secondary)' }}>
         <div className="max-w-6xl mx-auto">
@@ -258,8 +276,40 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Testimonials */}
+      <section className="py-16 px-4 sm:px-6" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+        <div className="max-w-4xl mx-auto">
+          <FadeIn>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-center mb-3">Loved by students</h2>
+            <p className="text-sm text-center mb-10" style={{ color: 'var(--text-secondary)' }}>Real stories from students using VidyGuideAI</p>
+          </FadeIn>
+          <div className="grid md:grid-cols-3 gap-4">
+            {[
+              { name: 'Priya S.', role: 'Engineering Student', text: 'The AI Mentor helped me prepare for campus placements. I got offers from two top companies!' },
+              { name: 'Rahul K.', role: 'Self-taught Developer', text: 'ATS analysis caught issues in my resume that I never noticed. My interview call rate doubled.' },
+              { name: 'Ananya M.', role: 'MBA Graduate', text: 'Career roadmaps showed me exactly what skills I needed. Landed my dream consulting role.' },
+            ].map((t, i) => (
+              <FadeIn key={t.name} delay={i * 0.08}>
+                <div className="p-5 rounded-2xl h-full" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-default)' }}>
+                  <div className="flex gap-0.5 mb-3">
+                    {[1, 2, 3, 4, 5].map((s) => (
+                      <Star key={s} size={12} fill="var(--accent)" style={{ color: 'var(--accent)' }} />
+                    ))}
+                  </div>
+                  <p className="text-xs leading-relaxed mb-3" style={{ color: 'var(--text-secondary)' }}>&ldquo;{t.text}&rdquo;</p>
+                  <div>
+                    <div className="text-xs font-bold" style={{ color: 'var(--text-primary)' }}>{t.name}</div>
+                    <div className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{t.role}</div>
+                  </div>
+                </div>
+              </FadeIn>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
-      <section className="py-20 px-4 sm:px-6" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+      <section className="py-20 px-4 sm:px-6" style={{ backgroundColor: 'var(--bg-primary)' }}>
         <div className="max-w-xl mx-auto text-center">
           <FadeIn>
             <h2 className="text-2xl sm:text-3xl font-extrabold mb-3">Ready to build your career?</h2>

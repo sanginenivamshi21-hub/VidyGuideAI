@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   },
   robots: { index: true, follow: true },
   manifest: '/manifest.json',
-  icons: { icon: '/favicon.ico', apple: '/icon-192.png' },
+  icons: { icon: '/favicon.svg', apple: '/icon-192.svg' },
 };
 
 export default function RootLayout({
