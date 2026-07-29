@@ -415,6 +415,16 @@ export default function MentorPage() {
             next[next.length - 1] = { ...next[next.length - 1], sendState: 'done' as const };
             return next;
           });
+
+          if (convId && !activeConvId) {
+            const title = fullContent.replace(/[#*_~`\[\]()>|]/g, '').trim().slice(0, 50);
+            fetch(`${API_BASE}/conversations/${convId}`, {
+              method: 'PUT',
+              credentials: 'include',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ title }),
+            }).then(() => fetchConversations()).catch(() => {});
+          }
         }
 
         if (settings.autoSpeak && fullContent) speakText(fullContent);

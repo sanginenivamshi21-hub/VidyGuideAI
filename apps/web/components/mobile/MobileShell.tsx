@@ -7,7 +7,7 @@ import {
   Home, LayoutDashboard, Bot, Compass, FileText, ScanSearch,
   Briefcase, Languages, Clock, User, Settings, LogOut,
   Sun, Moon, Monitor, X, ChevronRight, Search,
-  SquarePen,
+  SquarePen, Flame, Star, Crown,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
@@ -63,7 +63,7 @@ function HamburgerButton({ onClick }: { onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg active:scale-95 transition-transform bg-transparent border-none outline-none"
+      className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg active:scale-90 transition-transform bg-transparent border-none outline-none"
       aria-label="Open navigation"
     >
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -83,15 +83,23 @@ export default function MobileShell({ children }: { children: React.ReactNode })
   const [currentAccent, setCurrentAccent] = useState('emerald');
   const pathname = usePathname();
   const router = useRouter();
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout, user } = useAuth();
   const drawerRef = useRef<HTMLDivElement>(null);
   const touchStartX = useRef(0);
+  const [streak, setStreak] = useState(0);
 
   useEffect(() => {
     const saved = localStorage.getItem('vidyguide_theme') || 'dark';
     const accent = localStorage.getItem('vidyguide_accent') || 'emerald';
     setCurrentTheme(saved);
     setCurrentAccent(accent);
+    try {
+      const profile = localStorage.getItem('user');
+      if (profile) {
+        const parsed = JSON.parse(profile);
+        if (parsed.streak) setStreak(parsed.streak);
+      }
+    } catch {}
   }, []);
 
   const open = useCallback(() => setIsOpen(true), []);
@@ -169,6 +177,9 @@ export default function MobileShell({ children }: { children: React.ReactNode })
     if (start < 15 && end - start > 60) open();
   };
 
+  const userName = user?.fullName || user?.username || 'Guest';
+  const initials = userName.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase();
+
   return (
     <DrawerContext.Provider value={{ isOpen, open, close }}>
       <div
@@ -193,7 +204,7 @@ export default function MobileShell({ children }: { children: React.ReactNode })
             <span className="text-xs font-bold" style={{ color: 'var(--text-primary)' }}>AI Mentor</span>
             <button
               onClick={() => navigateAndClose(ROUTES.MENTOR)}
-              className="p-1.5 rounded-lg hover:bg-slate-800 transition-colors"
+              className="p-1.5 rounded-lg transition-colors"
               style={{ color: 'var(--text-secondary)' }}
               aria-label="New chat"
             >
@@ -238,25 +249,60 @@ export default function MobileShell({ children }: { children: React.ReactNode })
                 className="fixed left-0 top-0 bottom-0 w-[280px] max-w-[85vw] z-50 flex flex-col shadow-2xl"
                 style={{ backgroundColor: 'var(--bg-primary)', borderRight: '1px solid var(--border-default)' }}
               >
-                <div className="flex items-center justify-between px-4 py-4 shrink-0" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-                  <div className="flex items-center gap-2.5">
-                    <Logo size={28} />
-                    <div>
-                      <div className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>VidyGuideAI</div>
-                      <div className="text-[10px]" style={{ color: 'var(--text-tertiary)' }}>AI Career Platform</div>
-                    </div>
+                {/* Premium Drawer Header */}
+                <div className="shrink-0 px-4 pt-6 pb-4" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+                  <div className="flex items-center justify-between mb-4">
+                    <Logo size={26} />
+                    <button
+                      onClick={close}
+                      className="p-1.5 rounded-lg transition-colors touch-manipulation"
+                      style={{ color: 'var(--text-tertiary)' }}
+                      aria-label="Close navigation"
+                    >
+                      <X size={18} />
+                    </button>
                   </div>
-                  <button
-                    onClick={close}
-                    className="p-1.5 rounded-lg transition-colors"
-                    style={{ color: 'var(--text-secondary)' }}
-                    aria-label="Close navigation"
-                  >
-                    <X size={18} />
-                  </button>
+
+                  {isAuthenticated ? (
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
+                        style={{ backgroundColor: 'var(--accent-20)', color: 'var(--accent)' }}
+                      >
+                        {user?.profilePicture ? (
+                          <img src={user.profilePicture} alt="" className="w-full h-full rounded-full object-cover" />
+                        ) : (
+                          initials
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-bold truncate" style={{ color: 'var(--text-primary)' }}>{userName}</div>
+                        <div className="text-[10px]" style={{ color: 'var(--text-tertiary)' }}>Free Plan</div>
+                      </div>
+                      {streak > 0 && (
+                        <div className="flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold" style={{ backgroundColor: 'rgba(249,115,22,0.1)', color: '#fb923c' }}>
+                          <Flame size={11} />
+                          {streak}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-10 h-10 rounded-full flex items-center justify-center"
+                        style={{ backgroundColor: 'var(--bg-tertiary)' }}
+                      >
+                        <User size={18} style={{ color: 'var(--text-tertiary)' }} />
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>Guest</div>
+                        <div className="text-[10px]" style={{ color: 'var(--text-tertiary)' }}>Sign in to save progress</div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                <div className="px-3 py-2.5">
+                <div className="px-3 pt-3 pb-1.5">
                   <div className="relative">
                     <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-tertiary)' }} />
                     <input
@@ -282,7 +328,7 @@ export default function MobileShell({ children }: { children: React.ReactNode })
                           <button
                             key={item.href}
                             onClick={() => navigateAndClose(item.href)}
-                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs transition-all mb-0.5"
+                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs transition-all mb-0.5 active:scale-[0.98]"
                             style={{
                               color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
                               backgroundColor: isActive ? 'var(--accent-10)' : 'transparent',
@@ -300,6 +346,7 @@ export default function MobileShell({ children }: { children: React.ReactNode })
                   ))}
                 </div>
 
+                {/* Theme & Accent + Auth */}
                 <div className="px-3 py-3 shrink-0" style={{ borderTop: '1px solid var(--border-subtle)' }}>
                   <div className="flex items-center gap-1 mb-3 px-1">
                     {THEME_OPTIONS.map((opt) => {
@@ -309,7 +356,7 @@ export default function MobileShell({ children }: { children: React.ReactNode })
                         <button
                           key={opt.value}
                           onClick={() => handleThemeChange(opt.value)}
-                          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px] font-semibold transition-all"
+                          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px] font-semibold transition-all active:scale-90"
                           style={{
                             backgroundColor: isActive ? 'var(--accent-10)' : 'transparent',
                             color: isActive ? 'var(--accent)' : 'var(--text-muted)',
@@ -327,7 +374,7 @@ export default function MobileShell({ children }: { children: React.ReactNode })
                       <button
                         key={accent}
                         onClick={() => handleAccentChange(accent)}
-                        className="w-5 h-5 rounded-full transition-all"
+                        className="w-5 h-5 rounded-full transition-all active:scale-90"
                         style={{
                           backgroundColor: `var(--accent-${accent === currentAccent ? '20' : '10'})`,
                           outline: accent === currentAccent ? '2px solid var(--accent)' : 'none',
@@ -341,7 +388,7 @@ export default function MobileShell({ children }: { children: React.ReactNode })
                   {isAuthenticated ? (
                     <button
                       onClick={() => { logout(); close(); }}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs transition-all"
+                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs transition-all active:scale-[0.98]"
                       style={{ color: 'var(--text-secondary)' }}
                     >
                       <LogOut size={16} />
@@ -350,7 +397,7 @@ export default function MobileShell({ children }: { children: React.ReactNode })
                   ) : (
                     <button
                       onClick={() => navigateAndClose(ROUTES.AUTH)}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs transition-all"
+                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs transition-all active:scale-[0.98]"
                       style={{ color: 'var(--text-secondary)' }}
                     >
                       <LogOut size={16} />
