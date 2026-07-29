@@ -171,8 +171,8 @@ importers:
         specifier: 15.1.0
         version: 15.1.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       ogl:
-        specifier: ^0.0.117
-        version: 0.0.117
+        specifier: ^1.0.11
+        version: 1.0.11
       react:
         specifier: 19.0.0
         version: 19.0.0
@@ -3456,8 +3456,8 @@ packages:
     resolution: {integrity: sha512-gXah6aZrcUxjWg2zR2MwouP2eHlCBzdV4pygudehaKXSGW4v2AsRQUK+lwwXhii6KFZcunEnmSUoYp5CXibxtA==}
     engines: {node: '>= 0.4'}
 
-  ogl@0.0.117:
-    resolution: {integrity: sha512-vpcdQ5EFVzi9FYwsk+rjYAg6xy1qHcZc1M/7LU3z1L7pNNRca9ouWNgQlzLGakyDbAQ1iXitJ29IAiJJtz6FNg==}
+  ogl@1.0.11:
+    resolution: {integrity: sha512-kUpC154AFfxi16pmZUK4jk3J+8zxwTWGPo03EoYA8QPbzikHoaC82n6pNTbd+oEaJonaE8aPWBlX7ad9zrqLsA==}
 
   on-finished@2.4.1:
     resolution: {integrity: sha512-oVlzkg3ENAhCk2zdv7IJwd/QUD4z2RxRwpkcGY8psCVcCYZNq4wYnVWALHM+brtuJjePWiYF/ClmuDr8Ch5+kg==}
@@ -8138,7 +8138,7 @@ snapshots:
       define-properties: 1.2.1
       es-object-atoms: 1.1.2
 
-  ogl@0.0.117: {}
+  ogl@1.0.11: {}
 
   on-finished@2.4.1:
     dependencies:
