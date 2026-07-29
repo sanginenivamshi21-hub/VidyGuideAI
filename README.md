@@ -1,34 +1,77 @@
 <div align="center">
 
+<br/>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/images/logo.jpeg">
+  <img src="assets/images/logo.jpeg" alt="VidyGuideAI Logo" width="120" height="120" style="border-radius: 20px;">
+</picture>
+
+<br/>
+<br/>
+
 # VidyGuideAI
 
-**AI-Powered Career Mentor for Students**
+### Your AI-Powered Career Companion
+
+**AI Mentor · Resume Builder · Career Roadmaps · Interview Prep · Skill Gap Analysis**
 
 <br/>
 
-[![Next.js](https://img.shields.io/badge/Next.js-15.1-000000?style=flat-square&logo=next.js)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-15.1-000000?style=flat-square&logo=next.js&logoColor=white)](https://nextjs.org/)
 [![NestJS](https://img.shields.io/badge/NestJS-11-E0234E?style=flat-square&logo=nestjs)](https://nestjs.com/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![Prisma](https://img.shields.io/badge/Prisma-5.21-2D3748?style=flat-square&logo=prisma)](https://www.prisma.io/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat-square&logo=postgresql)](https://www.postgresql.org/)
-[![Groq](https://img.shields.io/badge/Groq-Llama%203-FF6600?style=flat-square&logo=data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCIgZmlsbD0iI0ZGNjYwMCIvPjwvc3ZnPg==)](https://groq.com/)
 [![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react)](https://react.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?style=flat-square&logo=tailwindcss)](https://tailwindcss.com/)
 [![Docker](https://img.shields.io/badge/Docker-✓-2496ED?style=flat-square&logo=docker)](https://docker.com/)
-[![MIT License](https://img.shields.io/badge/License-MIT-3DDC84?style=flat-square&logo=open-source-initiative)](LICENSE)
-[![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-8A2BE2?style=flat-square&logo=github)](CONTRIBUTING.md)
+[![MIT License](https://img.shields.io/badge/License-MIT-84CC16?style=flat-square)](LICENSE)
+[![Conventional Commits](https://img.shields.io/badge/Commits-Conventional-FE5196?style=flat-square)](https://www.conventionalcommits.org/)
+[![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-8B5CF6?style=flat-square)](CONTRIBUTING.md)
 
 <br/>
 
-<img src="assets/screenshots/dashboard.jpg" alt="VidyGuideAI Dashboard" width="750" style="border-radius: 16px; border: 1px solid #1e293b;" />
+[**Live Demo**](https://vidyguide.is-a.dev) ·
+[**Documentation**](docs/ARCHITECTURE.md) ·
+[**API Reference**](docs/API.md) ·
+[**Contributing**](CONTRIBUTING.md) ·
+[**Security**](SECURITY.md)
 
 <br/>
 
-[Features](#features) • [Screenshots](#screenshots) • [Tech Stack](#tech-stack) • [Architecture](#architecture) • [Quick Start](#quick-start) • [API Overview](#api-overview) • [Roadmap](#roadmap) • [Contributing](#contributing)
+<img src="assets/screenshots/dashboard.jpg" alt="VidyGuideAI Dashboard" width="780" style="border-radius: 16px; border: 1px solid #1e293b;" />
+
+<br/>
+
+**Build your career with AI.**
 
 </div>
 
 <br/>
+
+---
+
+## Table of Contents
+
+- [The Problem](#the-problem)
+- [Features](#features)
+- [Screenshots](#screenshots)
+- [Why VidyGuideAI?](#why-vidyguideai)
+- [Metrics](#metrics)
+- [Tech Stack](#tech-stack)
+- [Architecture](#architecture)
+- [Project Structure](#project-structure)
+- [Quick Start](#quick-start)
+- [AI Architecture](#ai-architecture)
+- [Performance](#performance)
+- [Mobile Experience](#mobile-experience)
+- [Security](#security)
+- [API Overview](#api-overview)
+- [Deployment](#deployment)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+- [License](#license)
 
 ---
 
@@ -65,58 +108,121 @@ VidyGuideAI solves this with an **all-in-one AI-powered career platform** that a
 ## Screenshots
 
 <div align="center">
-  <table>
-    <tr>
-      <td width="50%" align="center">
-        <img src="assets/screenshots/dashboard.jpg" alt="Dashboard" width="100%" style="border-radius: 12px; border: 1px solid #1e293b;" />
-        <br/><sub><strong>Dashboard</strong> — Intelligence hub with streaks and progress</sub>
-      </td>
-      <td width="50%" align="center">
-        <img src="assets/screenshots/ai-mentor.jpg" alt="AI Mentor" width="100%" style="border-radius: 12px; border: 1px solid #1e293b;" />
-        <br/><sub><strong>AI Mentor</strong> — Real-time streaming chat</sub>
-      </td>
-    </tr>
-    <tr>
-      <td width="50%" align="center">
-        <img src="assets/screenshots/resume-builder.jpg" alt="Resume Builder" width="100%" style="border-radius: 12px; border: 1px solid #1e293b;" />
-        <br/><sub><strong>Resume Builder</strong> — Guided wizard with live preview</sub>
-      </td>
-      <td width="50%" align="center">
-        <img src="assets/screenshots/resume-feedback.jpg" alt="Resume Review" width="100%" style="border-radius: 12px; border: 1px solid #1e293b;" />
-        <br/><sub><strong>Resume Review</strong> — ATS scoring and AI feedback</sub>
-      </td>
-    </tr>
-    <tr>
-      <td width="50%" align="center">
-        <img src="assets/screenshots/career-guidance.jpg" alt="Career Guidance" width="100%" style="border-radius: 12px; border: 1px solid #1e293b;" />
-        <br/><sub><strong>Career Guidance</strong> — Personalized recommendations</sub>
-      </td>
-      <td width="50%" align="center">
-        <img src="assets/screenshots/interview-prep.jpg" alt="Interview Prep" width="100%" style="border-radius: 12px; border: 1px solid #1e293b;" />
-        <br/><sub><strong>Interview Prep</strong> — Mock interviews with AI feedback</sub>
-      </td>
-    </tr>
-    <tr>
-      <td width="50%" align="center">
-        <img src="assets/screenshots/translator.jpg" alt="Translator" width="100%" style="border-radius: 12px; border: 1px solid #1e293b;" />
-        <br/><sub><strong>Translator</strong> — Multilingual support (10+ languages)</sub>
-      </td>
-      <td width="50%" align="center">
-        <img src="assets/screenshots/settings.jpg" alt="Settings" width="100%" style="border-radius: 12px; border: 1px solid #1e293b;" />
-        <br/><sub><strong>Settings</strong> — Theme, accent, AI model config</sub>
-      </td>
-    </tr>
-    <tr>
-      <td width="50%" align="center">
-        <img src="assets/screenshots/ai-mentor-mobile.jpeg" alt="AI Mentor Mobile" width="100%" style="border-radius: 12px; border: 1px solid #1e293b;" />
-        <br/><sub><strong>AI Mentor (Mobile)</strong> — Responsive chat interface</sub>
-      </td>
-      <td width="50%" align="center">
-        <img src="assets/screenshots/history.jpg" alt="History" width="100%" style="border-radius: 12px; border: 1px solid #1e293b;" />
-        <br/><sub><strong>History</strong> — Activity and conversation log</sub>
-      </td>
-    </tr>
-  </table>
+
+### Dashboard
+<img src="assets/screenshots/dashboard.jpg" alt="Dashboard" width="780" style="border-radius: 12px; border: 1px solid #1e293b;" />
+<br/>
+<sub>The central intelligence hub — streaks, XP, weekly progress, quick actions, activity timeline, and achievement badges at a glance.</sub>
+
+<br/>
+<br/>
+
+### AI Mentor
+<img src="assets/screenshots/ai-mentor.jpg" alt="AI Mentor" width="780" style="border-radius: 12px; border: 1px solid #1e293b;" />
+<br/>
+<sub>Real-time streaming chat with Groq AI (LLaMA 3 70B). Supports file attachments, voice input, markdown rendering, and conversation management.</sub>
+
+<br/>
+<br/>
+
+### AI Mentor (Mobile)
+<img src="assets/screenshots/ai-mentor-mobile.jpeg" alt="AI Mentor Mobile" width="350" style="border-radius: 12px; border: 1px solid #1e293b;" />
+<br/>
+<sub>Fully responsive mobile experience with sticky composer, voice recording, and bottom tab navigation.</sub>
+
+<br/>
+<br/>
+
+### Resume Builder
+<img src="assets/screenshots/resume-builder.jpg" alt="Resume Builder" width="780" style="border-radius: 12px; border: 1px solid #1e293b;" />
+<br/>
+<sub>10-step guided wizard with 5 ATS-optimized templates, role-specific skill suggestions, live preview, and auto-save.</sub>
+
+<br/>
+<br/>
+
+### Resume Review
+<img src="assets/screenshots/resume-feedback.jpg" alt="Resume Review" width="780" style="border-radius: 12px; border: 1px solid #1e293b;" />
+<br/>
+<sub>One-click ATS scoring, keyword analysis, formatting audit, grammar suggestions, and AI-powered feedback.</sub>
+
+<br/>
+<br/>
+
+### Career Guidance
+<img src="assets/screenshots/career-guidance.jpg" alt="Career Guidance" width="780" style="border-radius: 12px; border: 1px solid #1e293b;" />
+<br/>
+<sub>AI-driven role validation, industry-specific recommendations, and personalized career roadmaps with visual timelines.</sub>
+
+<br/>
+<br/>
+
+### Interview Prep
+<img src="assets/screenshots/interview-prep.jpg" alt="Interview Prep" width="780" style="border-radius: 12px; border: 1px solid #1e293b;" />
+<br/>
+<sub>Mock technical and behavioral interviews with role-specific questions, AI-generated feedback, and performance tracking.</sub>
+
+<br/>
+<br/>
+
+### Translator
+<img src="assets/screenshots/translator.jpg" alt="Translator" width="780" style="border-radius: 12px; border: 1px solid #1e293b;" />
+<br/>
+<sub>Translate career content between English and 10+ Indian languages. Real-time translation with context-aware phrasing.</sub>
+
+<br/>
+<br/>
+
+### History
+<img src="assets/screenshots/history.jpg" alt="History" width="780" style="border-radius: 12px; border: 1px solid #1e293b;" />
+<br/>
+<sub>Complete activity and conversation log with search, filter, and timeline views.</sub>
+
+<br/>
+<br/>
+
+### Settings
+<img src="assets/screenshots/settings.jpg" alt="Settings" width="780" style="border-radius: 12px; border: 1px solid #1e293b;" />
+<br/>
+<sub>Theme (dark/light/system), accent color picker, AI model selection, voice configuration, and speech rate/pitch controls.</sub>
+
+</div>
+
+---
+
+## Why VidyGuideAI?
+
+| Feature | VidyGuideAI | Traditional Platforms |
+|---------|------------|---------------------|
+| **AI Mentor** | Real-time streaming with Groq, Gemini, GPT fallback | Usually static Q&A or forums |
+| **Resume Builder** | 5 ATS-optimized templates, AI skill suggestions, live preview | Basic templates, no intelligence |
+| **Resume Review** | Automated ATS scoring + AI feedback in one click | None or paid manual review |
+| **Career Guidance** | Personalized roadmaps based on your background | Generic blog posts |
+| **Interview Prep** | AI-powered mock interviews with scoring | Static question banks |
+| **Language Support** | 10+ Indian languages with context-aware translation | English-only |
+| **OCR Scanner** | Extract text from PDFs and images (EasyOCR + Tesseract) | Not available |
+| **Real-time Streaming** | Token-by-token AI responses via SSE | Response-after-wait |
+| **Offline Cache** | Conversations work offline with localStorage | Online-only |
+| **Pricing** | **Free** — No subscription required | $10–50/month |
+
+---
+
+## Metrics
+
+<div align="center">
+
+| | |
+|---|---|
+| **23+ Pages** | Full-featured application |
+| **18+ API Endpoints** | RESTful NestJS backend |
+| **3 AI Providers** | Groq · Gemini · OpenRouter with automatic fallback |
+| **10+ Languages** | Indian language support for translation |
+| **5 ATS Templates** | Resume builder with live preview |
+| **105 kB** | Shared JavaScript bundle (tree-shaken) |
+| **2 Microservices** | Web (Next.js) + API (NestJS) |
+| **1 Python Service** | OCR + PDF generation |
+| **Monorepo** | pnpm workspace with shared config |
+
 </div>
 
 ---
@@ -125,14 +231,25 @@ VidyGuideAI solves this with an **all-in-one AI-powered career platform** that a
 
 <div align="center">
 
-| Frontend | Backend | AI & ML | Infrastructure |
-|----------|---------|---------|---------------|
-| Next.js 15 (App Router) | NestJS 11 | Groq (LLaMA 3 70B) | Docker + Compose |
-| React 19 | TypeScript 5.7 | Gemini 1.5 Flash | GitHub Actions CI |
-| Tailwind CSS 4 | Prisma 5.21 | OpenRouter (GPT-4o-mini) | Render Deployment |
-| Framer Motion | PostgreSQL 16 | EasyOCR (PyTorch) | Neon (PostgreSQL) |
-| Lucide React | JWT Auth (http-only cookies) | Tesseract OCR | Cloudinary Storage |
-| OGL (WebGL) | Resend (Email) | ReportLab (PDF) | Upstash Redis |
+| Layer | Technology | Purpose |
+|-------|-----------|---------|
+| **Frontend** | Next.js 15 (App Router) | SSR, Streaming, PWA |
+| **UI** | React 19 + Tailwind CSS 4 | Component framework, styling |
+| **Animation** | Framer Motion + OGL (WebGL) | UI animations, 3D visuals |
+| **Icons** | Lucide React | Consistent icon set |
+| **Backend** | NestJS 11 | Modular API gateway |
+| **Database** | PostgreSQL 16 + Prisma 5.21 | Relational data, ORM |
+| **AI (Primary)** | Groq (LLaMA 3 70B) | Fastest inference, reasoning |
+| **AI (Fallback 1)** | Gemini 1.5 Flash | Free tier, high rate limits |
+| **AI (Fallback 2)** | OpenRouter (GPT-4o-mini) | Broad model selection |
+| **Auth** | JWT (http-only cookies) + bcryptjs | Secure sessions |
+| **OCR** | EasyOCR (PyTorch) + Tesseract | Text extraction |
+| **PDF** | ReportLab (Python) | Resume PDF generation |
+| **Email** | Resend API | OTP, notifications |
+| **Storage** | Cloudinary | File uploads |
+| **Cache** | Upstash Redis | Session, rate limiting |
+| **Infrastructure** | Docker Compose | Containerization |
+| **CI/CD** | GitHub Actions | Automated builds |
 
 </div>
 
@@ -141,38 +258,6 @@ VidyGuideAI solves this with an **all-in-one AI-powered career platform** that a
 ## Architecture
 
 <img src="assets/images/architecture.svg" alt="VidyGuideAI Architecture Diagram" width="100%" style="border-radius: 12px; border: 1px solid #1e293b;" />
-
-### Architecture Overview
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    Next.js 15 Frontend                       │
-│  (React 19 · Tailwind CSS 4 · Framer Motion · Lucide Icons) │
-│  SSR · Streaming · Lazy Loading · Offline Cache · PWA       │
-└─────────────────────────┬───────────────────────────────────┘
-                          │ HTTP/JSON · credentials: include
-                          ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    NestJS 11 API Gateway                      │
-│  Helmet · CORS · Rate Limiting · Validation · JWT Auth       │
-│  ┌──────┬──────┬──────┬──────┬──────┬──────┬──────┬──────┐  │
-│  │ Auth │Career│Resume│Mentor│ OCR  │Transl│Conv. │History│  │
-│  └──────┴──────┴──────┴──────┴──────┴──────┴──────┴──────┘  │
-└──────┬──────────────────────────────────────────┬────────────┘
-       │                                          │
-       ▼                                          ▼
-┌──────────────────┐              ┌──────────────────────────┐
-│  PostgreSQL 16    │              │  AI Provider Factory      │
-│  + Prisma ORM     │              │  ┌────────────────────┐   │
-│  + Migrations     │              │  │ Groq (LLaMA 3)     │   │
-│                   │              │  │ ↓ (fallback)       │   │
-│  Users            │              │  │ Gemini 1.5 Flash   │   │
-│  Conversations    │              │  │ ↓ (fallback)       │   │
-│  Resumes          │              │  │ OpenRouter (GPT-4o)│   │
-│  Settings         │              │  └────────────────────┘   │
-│  History          │              │  + Resend · Cloudinary    │
-└──────────────────┘              └──────────────────────────┘
-```
 
 ### Key Design Decisions
 

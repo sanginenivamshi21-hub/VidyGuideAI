@@ -6,19 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
-## [3.1.2] - 2026-07-26
+## [3.2.0] - 2026-07-29
 
-### Fixed
-- Authentication session persistence: login cookies were not set due to missing `{ tokens: ... }` wrapper in auth service login response
-- Replaced `console.error` with structured `Logger` in OCR and Resume controllers
-- Moved `@types/nodemailer` from `dependencies` to `devDependencies`
+### Added
+- Social preview image (`social-preview.svg`) for GitHub sharing
+- Professional architecture SVG diagram with emerald accent theme
+- Metrics section in README (23+ pages, 18+ endpoints, 3 AI providers)
+- "Why VidyGuideAI?" comparison table vs traditional platforms
+- Full-width screenshot sections with descriptive captions
+- GitHub badges (conventional commits, PRs welcome, license)
+- Table of Contents with anchor navigation
 
 ### Changed
-- Replaced hardcoded `http://localhost:8000` API URLs with `API_BASE` constant from `lib/api.ts` across all frontend pages
-- Consolidated and renamed all screenshots to professional lowercase filenames
-- Full rewrite of README, ARCHITECTURE.md, API.md, DEPLOYMENT.md, and CONTRIBUTING.md
-- Removed empty `services/` and `styles/` directories
-- Removed unused imports from dashboard and sidebar components
+- README hero redesigned with logo, tagline, CTA buttons, and badges
+- Architecture diagram rebuilt with modern startup visuals, rounded cards, professional arrows
+- Version bumped to 3.2.0
+
+### Fixed
+- Restored missing screenshots from git index (12 files)
+- Repository history cleaned via hard reset to stable commit `2be7f1a`
 
 ---
 

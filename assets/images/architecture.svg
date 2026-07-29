@@ -1,76 +1,114 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 680" fill="none">
   <defs>
-    <linearGradient id="web" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0f172a"/><stop offset="100%" stop-color="#1e293b"/></linearGradient>
-    <linearGradient id="api" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1e293b"/><stop offset="100%" stop-color="#0f172a"/></linearGradient>
-    <linearGradient id="ai" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#065f46"/><stop offset="100%" stop-color="#047857"/></linearGradient>
-    <linearGradient id="db" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1e3a5f"/><stop offset="100%" stop-color="#1e40af"/></linearGradient>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a0f1e"/><stop offset="100%" stop-color="#0f172a"/></linearGradient>
+    <linearGradient id="web" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1e293b"/><stop offset="100%" stop-color="#0f172a"/></linearGradient>
+    <linearGradient id="api" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1e293b"/><stop offset="100%" stop-color="#111827"/></linearGradient>
+    <linearGradient id="ai" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#064e3b"/><stop offset="100%" stop-color="#047857"/></linearGradient>
+    <linearGradient id="db" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1e3a5f"/><stop offset="100%" stop-color="#1d4ed8"/></linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="shadow"><feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000" flood-opacity="0.3"/></filter>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#475569"/></marker>
   </defs>
-  <!-- Background -->
-  <rect width="900" height="620" rx="16" fill="#0f172a"/>
-  <rect width="900" height="620" rx="16" stroke="#1e293b" stroke-width="2"/>
 
-  <!-- Title -->
-  <text x="450" y="40" text-anchor="middle" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="18" font-weight="700">VidyGuideAI — Architecture</text>
+  <!-- Background -->
+  <rect width="1000" height="680" rx="20" fill="url(#bg)"/>
+  <rect width="1000" height="680" rx="20" stroke="#1e293b" stroke-width="2"/>
+
+  <!-- Header -->
+  <rect x="0" y="0" width="1000" height="56" rx="20" fill="#0f172a"/>
+  <rect x="0" y="36" width="1000" height="20" fill="#0f172a"/>
+  <circle cx="30" cy="28" r="6" fill="#10b981"/>
+  <text x="46" y="33" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="15" font-weight="700">VidyGuideAI Architecture</text>
+  <text x="780" y="33" fill="#64748b" font-family="monospace" font-size="10">v3.2.0 · Production Ready</text>
 
   <!-- Layer 1: Frontend -->
-  <rect x="50" y="65" width="800" height="110" rx="12" fill="url(#web)" stroke="#334155" stroke-width="1.5"/>
-  <text x="70" y="95" fill="#94a3b8" font-family="monospace" font-size="10" font-weight="700" letter-spacing="2">LAYER 1</text>
-  <text x="70" y="120" fill="#f8fafc" font-family="system-ui" font-size="15" font-weight="700">Next.js 15 Frontend</text>
-  <text x="70" y="142" fill="#64748b" font-family="system-ui" font-size="11">React 19 · Tailwind CSS 4 · Framer Motion · Lucide Icons · OGL (WebGL)</text>
-  <text x="450" y="120" text-anchor="middle" fill="#94a3b8" font-family="monospace" font-size="10">App Router · SSR · Streaming · PWA</text>
+  <rect x="40" y="80" width="920" height="115" rx="14" fill="url(#web)" stroke="#334155" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="54" y="88" width="54" height="18" rx="4" fill="#10b981" opacity="0.15"/>
+  <text x="58" y="101" fill="#34d399" font-family="monospace" font-size="9" font-weight="700">LAYER 1</text>
+  <text x="60" y="130" fill="#f8fafc" font-family="system-ui" font-size="17" font-weight="700">Next.js 15 Frontend</text>
+  <text x="60" y="155" fill="#64748b" font-family="system-ui" font-size="12">React 19 · Tailwind CSS 4 · Framer Motion · Lucide Icons · OGL (WebGL)</text>
+  <text x="60" y="178" fill="#475569" font-family="system-ui" font-size="11">App Router · SSR · Streaming · PWA · Offline Cache · Lazy Loading</text>
+  <rect x="760" y="100" width="180" height="44" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+  <text x="850" y="119" text-anchor="middle" fill="#94a3b8" font-family="monospace" font-size="9">23 Pages</text>
+  <text x="850" y="135" text-anchor="middle" fill="#94a3b8" font-family="monospace" font-size="9">105 KB Shared JS</text>
 
   <!-- Arrow 1 -->
-  <line x1="450" y1="175" x2="450" y2="215" stroke="#334155" stroke-width="2"/>
-  <polygon points="450,220 444,210 456,210" fill="#334155"/>
-  <text x="465" y="200" fill="#64748b" font-family="monospace" font-size="9">HTTP/JSON · credentials: include</text>
+  <line x1="500" y1="195" x2="500" y2="235" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="425" y="207" width="70" height="16" rx="4" fill="#0f172a"/>
+  <text x="460" y="219" text-anchor="middle" fill="#64748b" font-family="monospace" font-size="8">HTTP / JSON</text>
 
   <!-- Layer 2: API -->
-  <rect x="50" y="225" width="800" height="130" rx="12" fill="url(#api)" stroke="#334155" stroke-width="1.5"/>
-  <text x="70" y="255" fill="#94a3b8" font-family="monospace" font-size="10" font-weight="700" letter-spacing="2">LAYER 2</text>
-  <text x="70" y="280" fill="#f8fafc" font-family="system-ui" font-size="15" font-weight="700">NestJS 11 API Gateway</text>
-  <text x="70" y="302" fill="#64748b" font-family="system-ui" font-size="11">Helmet · CORS · Rate Limiting · JWT Auth · Validation</text>
-  <line x1="70" y1="315" x2="830" y2="315" stroke="#1e293b" stroke-width="1"/>
-  <text x="70" y="338" fill="#94a3b8" font-family="monospace" font-size="10">Auth</text>
-  <text x="120" y="338" fill="#94a3b8" font-family="monospace" font-size="10">Career</text>
-  <text x="175" y="338" fill="#94a3b8" font-family="monospace" font-size="10">Resume</text>
-  <text x="235" y="338" fill="#94a3b8" font-family="monospace" font-size="10">Mentor</text>
-  <text x="290" y="338" fill="#94a3b8" font-family="monospace" font-size="10">OCR</text>
-  <text x="330" y="338" fill="#94a3b8" font-family="monospace" font-size="10">Translator</text>
-  <text x="400" y="338" fill="#94a3b8" font-family="monospace" font-size="10">Conversations</text>
-  <text x="490" y="338" fill="#94a3b8" font-family="monospace" font-size="10">History</text>
-  <text x="550" y="338" fill="#94a3b8" font-family="monospace" font-size="10">Users</text>
-  <text x="600" y="338" fill="#94a3b8" font-family="monospace" font-size="10">Settings</text>
+  <rect x="40" y="240" width="920" height="150" rx="14" fill="url(#api)" stroke="#334155" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="54" y="248" width="54" height="18" rx="4" fill="#3b82f6" opacity="0.15"/>
+  <text x="58" y="261" fill="#60a5fa" font-family="monospace" font-size="9" font-weight="700">LAYER 2</text>
+  <text x="60" y="290" fill="#f8fafc" font-family="system-ui" font-size="17" font-weight="700">NestJS 11 API Gateway</text>
+  <text x="60" y="315" fill="#64748b" font-family="system-ui" font-size="12">Helmet · CORS · Rate Limiting · JWT Auth · Validation · Zod Schemas</text>
 
-  <!-- Arrow 2 (left) -->
-  <line x1="200" y1="355" x2="200" y2="415" stroke="#334155" stroke-width="2"/>
-  <polygon points="200,420 194,410 206,410" fill="#334155"/>
+  <!-- Module badges -->
+  <g transform="translate(60, 340)">
+    <rect x="0" y="0" width="50" height="22" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+    <text x="25" y="15" text-anchor="middle" fill="#94a3b8" font-family="monospace" font-size="9">Auth</text>
+    <rect x="58" y="0" width="58" height="22" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+    <text x="87" y="15" text-anchor="middle" fill="#94a3b8" font-family="monospace" font-size="9">Career</text>
+    <rect x="124" y="0" width="62" height="22" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+    <text x="155" y="15" text-anchor="middle" fill="#94a3b8" font-family="monospace" font-size="9">Resume</text>
+    <rect x="194" y="0" width="62" height="22" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+    <text x="225" y="15" text-anchor="middle" fill="#94a3b8" font-family="monospace" font-size="9">Mentor</text>
+    <rect x="264" y="0" width="48" height="22" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+    <text x="288" y="15" text-anchor="middle" fill="#94a3b8" font-family="monospace" font-size="9">OCR</text>
+    <rect x="320" y="0" width="78" height="22" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+    <text x="359" y="15" text-anchor="middle" fill="#94a3b8" font-family="monospace" font-size="9">Translator</text>
+    <rect x="406" y="0" width="106" height="22" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+    <text x="459" y="15" text-anchor="middle" fill="#94a3b8" font-family="monospace" font-size="9">Conversations</text>
+    <rect x="520" y="0" width="62" height="22" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+    <text x="551" y="15" text-anchor="middle" fill="#94a3b8" font-family="monospace" font-size="9">History</text>
+    <rect x="590" y="0" width="52" height="22" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+    <text x="616" y="15" text-anchor="middle" fill="#94a3b8" font-family="monospace" font-size="9">Users</text>
+    <rect x="650" y="0" width="66" height="22" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+    <text x="683" y="15" text-anchor="middle" fill="#94a3b8" font-family="monospace" font-size="9">Settings</text>
+  </g>
 
-  <!-- Arrow 2 (right) -->
-  <line x1="650" y1="355" x2="650" y2="415" stroke="#334155" stroke-width="2"/>
-  <polygon points="650,420 644,410 656,410" fill="#334155"/>
-
-  <text x="200" y="393" text-anchor="middle" fill="#64748b" font-family="monospace" font-size="9">Prisma ORM</text>
-  <text x="650" y="393" text-anchor="middle" fill="#64748b" font-family="monospace" font-size="9">HTTP / SDK</text>
+  <!-- Fork arrows -->
+  <line x1="250" y1="390" x2="250" y2="440" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="750" y1="390" x2="750" y2="440" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="200" y="410" width="90" height="18" rx="4" fill="#0f172a"/>
+  <text x="245" y="423" text-anchor="middle" fill="#64748b" font-family="monospace" font-size="8">Prisma ORM</text>
+  <rect x="700" y="410" width="90" height="18" rx="4" fill="#0f172a"/>
+  <text x="745" y="423" text-anchor="middle" fill="#64748b" font-family="monospace" font-size="8">HTTP / SDK</text>
 
   <!-- Layer 3: Database -->
-  <rect x="50" y="425" width="350" height="90" rx="12" fill="url(#db)" stroke="#1e40af" stroke-width="1.5"/>
-  <text x="70" y="450" fill="#60a5fa" font-family="monospace" font-size="10" font-weight="700" letter-spacing="2">LAYER 3A</text>
-  <text x="70" y="470" fill="#f8fafc" font-family="system-ui" font-size="14" font-weight="700">PostgreSQL 16</text>
-  <text x="70" y="490" fill="#93c5fd" font-family="system-ui" font-size="11">Neon Serverless · Prisma Migrations</text>
-  <text x="70" y="505" fill="#64748b" font-family="monospace" font-size="9">Users · Conversations · Resumes · Settings · History</text>
+  <rect x="40" y="445" width="440" height="110" rx="14" fill="url(#db)" stroke="#3b82f6" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="54" y="453" width="56" height="18" rx="4" fill="#3b82f6" opacity="0.15"/>
+  <text x="58" y="466" fill="#60a5fa" font-family="monospace" font-size="9" font-weight="700">LAYER 3A</text>
+  <rect x="58" y="483" width="20" height="20" rx="4" fill="#2563eb" opacity="0.3"/>
+  <text x="64" y="497" fill="#93c5fd" font-family="monospace" font-size="11">&#x25db;</text>
+  <text x="88" y="500" fill="#f8fafc" font-family="system-ui" font-size="15" font-weight="700">PostgreSQL 16</text>
+  <text x="88" y="520" fill="#93c5fd" font-family="system-ui" font-size="11">Neon Serverless · Prisma Migrations</text>
+  <text x="60" y="542" fill="#64748b" font-family="monospace" font-size="10">Users · Conversations · Resumes · Settings · History</text>
 
-  <!-- Layer 3: AI Providers -->
-  <rect x="500" y="425" width="350" height="90" rx="12" fill="url(#ai)" stroke="#047857" stroke-width="1.5"/>
-  <text x="520" y="450" fill="#6ee7b7" font-family="monospace" font-size="10" font-weight="700" letter-spacing="2">LAYER 3B</text>
-  <text x="520" y="470" fill="#f8fafc" font-family="system-ui" font-size="14" font-weight="700">AI Provider Factory</text>
-  <text x="520" y="490" fill="#a7f3d0" font-family="system-ui" font-size="11">Automatic Fallback · Streaming · Memory</text>
-  <text x="520" y="505" fill="#6ee7b7" font-family="monospace" font-size="10">Groq (LLaMA 3) → Gemini 1.5 → OpenRouter</text>
+  <!-- Layer 3: AI -->
+  <rect x="520" y="445" width="440" height="110" rx="14" fill="url(#ai)" stroke="#10b981" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="534" y="453" width="56" height="18" rx="4" fill="#10b981" opacity="0.15"/>
+  <text x="538" y="466" fill="#34d399" font-family="monospace" font-size="9" font-weight="700">LAYER 3B</text>
+  <text x="540" y="500" fill="#f8fafc" font-family="system-ui" font-size="15" font-weight="700">AI Provider Factory</text>
+  <text x="540" y="520" fill="#a7f3d0" font-family="system-ui" font-size="11">Automatic Fallback · Streaming · Conversation Memory</text>
+  <text x="540" y="542" fill="#6ee7b7" font-family="monospace" font-size="10">Groq (LLaMA 3) → Gemini 1.5 Flash → OpenRouter (GPT-4o)</text>
 
-  <!-- Layer 4: Extras -->
-  <rect x="50" y="535" width="800" height="60" rx="12" fill="#1e293b" stroke="#334155" stroke-width="1"/>
-  <text x="100" y="560" fill="#94a3b8" font-family="system-ui" font-size="11">Resend API (Email)</text>
-  <text x="250" y="560" fill="#94a3b8" font-family="system-ui" font-size="11">Cloudinary (Files)</text>
-  <text x="400" y="560" fill="#94a3b8" font-family="system-ui" font-size="11">EasyOCR + Tesseract</text>
-  <text x="570" y="560" fill="#94a3b8" font-family="system-ui" font-size="11">ReportLab (PDF)</text>
-  <text x="700" y="560" fill="#94a3b8" font-family="system-ui" font-size="11">Redis (Cache)</text>
+  <!-- Layer 4: Services -->
+  <rect x="40" y="575" width="920" height="60" rx="14" fill="#1e293b" stroke="#334155" stroke-width="1" filter="url(#shadow)"/>
+  <rect x="54" y="583" width="56" height="18" rx="4" fill="#f59e0b" opacity="0.15"/>
+  <text x="58" y="596" fill="#fbbf24" font-family="monospace" font-size="9" font-weight="700">EXTRAS</text>
+
+  <g transform="translate(140, 590)">
+    <rect x="0" y="0" width="130" height="30" rx="8" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+    <text x="65" y="20" text-anchor="middle" fill="#94a3b8" font-family="system-ui" font-size="11">Resend (Email)</text>
+    <rect x="145" y="0" width="130" height="30" rx="8" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+    <text x="210" y="20" text-anchor="middle" fill="#94a3b8" font-family="system-ui" font-size="11">Cloudinary (Files)</text>
+    <rect x="290" y="0" width="140" height="30" rx="8" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+    <text x="360" y="20" text-anchor="middle" fill="#94a3b8" font-family="system-ui" font-size="11">EasyOCR + Tesseract</text>
+    <rect x="445" y="0" width="130" height="30" rx="8" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+    <text x="510" y="20" text-anchor="middle" fill="#94a3b8" font-family="system-ui" font-size="11">ReportLab (PDF)</text>
+    <rect x="590" y="0" width="110" height="30" rx="8" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+    <text x="645" y="20" text-anchor="middle" fill="#94a3b8" font-family="system-ui" font-size="11">Redis (Cache)</text>
+  </g>
 </svg>
