@@ -1,6 +1,7 @@
 'use client';
 
-import { useRef, useEffect, useCallback } from 'react';
+import { memo, useRef, useEffect, useCallback, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, Paperclip, Square, SendHorizonal, Plus } from 'lucide-react';
 import AttachmentCard from '@/components/AttachmentCard';
 
@@ -22,7 +23,7 @@ interface ChatComposerProps {
   onToolPaletteToggle?: () => void;
 }
 
-export default function ChatComposer({
+function ChatComposer({
   input,
   onInputChange,
   onSend,
@@ -40,6 +41,7 @@ export default function ChatComposer({
   onToolPaletteToggle,
 }: ChatComposerProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [viewportHeight, setViewportHeight] = useState<number | null>(null);
 
   useEffect(() => {
     const ta = textareaRef.current;
@@ -48,6 +50,15 @@ export default function ChatComposer({
       ta.style.height = Math.min(ta.scrollHeight, 160) + 'px';
     }
   }, [input]);
+
+  useEffect(() => {
+    const vv = globalThis.visualViewport;
+    if (!vv) return;
+    const handler = () => setViewportHeight(vv.height);
+    vv.addEventListener('resize', handler);
+    handler();
+    return () => vv.removeEventListener('resize', handler);
+  }, []);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -75,10 +86,18 @@ export default function ChatComposer({
 
   const hasContent = input.trim().length > 0 || attachments.length > 0;
 
+  const keyboardPadding = viewportHeight && viewportHeight < globalThis.innerHeight
+    ? globalThis.innerHeight - viewportHeight
+    : 0;
+
   return (
     <div
-      className="shrink-0 safe-area-bottom z-20"
-      style={{ borderTop: '1px solid var(--border-default)', backgroundColor: 'var(--bg-primary)' }}
+      className="shrink-0 z-20"
+      style={{
+        borderTop: '1px solid var(--border-default)',
+        backgroundColor: 'var(--bg-primary)',
+        paddingBottom: keyboardPadding > 0 ? `${keyboardPadding}px` : 'env(safe-area-inset-bottom, 0px)',
+      }}
     >
       {fileError && (
         <div className="px-4 py-2" style={{ backgroundColor: 'rgba(239,68,68,0.1)' }}>
@@ -108,14 +127,14 @@ export default function ChatComposer({
           <button
             type="button"
             onClick={onVoiceInput}
-            className="p-2 rounded-xl shrink-0 transition-colors touch-manipulation hidden sm:block"
+            className="p-2 rounded-xl shrink-0 transition-colors touch-manipulation"
             style={{ color: 'var(--text-tertiary)' }}
             aria-label="Voice input"
           >
             <Mic size={19} />
           </button>
 
-          <label className="p-2 rounded-xl shrink-0 cursor-pointer transition-colors touch-manipulation hidden sm:block" style={{ color: 'var(--text-tertiary)' }}>
+          <label className="p-2 rounded-xl shrink-0 cursor-pointer transition-colors touch-manipulation" style={{ color: 'var(--text-tertiary)' }}>
             <Paperclip size={19} />
             <input
               type="file"
@@ -146,24 +165,48 @@ export default function ChatComposer({
             onKeyDown={handleKeyDown}
             onPaste={handlePaste}
             rows={1}
-            placeholder="Ask anything..."
+            placeholder="Ask anything... (Ctrl+Enter to send)"
             className="flex-1 bg-transparent text-sm outline-none resize-none max-h-[160px] py-1.5 px-1 leading-relaxed"
             style={{ color: 'var(--text-primary)', scrollbarWidth: 'thin' }}
           />
 
-          <button
+          <motion.button
             type="button"
             onClick={isStreaming ? onStop : onSend}
             disabled={!isStreaming && !hasContent}
-            className="p-2 rounded-xl transition-all shrink-0 disabled:opacity-30 disabled:cursor-not-allowed touch-manipulation active:scale-90"
+            className="p-2 rounded-xl shrink-0 disabled:opacity-30 disabled:cursor-not-allowed touch-manipulation"
             style={{
               backgroundColor: isStreaming ? 'rgba(239,68,68,0.15)' : hasContent ? 'var(--accent)' : 'var(--bg-tertiary)',
               color: isStreaming ? '#ef4444' : hasContent ? 'white' : 'var(--text-muted)',
             }}
+            whileTap={{ scale: 0.85 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 17 }}
             aria-label={isStreaming ? 'Stop generating' : 'Send message'}
           >
-            {isStreaming ? <Square size={16} /> : <SendHorizonal size={17} />}
-          </button>
+            <AnimatePresence mode="wait">
+              {isStreaming ? (
+                <motion.div
+                  key="stop"
+                  initial={{ scale: 0.5, opacity: 0, rotate: -90 }}
+                  animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                  exit={{ scale: 0.5, opacity: 0, rotate: 90 }}
+                  transition={{ duration: 0.15, ease: 'easeOut' }}
+                >
+                  <Square size={16} />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="send"
+                  initial={{ scale: 0.5, opacity: 0, rotate: 90 }}
+                  animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                  exit={{ scale: 0.5, opacity: 0, rotate: -90 }}
+                  transition={{ duration: 0.15, ease: 'easeOut' }}
+                >
+                  <SendHorizonal size={17} />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.button>
         </div>
         <p className="text-[10px] mt-1.5 text-center" style={{ color: 'var(--text-muted)' }}>
           AI can make mistakes. Verify important information.
@@ -172,3 +215,5 @@ export default function ChatComposer({
     </div>
   );
 }
+
+export default memo(ChatComposer);

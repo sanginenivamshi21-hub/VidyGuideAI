@@ -28,6 +28,7 @@ export default function MentorPage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [showScrollBtn, setShowScrollBtn] = useState(false);
+  const [isNearBottom, setIsNearBottom] = useState(true);
   const [attachments, setAttachments] = useState<File[]>([]);
   const [attachmentPreviews, setAttachmentPreviews] = useState<Record<number, string>>({});
   const [fileError, setFileError] = useState('');
@@ -141,7 +142,9 @@ export default function MentorPage() {
     const el = chatRef.current;
     if (!el) return;
     const handleScroll = () => {
-      setShowScrollBtn(el.scrollHeight - el.scrollTop - el.clientHeight > 300);
+      const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+      setShowScrollBtn(distanceFromBottom > 300);
+      setIsNearBottom(distanceFromBottom < 100);
     };
     el.addEventListener('scroll', handleScroll);
     return () => el.removeEventListener('scroll', handleScroll);
@@ -485,7 +488,7 @@ export default function MentorPage() {
         onRename={renameConversation}
       />
 
-      <div className="flex flex-col h-full overflow-hidden">
+      <div className="absolute inset-0 flex flex-col overflow-hidden">
         <ChatHeader
           onToggleDrawer={() => setDrawerOpen((s) => !s)}
           onNewChat={handleNewChat}
@@ -495,7 +498,7 @@ export default function MentorPage() {
 
         <div
           ref={chatRef}
-          className="flex-1 overflow-y-auto scrollbar-thin"
+          className="flex-1 overflow-y-auto scrollbar-thin min-h-0"
           onDragOver={(e) => { e.preventDefault(); }}
           onDrop={(e) => {
             e.preventDefault();
@@ -512,6 +515,7 @@ export default function MentorPage() {
             onRegenerate={regenerateLast}
             onContinue={continueLast}
             onSpeak={speakText}
+            isNearBottom={isNearBottom}
           />
         </div>
 

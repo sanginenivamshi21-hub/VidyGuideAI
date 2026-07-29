@@ -150,9 +150,19 @@ body {
 }
 .status-enter { animation: status-in 0.2s ease-out; }
 
-[data-animations="false"] * {
+[data-animations="false"] *,
+[data-animations="false"] *::before,
+[data-animations="false"] *::after {
   animation-duration: 0s !important;
   transition-duration: 0s !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 .scrollbar-thin::-webkit-scrollbar { width: 6px; }
@@ -168,6 +178,15 @@ body {
 }
 
 .touch-manipulation { touch-action: manipulation; }
+
+*:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+button:focus:not(:focus-visible) {
+  outline: none;
+}
 
 @media (max-width: 1023px) {
   .hide-scrollbar::-webkit-scrollbar { display: none; }
