@@ -5,6 +5,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node -e \"const fs=require('fs'),p=__dirname+'/.next';fs.existsSync(p)&&(console.log('→ Cleaning stale .next cache'),fs.rmSync(p,{recursive:true,force:true}))\"",
+    "clean": "node -e \"const fs=require('fs'),p=__dirname+'/.next';fs.existsSync(p)&&fs.rmSync(p,{recursive:true,force:true})\"",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
