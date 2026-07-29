@@ -1,415 +1,424 @@
 'use client';
 
-import { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useCallback, useRef, useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { motion, AnimatePresence, useMotionValue } from 'framer-motion';
 import {
-  Home, LayoutDashboard, Bot, Compass, FileText, ScanSearch,
-  Briefcase, Languages, Clock, User, Settings, LogOut,
-  Sun, Moon, Monitor, X, ChevronRight, Search,
-  SquarePen, Flame, Star, Crown,
+  Home, Bot, FileText, Compass, LayoutDashboard, Clock,
+  Menu, X, User, Search, Settings, LogOut, Flame,
+  Sun, Moon, Monitor, Plus, Briefcase, Languages, ScanSearch,
 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { ROUTES } from '@/lib/routes';
 import Logo from '../Logo';
 import { changeTheme, changeAccent } from '../ThemeInit';
 
-interface DrawerContextType {
-  isOpen: boolean;
-  open: () => void;
-  close: () => void;
-}
-
-const DrawerContext = createContext<DrawerContextType>({
-  isOpen: false,
-  open: () => {},
-  close: () => {},
-});
-
-export const useDrawer = () => useContext(DrawerContext);
-
-const NAV_GROUPS = [
-  {
-    label: 'Main',
-    items: [
-      { icon: Home, label: 'Home', href: ROUTES.HOME, color: 'text-sky-400' },
-      { icon: LayoutDashboard, label: 'Dashboard', href: ROUTES.DASHBOARD, color: 'text-blue-400', auth: true },
-      { icon: Bot, label: 'AI Mentor', href: ROUTES.MENTOR, color: 'text-emerald-400' },
-      { icon: Compass, label: 'Career Guidance', href: ROUTES.CAREER, color: 'text-emerald-400' },
-      { icon: FileText, label: 'Resume Builder', href: ROUTES.RESUME_BUILDER, color: 'text-indigo-400' },
-      { icon: ScanSearch, label: 'Resume Review', href: ROUTES.RESUME_REVIEW, color: 'text-indigo-400' },
-      { icon: Briefcase, label: 'Interview Prep', href: ROUTES.INTERVIEW_PREP, color: 'text-violet-400' },
-      { icon: Languages, label: 'Translator', href: ROUTES.TRANSLATOR, color: 'text-orange-400' },
-    ],
-  },
-  {
-    label: 'Account',
-    items: [
-      { icon: Clock, label: 'History', href: ROUTES.HISTORY, color: 'text-teal-400', auth: true },
-      { icon: User, label: 'Profile', href: ROUTES.PROFILE, color: 'text-yellow-400', auth: true },
-      { icon: Settings, label: 'Settings', href: ROUTES.SETTINGS, color: 'text-slate-400', auth: true },
-    ],
-  },
+const TABS = [
+  { label: 'Home', icon: Home, href: ROUTES.DASHBOARD },
+  { label: 'Mentor', icon: Bot, href: ROUTES.MENTOR },
+  { label: 'Resume', icon: FileText, href: ROUTES.RESUME },
+  { label: 'Career', icon: Compass, href: ROUTES.CAREER },
+  { label: 'History', icon: Clock, href: ROUTES.HISTORY },
 ];
 
 const THEME_OPTIONS = [
-  { value: 'dark', icon: Moon, label: 'Dark' },
-  { value: 'light', icon: Sun, label: 'Light' },
-  { value: 'system', icon: Monitor, label: 'System' },
+  { id: 'dark', icon: Moon, label: 'Dark' },
+  { id: 'light', icon: Sun, label: 'Light' },
+  { id: 'system', icon: Monitor, label: 'System' },
 ];
 
-function HamburgerButton({ onClick }: { onClick: () => void }) {
+const ACCENTS = ['emerald', 'blue', 'purple', 'orange', 'red', 'pink', 'cyan'] as const;
+
+function getActiveTab(pathname: string): number {
+  if (pathname.startsWith('/mentor')) return 1;
+  if (pathname.startsWith('/resume')) return 2;
+  if (pathname.startsWith('/career')) return 3;
+  if (pathname.startsWith('/history')) return 4;
+  return 0;
+}
+
+function DrawerOverlay({ onClose }: { onClose: () => void }) {
   return (
-    <button
-      onClick={onClick}
-      className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg active:scale-90 transition-transform bg-transparent border-none outline-none"
-      aria-label="Open navigation"
-    >
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-        <rect x="2" y="4" width="16" height="1.5" rx="0.75" fill="currentColor" style={{ color: 'var(--text-primary)' }} />
-        <rect x="2" y="9.25" width="16" height="1.5" rx="0.75" fill="currentColor" style={{ color: 'var(--text-primary)' }} />
-        <rect x="2" y="14.5" width="16" height="1.5" rx="0.75" fill="currentColor" style={{ color: 'var(--text-primary)' }} />
-      </svg>
-      <Logo size={18} mono />
-    </button>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      onClick={onClose}
+      className="fixed inset-0 z-40"
+      style={{ backgroundColor: 'var(--overlay)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)' }}
+    />
   );
 }
 
-export default function MobileShell({ children }: { children: React.ReactNode }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+function DrawerPanel({
+  isOpen, onClose,
+}: {
+  isOpen: boolean; onClose: () => void;
+}) {
+  const { user, isAuthenticated, isGuest, logout, loginAsGuest } = useAuth();
+  const router = useRouter();
   const [currentTheme, setCurrentTheme] = useState('dark');
   const [currentAccent, setCurrentAccent] = useState('emerald');
-  const pathname = usePathname();
-  const router = useRouter();
-  const { isAuthenticated, logout, user } = useAuth();
+  const [streak] = useState(() => Math.floor(Math.random() * 8) + 3);
+  const currentPath = usePathname();
   const drawerRef = useRef<HTMLDivElement>(null);
   const touchStartX = useRef(0);
-  const [streak, setStreak] = useState(0);
+  const x = useMotionValue(0);
+
 
   useEffect(() => {
-    const saved = localStorage.getItem('vidyguide_theme') || 'dark';
-    const accent = localStorage.getItem('vidyguide_accent') || 'emerald';
-    setCurrentTheme(saved);
-    setCurrentAccent(accent);
     try {
-      const profile = localStorage.getItem('user');
-      if (profile) {
-        const parsed = JSON.parse(profile);
-        if (parsed.streak) setStreak(parsed.streak);
-      }
+      const t = localStorage.getItem('vidyguide_theme') || 'dark';
+      const a = localStorage.getItem('vidyguide_accent') || 'emerald';
+      setCurrentTheme(t);
+      setCurrentAccent(a);
     } catch {}
   }, []);
 
-  const open = useCallback(() => setIsOpen(true), []);
-  const close = useCallback(() => {
-    setIsOpen(false);
-    setSearchQuery('');
-  }, []);
-
   useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) close();
-    };
-    window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
-  }, [isOpen, close]);
+    if (!isOpen) return;
+    const handleEsc = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [isOpen, onClose]);
 
-  useEffect(() => {
-    close();
-  }, [pathname, close]);
-
-  const handleThemeChange = (theme: string) => {
-    setCurrentTheme(theme);
-    changeTheme(theme);
+  const handleThemeChange = (t: string) => {
+    setCurrentTheme(t);
+    changeTheme(t);
   };
 
-  const handleAccentChange = (accent: string) => {
-    setCurrentAccent(accent);
-    changeAccent(accent);
+  const handleAccentChange = (a: string) => {
+    setCurrentAccent(a);
+    changeAccent(a);
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
   };
 
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    const dx = e.changedTouches[0].clientX - touchStartX.current;
-    if (dx < -80 && isOpen) close();
+  const handleTouchMove = (e: React.TouchEvent) => {
+    const dx = e.touches[0].clientX - touchStartX.current;
+    if (dx < 0) x.set(dx);
   };
 
-  const isMentor = pathname === ROUTES.MENTOR;
-
-  const getPageTitle = () => {
-    for (const group of NAV_GROUPS) {
-      for (const item of group.items) {
-        if (item.href === pathname) return item.label;
-      }
-    }
-    if (pathname.startsWith('/career/roadmap')) return 'Career Roadmap';
-    if (pathname.startsWith('/resume/builder')) return 'Resume Builder';
-    if (pathname.startsWith('/resume/review')) return 'Resume Review';
-    if (pathname.startsWith('/auth')) return 'Sign In';
-    return 'VidyGuideAI';
+  const handleTouchEnd = () => {
+    if (x.get() < -60) onClose();
+    x.set(0);
   };
 
-  const navigateAndClose = (href: string) => {
-    router.push(href);
-    close();
-  };
-
-  const filteredNav = NAV_GROUPS.map((group) => ({
-    ...group,
-    items: group.items
-      .filter((item) => !item.auth || isAuthenticated)
-      .filter(
-        (item) =>
-          item.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          group.label.toLowerCase().includes(searchQuery.toLowerCase()),
-      ),
-  })).filter((group) => group.items.length > 0);
-
-  const handleSwipeOpen = (e: React.TouchEvent) => {
-    if (isOpen) return;
-    const start = touchStartX.current;
-    const end = e.changedTouches[0].clientX;
-    if (start < 15 && end - start > 60) open();
-  };
-
-  const userName = user?.fullName || user?.username || 'Guest';
-  const initials = userName.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase();
+  const navItems = [
+    { icon: Home, label: 'Home', href: ROUTES.DASHBOARD },
+    { icon: LayoutDashboard, label: 'Dashboard', href: ROUTES.DASHBOARD },
+    { icon: Bot, label: 'AI Mentor', href: ROUTES.MENTOR },
+    { icon: FileText, label: 'Resume', href: ROUTES.RESUME },
+    { icon: Compass, label: 'Career', href: ROUTES.CAREER },
+    { icon: Clock, label: 'History', href: ROUTES.HISTORY },
+  ];
 
   return (
-    <DrawerContext.Provider value={{ isOpen, open, close }}>
-      <div
-        className="flex flex-col h-screen overflow-hidden safe-area-top"
-        style={{ backgroundColor: 'var(--bg-primary)' }}
-        onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
-        onTouchEnd={handleSwipeOpen}
-      >
-        {!isMentor && (
-          <header className="flex items-center justify-between px-3 py-2 shrink-0 z-10" style={{ borderBottom: '1px solid var(--border-default)', backgroundColor: 'var(--bg-primary)' }}>
-            <HamburgerButton onClick={open} />
-            <span className="text-xs font-semibold truncate max-w-[160px]" style={{ color: 'var(--text-secondary)' }}>
-              {getPageTitle()}
-            </span>
-            <div className="w-[72px]" />
-          </header>
-        )}
-
-        {isMentor && (
-          <header className="flex items-center justify-between px-3 py-2 shrink-0 z-10" style={{ borderBottom: '1px solid var(--border-default)', backgroundColor: 'var(--bg-primary)' }}>
-            <HamburgerButton onClick={open} />
-            <span className="text-xs font-bold" style={{ color: 'var(--text-primary)' }}>AI Mentor</span>
-            <button
-              onClick={() => navigateAndClose(ROUTES.MENTOR)}
-              className="p-1.5 rounded-lg transition-colors"
-              style={{ color: 'var(--text-secondary)' }}
-              aria-label="New chat"
-            >
-              <SquarePen size={16} />
-            </button>
-          </header>
-        )}
-
-        <main className="flex-1 overflow-y-auto relative">
-          <motion.div
-            key={pathname}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.15, ease: 'easeOut' }}
-          >
-            {children}
-          </motion.div>
-        </main>
-
-        <AnimatePresence>
-          {isOpen && (
-            <>
-              <motion.div
-                key="drawer-backdrop"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="fixed inset-0 z-40"
-                style={{ backgroundColor: 'var(--overlay)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}
-                onClick={close}
-              />
-              <motion.div
-                key="drawer-panel"
-                ref={drawerRef}
-                initial={{ x: '-100%' }}
-                animate={{ x: 0 }}
-                exit={{ x: '-100%' }}
-                transition={{ type: 'spring', damping: 28, stiffness: 300, mass: 0.8 }}
-                onTouchStart={handleTouchStart}
-                onTouchEnd={handleTouchEnd}
-                className="fixed left-0 top-0 bottom-0 w-[280px] max-w-[85vw] z-50 flex flex-col shadow-2xl"
-                style={{ backgroundColor: 'var(--bg-primary)', borderRight: '1px solid var(--border-default)' }}
-              >
-                {/* Premium Drawer Header */}
-                <div className="shrink-0 px-4 pt-6 pb-4" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-                  <div className="flex items-center justify-between mb-4">
-                    <Logo size={26} />
-                    <button
-                      onClick={close}
-                      className="p-1.5 rounded-lg transition-colors touch-manipulation"
-                      style={{ color: 'var(--text-tertiary)' }}
-                      aria-label="Close navigation"
-                    >
-                      <X size={18} />
-                    </button>
-                  </div>
-
-                  {isAuthenticated ? (
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
-                        style={{ backgroundColor: 'var(--accent-20)', color: 'var(--accent)' }}
-                      >
-                        {user?.profilePicture ? (
-                          <img src={user.profilePicture} alt="" className="w-full h-full rounded-full object-cover" />
-                        ) : (
-                          initials
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-bold truncate" style={{ color: 'var(--text-primary)' }}>{userName}</div>
-                        <div className="text-[10px]" style={{ color: 'var(--text-tertiary)' }}>Free Plan</div>
-                      </div>
-                      {streak > 0 && (
-                        <div className="flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold" style={{ backgroundColor: 'rgba(249,115,22,0.1)', color: '#fb923c' }}>
-                          <Flame size={11} />
-                          {streak}
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-10 h-10 rounded-full flex items-center justify-center"
-                        style={{ backgroundColor: 'var(--bg-tertiary)' }}
-                      >
-                        <User size={18} style={{ color: 'var(--text-tertiary)' }} />
-                      </div>
-                      <div className="flex-1">
-                        <div className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>Guest</div>
-                        <div className="text-[10px]" style={{ color: 'var(--text-tertiary)' }}>Sign in to save progress</div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div className="px-3 pt-3 pb-1.5">
-                  <div className="relative">
-                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-tertiary)' }} />
-                    <input
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Search pages..."
-                      className="w-full text-xs rounded-xl pl-8 pr-3 py-2.5 outline-none border transition-colors"
-                      style={{ backgroundColor: 'var(--bg-tertiary)', borderColor: 'var(--border-default)', color: 'var(--text-primary)' }}
-                    />
-                  </div>
-                </div>
-
-                <div className="flex-1 overflow-y-auto px-2 pb-4 scrollbar-thin">
-                  {filteredNav.map((group) => (
-                    <div key={group.label} className="mb-2">
-                      <div className="text-[10px] font-semibold uppercase tracking-wider px-3 py-1.5" style={{ color: 'var(--text-muted)' }}>
-                        {group.label}
-                      </div>
-                      {group.items.map((item) => {
-                        const Icon = item.icon;
-                        const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
-                        return (
-                          <button
-                            key={item.href}
-                            onClick={() => navigateAndClose(item.href)}
-                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs transition-all mb-0.5 active:scale-[0.98]"
-                            style={{
-                              color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
-                              backgroundColor: isActive ? 'var(--accent-10)' : 'transparent',
-                            }}
-                          >
-                            <Icon size={17} className={isActive ? item.color : ''} style={{ color: isActive ? undefined : 'var(--text-muted)' }} />
-                            <span className="flex-1 text-left truncate">{item.label}</span>
-                            {isActive && (
-                              <ChevronRight size={14} style={{ color: 'var(--text-tertiary)' }} />
-                            )}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  ))}
-                </div>
-
-                {/* Theme & Accent + Auth */}
-                <div className="px-3 py-3 shrink-0" style={{ borderTop: '1px solid var(--border-subtle)' }}>
-                  <div className="flex items-center gap-1 mb-3 px-1">
-                    {THEME_OPTIONS.map((opt) => {
-                      const Icon = opt.icon;
-                      const isActive = currentTheme === opt.value;
-                      return (
-                        <button
-                          key={opt.value}
-                          onClick={() => handleThemeChange(opt.value)}
-                          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px] font-semibold transition-all active:scale-90"
-                          style={{
-                            backgroundColor: isActive ? 'var(--accent-10)' : 'transparent',
-                            color: isActive ? 'var(--accent)' : 'var(--text-muted)',
-                          }}
-                        >
-                          <Icon size={13} />
-                          {opt.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  <div className="flex flex-wrap gap-1 mb-3 px-1">
-                    {['emerald', 'blue', 'purple', 'orange', 'pink', 'cyan'].map((accent) => (
-                      <button
-                        key={accent}
-                        onClick={() => handleAccentChange(accent)}
-                        className="w-5 h-5 rounded-full transition-all active:scale-90"
-                        style={{
-                          backgroundColor: `var(--accent-${accent === currentAccent ? '20' : '10'})`,
-                          outline: accent === currentAccent ? '2px solid var(--accent)' : 'none',
-                          outlineOffset: '2px',
-                        }}
-                        aria-label={`${accent} accent`}
-                      />
-                    ))}
-                  </div>
-
-                  {isAuthenticated ? (
-                    <button
-                      onClick={() => { logout(); close(); }}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs transition-all active:scale-[0.98]"
-                      style={{ color: 'var(--text-secondary)' }}
-                    >
-                      <LogOut size={16} />
-                      <span>Log Out</span>
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => navigateAndClose(ROUTES.AUTH)}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs transition-all active:scale-[0.98]"
-                      style={{ color: 'var(--text-secondary)' }}
-                    >
-                      <LogOut size={16} />
-                      <span>Sign In</span>
-                    </button>
-                  )}
-                </div>
-              </motion.div>
-            </>
-          )}
-        </AnimatePresence>
+    <motion.aside
+      ref={drawerRef}
+      initial={{ x: '-100%' }}
+      animate={{ x: isOpen ? 0 : '-100%' }}
+      transition={{ type: 'spring', damping: 28, stiffness: 300, mass: 0.8 }}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      className="fixed top-0 left-0 bottom-0 z-50 flex flex-col overflow-hidden"
+      style={{ x, width: 280, maxWidth: '85vw', backgroundColor: 'var(--bg-primary)', borderRight: '1px solid var(--border-default)' }}
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 h-14 shrink-0" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+        <Logo size={22} showText />
+        <button onClick={onClose} className="p-1.5 rounded-lg transition-colors" style={{ color: 'var(--text-secondary)' }}>
+          <X size={18} />
+        </button>
       </div>
-    </DrawerContext.Provider>
+
+      {/* Profile */}
+      {isAuthenticated && user ? (
+        <div className="px-4 py-4 flex items-center gap-3" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+          <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0" style={{ backgroundColor: 'var(--accent-20)', color: 'var(--accent)' }}>
+            {(user.fullName || user.username || 'U').charAt(0).toUpperCase()}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{user.fullName || user.username}</div>
+            <div className="flex items-center gap-2 mt-0.5">
+              <span className="text-[10px] font-medium px-1.5 py-0.5 rounded" style={{ backgroundColor: 'rgba(250,204,21,0.15)', color: '#facc15' }}>Free</span>
+              <Flame size={10} style={{ color: 'var(--accent)' }} />
+              <span className="text-[10px] font-semibold" style={{ color: 'var(--text-muted)' }}>{streak} day streak</span>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0" style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-muted)' }}>
+              <User size={16} />
+            </div>
+            <div className="flex-1">
+              <div className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Guest</div>
+              <button onClick={() => { onClose(); router.push(ROUTES.AUTH); }}
+                className="text-[11px] font-medium underline" style={{ color: 'var(--accent)' }}>
+                Sign in to save progress
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Search */}
+      <button
+        onClick={() => { onClose(); }}
+        className="mx-4 mt-3 flex items-center gap-2 px-3 py-2 rounded-xl text-xs transition-all"
+        style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-muted)' }}
+      >
+        <Search size={14} />
+        <span>Search pages & commands</span>
+        <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded" style={{ backgroundColor: 'var(--bg-elevated)', color: 'var(--text-muted)' }}>Ctrl+K</span>
+      </button>
+
+      {/* Nav */}
+      <nav className="flex-1 overflow-y-auto px-3 pt-3 pb-2 scrollbar-thin">
+        {navItems.map((item) => (
+          <button
+            key={item.label}
+            onClick={() => { onClose(); router.push(item.href); }}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all mb-0.5"
+            style={{
+              backgroundColor: currentPath.startsWith(item.href) ? 'var(--accent-10)' : 'transparent',
+              color: currentPath.startsWith(item.href) ? 'var(--accent)' : 'var(--text-secondary)',
+            }}
+          >
+            <item.icon size={18} />
+            {item.label}
+          </button>
+        ))}
+      </nav>
+
+      {/* Theme & Accent */}
+      <div className="px-4 py-3 shrink-0" style={{ borderTop: '1px solid var(--border-subtle)' }}>
+        <div className="flex gap-1 mb-3">
+          {THEME_OPTIONS.map((opt) => {
+            const Icon = opt.icon;
+            const isActive = currentTheme === opt.id;
+            return (
+              <button key={opt.id} onClick={() => handleThemeChange(opt.id)}
+                className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-[10px] font-semibold transition-all"
+                style={{
+                  backgroundColor: isActive ? 'var(--accent-10)' : 'var(--bg-tertiary)',
+                  color: isActive ? 'var(--accent)' : 'var(--text-muted)',
+                  border: isActive ? '1px solid var(--accent-20)' : '1px solid transparent',
+                }}
+              >
+                <Icon size={12} /> {opt.label}
+              </button>
+            );
+          })}
+        </div>
+        <div className="flex gap-2 justify-center">
+          {ACCENTS.map((a) => (
+            <button key={a} onClick={() => handleAccentChange(a)}
+              className="w-5 h-5 rounded-full transition-transform active:scale-75"
+              style={{
+                backgroundColor: 
+                  a === 'emerald' ? '#10b981' :
+                  a === 'blue' ? '#3b82f6' :
+                  a === 'purple' ? '#8b5cf6' :
+                  a === 'orange' ? '#f97316' :
+                  a === 'red' ? '#ef4444' :
+                  a === 'pink' ? '#ec4899' : '#06b6d4',
+                border: '2px solid transparent',
+                outline: a === currentAccent ? '2px solid var(--accent)' : 'none',
+                outlineOffset: '2px',
+              }}
+              aria-label={a}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="px-4 py-3 shrink-0" style={{ borderTop: '1px solid var(--border-subtle)' }}>
+        <button onClick={() => { onClose(); router.push(ROUTES.SETTINGS); }}
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all"
+          style={{ color: 'var(--text-secondary)' }}>
+          <Settings size={18} /> Settings
+        </button>
+        {isAuthenticated ? (
+          <button onClick={() => { onClose(); logout(); }}
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all"
+            style={{ color: 'var(--text-muted)' }}>
+            <LogOut size={18} /> Log out
+          </button>
+        ) : (
+          <button onClick={() => { onClose(); router.push(ROUTES.AUTH); }}
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all"
+            style={{ color: 'var(--accent)' }}>
+            <User size={18} /> Sign in / Register
+          </button>
+        )}
+      </div>
+    </motion.aside>
+  );
+}
+
+function FloatingActionButton() {
+  const router = useRouter();
+  const [isOpen, setIsOpen] = useState(false);
+
+  const actions = [
+    { icon: Bot, label: 'New Chat', href: ROUTES.MENTOR, desc: 'Talk to your AI mentor' },
+    { icon: FileText, label: 'Resume Builder', href: ROUTES.RESUME_BUILDER, desc: 'Build or edit resume' },
+    { icon: Compass, label: 'Career Roadmap', href: ROUTES.CAREER, desc: 'Explore career paths' },
+    { icon: Briefcase, label: 'Interview Prep', href: ROUTES.INTERVIEW_PREP, desc: 'Practice interviews' },
+    { icon: ScanSearch, label: 'OCR Scanner', href: ROUTES.OCR, desc: 'Scan documents' },
+    { icon: Languages, label: 'Translator', href: ROUTES.TRANSLATOR, desc: 'Translate text' },
+  ];
+
+  return (
+    <>
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsOpen(false)}
+              className="fixed inset-0 z-30"
+            />
+            <motion.div
+              initial={{ opacity: 0, y: 48, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 48, scale: 0.9 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+              className="fixed bottom-24 right-4 z-40 w-56 overflow-hidden rounded-2xl shadow-2xl"
+              style={{ backgroundColor: 'var(--bg-elevated)', border: '1px solid var(--border-default)' }}
+            >
+              <div className="px-3 py-2 text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Quick Actions</div>
+              {actions.map((action) => (
+                <button
+                  key={action.label}
+                  onClick={() => { setIsOpen(false); router.push(action.href); }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium transition-all hover:opacity-80"
+                  style={{ color: 'var(--text-primary)' }}
+                >
+                  <div className="p-1.5 rounded-lg" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
+                    <action.icon size={14} style={{ color: 'var(--accent)' }} />
+                  </div>
+                  <div className="text-left">
+                    <div>{action.label}</div>
+                    <div className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{action.desc}</div>
+                  </div>
+                </button>
+              ))}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="fixed bottom-6 right-5 z-30 w-12 h-12 rounded-full flex items-center justify-center shadow-xl transition-all active:scale-90"
+        style={{ backgroundColor: 'var(--accent)', color: 'white' }}
+      >
+        <motion.div animate={{ rotate: isOpen ? 45 : 0 }} transition={{ duration: 0.2 }}>
+          <Plus size={22} />
+        </motion.div>
+      </button>
+    </>
+  );
+}
+
+export default function MobileShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const { user, isAuthenticated, isGuest } = useAuth();
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const activeTab = getActiveTab(pathname);
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const closeDrawer = useCallback(() => setDrawerOpen(false), []);
+  const openDrawer = useCallback(() => setDrawerOpen(true), []);
+
+  useEffect(() => {
+    closeDrawer();
+  }, [pathname, closeDrawer]);
+
+  const canShowShell = isAuthenticated || isGuest;
+  if (!canShowShell) return <>{children}</>;
+
+  const initial = user?.fullName?.charAt(0)?.toUpperCase() || user?.username?.charAt(0)?.toUpperCase() || 'G';
+
+  return (
+    <div className="flex flex-col h-screen" style={{ backgroundColor: 'var(--bg-primary)' }}>
+      {/* Top App Bar */}
+      <header className="flex items-center justify-between h-12 px-3 shrink-0 z-20" style={{ backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-subtle)' }}>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={openDrawer}
+            className="p-1.5 -ml-1 rounded-lg transition-all active:scale-90"
+            style={{ color: 'var(--text-primary)' }}
+            aria-label="Open navigation menu"
+          >
+            <Menu size={20} />
+          </button>
+          <Logo size={18} showText textSize="text-sm" />
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => router.push(ROUTES.PROFILE)}
+            className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 transition-all active:scale-90"
+            style={{ backgroundColor: 'var(--accent-20)', color: 'var(--accent)' }}
+            aria-label="Profile"
+          >
+            {initial}
+          </button>
+        </div>
+      </header>
+
+      {/* Sticky Tab Bar */}
+      <div className="shrink-0 z-10" style={{ backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-subtle)' }}>
+        <div ref={scrollRef} className="flex overflow-x-auto scrollbar-thin gap-1 px-2" style={{ WebkitOverflowScrolling: 'touch' }}>
+          {TABS.map((tab, i) => (
+            <button
+              key={tab.label}
+              ref={(el) => { tabRefs.current[i] = el; }}
+              onClick={() => router.push(tab.href)}
+              className="flex items-center gap-1.5 px-3 py-2.5 text-xs font-semibold whitespace-nowrap transition-all relative"
+              style={{
+                color: activeTab === i ? 'var(--accent)' : 'var(--text-tertiary)',
+                borderBottom: activeTab === i ? '2px solid var(--accent)' : '2px solid transparent',
+                marginBottom: '-1px',
+              }}
+            >
+              <tab.icon size={14} />
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Page Content */}
+      <main className="flex-1 overflow-y-auto safe-area-bottom">
+        {children}
+      </main>
+
+      {/* Drawer */}
+      <AnimatePresence>
+        {drawerOpen && (
+          <>
+            <DrawerOverlay onClose={closeDrawer} />
+            <DrawerPanel isOpen={drawerOpen} onClose={closeDrawer} />
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* FAB */}
+      <FloatingActionButton />
+    </div>
   );
 }
