@@ -106,6 +106,16 @@ VidyGuideAI solves this with an **all-in-one AI-powered career platform** that a
         <br/><sub><strong>Settings</strong> — Theme, accent, AI model config</sub>
       </td>
     </tr>
+    <tr>
+      <td width="50%" align="center">
+        <img src="assets/screenshots/ai-mentor-mobile.jpeg" alt="AI Mentor Mobile" width="100%" style="border-radius: 12px; border: 1px solid #1e293b;" />
+        <br/><sub><strong>AI Mentor (Mobile)</strong> — Responsive chat interface</sub>
+      </td>
+      <td width="50%" align="center">
+        <img src="assets/screenshots/history.jpg" alt="History" width="100%" style="border-radius: 12px; border: 1px solid #1e293b;" />
+        <br/><sub><strong>History</strong> — Activity and conversation log</sub>
+      </td>
+    </tr>
   </table>
 </div>
 
