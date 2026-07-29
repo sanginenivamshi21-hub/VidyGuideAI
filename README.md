@@ -4,9 +4,15 @@
 
 # VidyGuideAI
 
+<br/>
+
 ### Your AI-Powered Career Companion
 
-**AI Mentor · Resume Builder · Career Roadmaps · Interview Preparation · Resume Review**
+**AI Mentor** · **Resume Builder** · **Career Roadmaps** · **Interview Preparation** · **Resume Review**
+
+<br/>
+
+---
 
 <br/>
 
@@ -24,11 +30,10 @@
 
 <br/>
 
-[**Live Demo**](https://vidyguide.is-a.dev) ·
-[**Documentation**](docs/ARCHITECTURE.md) ·
-[**API Reference**](docs/API.md) ·
-[**Contributing**](CONTRIBUTING.md) ·
-[**Security**](SECURITY.md)
+[📖 **Documentation**](docs/ARCHITECTURE.md) ·
+[🔌 **API Reference**](docs/API.md) ·
+[🤝 **Contributing**](CONTRIBUTING.md) ·
+[🔒 **Security**](SECURITY.md)
 
 <br/>
 
@@ -36,7 +41,7 @@
 
 <br/>
 
-**Build your career with AI.**
+*Build your career with AI.*
 
 </div>
 
