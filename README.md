@@ -2,19 +2,11 @@
 
 <br/>
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/images/logo.jpeg">
-  <img src="assets/images/logo.jpeg" alt="VidyGuideAI Logo" width="120" height="120" style="border-radius: 20px;">
-</picture>
-
-<br/>
-<br/>
-
 # VidyGuideAI
 
 ### Your AI-Powered Career Companion
 
-**AI Mentor · Resume Builder · Career Roadmaps · Interview Prep · Skill Gap Analysis**
+**AI Mentor · Resume Builder · Career Roadmaps · Interview Preparation · Resume Review**
 
 <br/>
 
