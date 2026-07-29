@@ -1,17 +1,34 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import Sidebar from '../components/Sidebar';
 import ThemeInit from '../components/ThemeInit';
 import { AuthProvider } from '../hooks/useAuth';
-import MobileShell from '../components/mobile/MobileShell';
-import SoftAurora from '../components/SoftAuroraWrapper';
+import AppShell from '../components/AppShell';
 
 const inter = Inter({ subsets: ['latin'] });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://vidyguideai.com';
+
 export const metadata: Metadata = {
-  title: 'VidyGuideAI - Production SaaS',
-  description: 'AI-powered localized career counseling platform',
+  title: { default: 'VidyGuideAI - AI Career Platform for Students', template: '%s | VidyGuideAI' },
+  description: 'Build ATS-compatible resumes, practice interviews, get personalized career guidance, and chat with an AI mentor — all in one place. In your language.',
+  keywords: ['AI career platform', 'resume builder', 'interview prep', 'career guidance', 'ATS resume', 'AI mentor', 'job preparation', 'India careers'],
+  openGraph: {
+    title: 'VidyGuideAI - AI Career Platform for Students',
+    description: 'Build ATS-compatible resumes, practice interviews, get personalized career guidance, and chat with an AI mentor.',
+    url: siteUrl,
+    siteName: 'VidyGuideAI',
+    locale: 'en_IN',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'VidyGuideAI - AI Career Platform for Students',
+    description: 'Build ATS-compatible resumes, practice interviews, get personalized career guidance, and chat with an AI mentor.',
+  },
+  robots: { index: true, follow: true },
+  manifest: '/manifest.json',
+  icons: { icon: '/favicon.ico', apple: '/icon-192.png' },
 };
 
 export default function RootLayout({
@@ -28,19 +45,7 @@ export default function RootLayout({
       <body className={`${inter.className} min-h-full`}>
         <ThemeInit />
         <AuthProvider>
-          <div className="hidden lg:flex h-screen overflow-hidden">
-            <Sidebar />
-            <main className="flex-1 h-screen overflow-y-auto relative flex flex-col safe-area-bottom">
-              <SoftAurora speed={0.4} scale={1.2} brightness={0.8} />
-              <div className="flex-1 p-4 sm:p-6 lg:p-8 z-10 max-w-7xl mx-auto w-full">
-                {children}
-              </div>
-            </main>
-          </div>
-
-          <div className="lg:hidden">
-            <MobileShell>{children}</MobileShell>
-          </div>
+          <AppShell>{children}</AppShell>
         </AuthProvider>
       </body>
     </html>
