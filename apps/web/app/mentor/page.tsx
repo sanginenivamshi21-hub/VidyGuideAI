@@ -5,6 +5,8 @@ import { useSettings } from '@/hooks/useSettings';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { API_BASE } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
+import { useMemory } from '@/hooks/useMemory';
+import { setCache, getCache } from '@/lib/offlineCache';
 import ChatHeader from './_components/ChatHeader';
 import ChatMessages from './_components/ChatMessages';
 import ChatComposer from './_components/ChatComposer';
@@ -18,6 +20,7 @@ const MAX_FILE_SIZE = 20 * 1024 * 1024;
 export default function MentorPage() {
   const { settings, updateSettings } = useSettings();
   const { isAuthenticated } = useAuth();
+  const { getMemoryContext, updateMemory } = useMemory();
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
@@ -48,9 +51,14 @@ export default function MentorPage() {
       const res = await fetch(`${API_BASE}/conversations`, { credentials: 'include' });
       if (res.ok) {
         const data = await res.json();
-        setConversations(Array.isArray(data) ? data : []);
+        const convs = Array.isArray(data) ? data : [];
+        setConversations(convs);
+        setCache('conversations', convs, 5 * 60 * 1000);
       }
-    } catch { /* ignore */ }
+    } catch {
+      const cached = getCache<Conversation[]>('conversations');
+      if (cached) setConversations(cached);
+    }
   };
 
   const handleNewChat = useCallback(() => {
@@ -343,12 +351,16 @@ export default function MentorPage() {
       ]);
 
       try {
+        const memoryContext = getMemoryContext();
         const historyMessages = messages.map((m) => ({ role: m.role, content: m.content }));
+        const contextualizedQuestion = memoryContext
+          ? `[User context: ${memoryContext}]\n\n${fullText}`
+          : fullText;
         const res = await fetch(`${API_BASE}/mentor/stream`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            question: fullText,
+            question: contextualizedQuestion,
             reply_language: settings.language,
             temperature: settings.temperature,
             maxTokens: settings.maxTokens,

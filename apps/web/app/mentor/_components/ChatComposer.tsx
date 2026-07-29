@@ -2,7 +2,7 @@
 
 import { memo, useRef, useEffect, useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mic, Paperclip, Square, SendHorizonal, Plus } from 'lucide-react';
+import { Mic, Paperclip, Square, SendHorizonal, Plus, Camera, Images } from 'lucide-react';
 import AttachmentCard from '@/components/AttachmentCard';
 
 interface ChatComposerProps {
@@ -133,6 +133,30 @@ function ChatComposer({
           >
             <Mic size={19} />
           </button>
+
+          {/* Camera capture (mobile) */}
+          <label className="p-2 rounded-xl shrink-0 cursor-pointer transition-colors touch-manipulation sm:hidden" style={{ color: 'var(--text-tertiary)' }}>
+            <Camera size={19} />
+            <input
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={onFileSelect}
+              className="hidden"
+            />
+          </label>
+
+          {/* Gallery picker (mobile) */}
+          <label className="p-2 rounded-xl shrink-0 cursor-pointer transition-colors touch-manipulation sm:hidden" style={{ color: 'var(--text-tertiary)' }}>
+            <Images size={19} />
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={onFileSelect}
+              className="hidden"
+            />
+          </label>
 
           <label className="p-2 rounded-xl shrink-0 cursor-pointer transition-colors touch-manipulation" style={{ color: 'var(--text-tertiary)' }}>
             <Paperclip size={19} />
