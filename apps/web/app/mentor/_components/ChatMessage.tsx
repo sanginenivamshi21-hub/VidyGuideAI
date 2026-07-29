@@ -71,7 +71,10 @@ const ChatMessage = memo(function ChatMessage({
         ) : (
           <div className="text-sm leading-relaxed" style={{ color: 'var(--text-primary)' }}>
             {message.content ? (
-              <MarkdownRenderer content={message.content} />
+              <>
+                <MarkdownRenderer content={message.content} />
+                {isStreaming && <span className="streaming-cursor" />}
+              </>
             ) : sendState === 'streaming' ? (
               <div className="flex items-center gap-1.5 py-1">
                 <span className="w-2 h-2 rounded-full thinking-dot" style={{ backgroundColor: 'var(--accent)' }} />

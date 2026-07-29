@@ -65,7 +65,7 @@ function ScoreCallout({ score }: { score: ScoreSegment }) {
       </div>
       <div className="flex flex-col">
         <span className="text-xs font-bold uppercase tracking-widest">ATS Match Score</span>
-        <span className="text-[10px] text-slate-500">out of 100</span>
+        <span className="text-[10px] text-muted">out of 100</span>
       </div>
     </div>
   );
@@ -90,7 +90,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
 
     return parts.map((part, idx) => {
       if (part.startsWith('**') && part.endsWith('**')) {
-        return <strong key={idx} className="text-white font-extrabold">{part.slice(2, -2)}</strong>;
+        return <strong key={idx} className="text-primary font-extrabold">{part.slice(2, -2)}</strong>;
       }
       if (part.startsWith('`') && part.endsWith('`') && part.length > 2) {
         return <code key={idx} className="bg-slate-950 text-emerald-400 px-1.5 py-0.5 rounded font-mono text-xs border border-slate-800">{part.slice(1, -1)}</code>;
@@ -98,7 +98,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
       if (part.includes('**') || part.includes('`')) {
         return part.split(/(\*\*.*?\*\*|`.*?`)/g).map((subPart, subIdx) => {
           if (subPart.startsWith('**') && subPart.endsWith('**')) {
-            return <strong key={`sub-${idx}-${subIdx}`} className="text-white font-extrabold">{subPart.slice(2, -2)}</strong>;
+            return <strong key={`sub-${idx}-${subIdx}`} className="text-primary font-extrabold">{subPart.slice(2, -2)}</strong>;
           }
           if (subPart.startsWith('`') && subPart.endsWith('`') && subPart.length > 2) {
             return <code key={`sub-${idx}-${subIdx}`} className="bg-slate-950 text-emerald-400 px-1.5 py-0.5 rounded font-mono text-xs border border-slate-800">{subPart.slice(1, -1)}</code>;
@@ -113,7 +113,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
   const flushList = () => {
     if (currentList.length > 0) {
       renderedElements.push(
-        <ul key={`ul-${listKeyCounter++}`} className="list-disc pl-5 my-3 flex flex-col gap-1.5 text-slate-300">
+        <ul key={`ul-${listKeyCounter++}`} className="list-disc pl-5 my-3 flex flex-col gap-1.5 text-secondary">
           {currentList}
         </ul>
       );
@@ -124,7 +124,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
   const flushOrderedList = () => {
     if (currentList.length > 0) {
       renderedElements.push(
-        <ol key={`ol-${listKeyCounter++}`} className="list-decimal pl-5 my-3 flex flex-col gap-1.5 text-slate-300">
+        <ol key={`ol-${listKeyCounter++}`} className="list-decimal pl-5 my-3 flex flex-col gap-1.5 text-secondary">
           {currentList}
         </ol>
       );
@@ -138,7 +138,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
         <div key={`table-${listKeyCounter++}`} className="overflow-x-auto my-4 border border-slate-800 rounded-xl bg-slate-950/40">
           <table className="w-full text-xs text-left border-collapse">
             <thead>
-              <tr className="bg-slate-950 text-slate-400 border-b border-slate-800">
+              <tr className="bg-slate-950 text-tertiary border-b border-slate-800">
                 {tableHeaders.map((h, i) => (
                   <th key={i} className="p-3 font-bold uppercase tracking-wider text-[10px]">{h}</th>
                 ))}
@@ -148,7 +148,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
               {tableRows.map((row, i) => (
                 <tr key={i} className="border-b border-slate-800/50 hover:bg-slate-900/20">
                   {row.map((cell, j) => (
-                    <td key={j} className="p-3 text-slate-300">{parseInline(cell)}</td>
+                    <td key={j} className="p-3 text-secondary">{parseInline(cell)}</td>
                   ))}
                 </tr>
               ))}
@@ -168,17 +168,17 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
       renderedElements.push(
         <div key={`code-${listKeyCounter++}`} className="my-4 border border-slate-800 rounded-xl bg-slate-950/60 overflow-hidden">
           <div className="flex items-center justify-between px-4 py-2 border-b border-slate-800 bg-slate-900/40">
-            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{codeBlockLang || 'Code'}</span>
+            <span className="text-[10px] font-bold text-muted uppercase tracking-wider">{codeBlockLang || 'Code'}</span>
             <button
               onClick={() => {
                 navigator.clipboard.writeText(codeStr);
               }}
-              className="text-[10px] text-slate-500 hover:text-emerald-400 transition-colors font-semibold"
+              className="text-[10px] text-muted hover:text-emerald-400 transition-colors font-semibold"
             >
               Copy
             </button>
           </div>
-          <pre className="p-4 text-xs font-mono text-slate-300 leading-relaxed overflow-x-auto">
+          <pre className="p-4 text-xs font-mono text-secondary leading-relaxed overflow-x-auto">
             <code>{codeStr}</code>
           </pre>
         </div>
@@ -274,7 +274,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
             seg.type === 'score' ? (
               <ScoreCallout key={`score-${i}-${si}`} score={seg} />
             ) : (
-              <p key={`score-text-${i}-${si}`} className="my-2 text-slate-300 leading-relaxed text-sm">
+              <p key={`score-text-${i}-${si}`} className="my-2 text-secondary leading-relaxed text-sm">
                 {parseInline(seg.content)}
               </p>
             )
@@ -291,7 +291,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
       const pct = Math.min(100, Math.max(0, parseInt(progressMatch[1], 10)));
       renderedElements.push(
         <div key={`progress-${i}`} className="my-3 flex flex-col gap-1.5">
-          <div className="flex justify-between text-xs text-slate-500">
+          <div className="flex justify-between text-xs text-muted">
             <span>Progress</span>
             <span className="text-emerald-400 font-bold">{pct}%</span>
           </div>
@@ -319,7 +319,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
       flushCodeBlock();
       const cleanText = line.startsWith('## ') ? line.slice(3) : line.slice(2);
       renderedElements.push(
-        <h2 key={i} className="text-white font-extrabold text-base mt-6 mb-3 flex items-center gap-2 border-b border-slate-800 pb-2">
+        <h2 key={i} className="text-primary font-extrabold text-base mt-6 mb-3 flex items-center gap-2 border-b border-slate-800 pb-2">
           {parseInline(cleanText)}
         </h2>
       );
@@ -328,7 +328,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
     if (line.startsWith('### ')) {
       flushCodeBlock();
       renderedElements.push(
-        <h3 key={i} className="text-white font-bold text-sm mt-4 mb-2">
+        <h3 key={i} className="text-primary font-bold text-sm mt-4 mb-2">
           {parseInline(line.slice(4))}
         </h3>
       );
@@ -350,7 +350,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
     if (line !== '') {
       flushCodeBlock();
       renderedElements.push(
-        <p key={i} className="my-2 text-slate-300 leading-relaxed text-sm">
+        <p key={i} className="my-2 text-secondary leading-relaxed text-sm">
           {parseInline(line)}
         </p>
       );

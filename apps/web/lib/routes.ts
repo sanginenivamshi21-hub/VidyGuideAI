@@ -27,7 +27,7 @@ export const SIDEBAR_ITEMS = [
   { icon: 'Briefcase' as const, label: 'Interview Prep', href: ROUTES.INTERVIEW_PREP, color: 'text-violet-400' },
   { icon: 'Clock' as const, label: 'History', href: ROUTES.HISTORY, color: 'text-teal-400' },
   { icon: 'User' as const, label: 'Profile', href: ROUTES.PROFILE, color: 'text-yellow-400' },
-  { icon: 'Settings' as const, label: 'Settings', href: ROUTES.SETTINGS, color: 'text-slate-400' },
+  { icon: 'Settings' as const, label: 'Settings', href: ROUTES.SETTINGS, color: 'var(--accent)' },
 ] as const;
 
 export const DASHBOARD_CARDS = [

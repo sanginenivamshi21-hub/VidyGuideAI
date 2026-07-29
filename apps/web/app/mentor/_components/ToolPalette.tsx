@@ -94,8 +94,8 @@ export default function ToolPalette({ onResult, isOpen, onClose, onOpen }: ToolP
           >
             <div className="rounded-2xl border border-slate-800 bg-slate-900/95 backdrop-blur-xl overflow-hidden">
               <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800/50">
-                <span className="text-xs font-bold text-white">Tools</span>
-                <button onClick={onClose} className="p-1 rounded hover:bg-slate-800 text-slate-400">
+                <span className="text-xs font-bold text-primary">Tools</span>
+                <button onClick={onClose} className="p-1 rounded hover:bg-slate-800 text-tertiary">
                   <X size={14} />
                 </button>
               </div>
@@ -110,8 +110,8 @@ export default function ToolPalette({ onResult, isOpen, onClose, onOpen }: ToolP
                     >
                       <Icon size={18} className={tool.color} />
                       <div className="flex flex-col gap-0.5">
-                        <span className="text-xs font-semibold text-white">{tool.label}</span>
-                        <span className="text-[10px] text-slate-500 leading-tight">{tool.desc}</span>
+                        <span className="text-xs font-semibold text-primary">{tool.label}</span>
+                        <span className="text-[10px] text-muted leading-tight">{tool.desc}</span>
                       </div>
                     </button>
                   );
@@ -141,10 +141,10 @@ export default function ToolPalette({ onResult, isOpen, onClose, onOpen }: ToolP
               className="relative w-full sm:max-w-lg max-h-[85vh] bg-slate-900 border border-slate-800 rounded-t-2xl sm:rounded-2xl overflow-hidden flex flex-col shadow-2xl"
             >
               <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800/50 shrink-0">
-                <span className="text-sm font-bold text-white">
+                <span className="text-sm font-bold text-primary">
                   {TOOLS.find((t) => t.id === activeTool)?.label}
                 </span>
-                <button onClick={handleToolClose} className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400">
+                <button onClick={handleToolClose} className="p-1.5 rounded-lg hover:bg-slate-800 text-tertiary">
                   <X size={16} />
                 </button>
               </div>

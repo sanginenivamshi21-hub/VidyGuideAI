@@ -145,7 +145,7 @@ export default function DashboardPage() {
       )}
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
         {QUICK_ACTIONS.map((a) => (
           <Link key={a.label} href={a.href}
             className="flex flex-col items-center gap-1.5 p-3 rounded-2xl transition-all active:scale-95"

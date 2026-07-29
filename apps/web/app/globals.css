@@ -27,11 +27,15 @@
   --bg-input: #020617;
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
-  --text-tertiary: #64748b;
-  --text-muted: #475569;
+  --text-tertiary: #7b8a9c;
+  --text-muted: #64748b;
   --border-default: rgba(51, 65, 85, 0.5);
   --border-subtle: rgba(51, 65, 85, 0.3);
   --overlay: rgba(0, 0, 0, 0.5);
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #3b82f6;
 }
 
 :root.light {
@@ -44,15 +48,32 @@
   --text-primary: #0f172a;
   --text-secondary: #475569;
   --text-tertiary: #64748b;
-  --text-muted: #94a3b8;
+  --text-muted: #7b8a9c;
   --border-default: rgba(226, 232, 240, 1);
   --border-subtle: rgba(226, 232, 240, 0.5);
   --overlay: rgba(0, 0, 0, 0.3);
+  --success: #059669;
+  --warning: #d97706;
+  --danger: #dc2626;
+  --info: #2563eb;
 }
 
 @theme inline {
+  --color-primary: var(--text-primary);
+  --color-secondary: var(--text-secondary);
+  --color-tertiary: var(--text-tertiary);
+  --color-muted: var(--text-muted);
   --color-background: var(--bg-primary);
-  --color-foreground: var(--text-primary);
+  --color-surface: var(--bg-secondary);
+  --color-elevated: var(--bg-tertiary);
+  --color-card: var(--bg-card);
+  --color-input: var(--bg-input);
+  --color-border: var(--border-default);
+  --color-accent: var(--accent);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-info: var(--info);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -142,6 +163,20 @@ body {
 @keyframes thinking-pulse {
   0%, 100% { opacity: 0.5; }
   50% { opacity: 1; }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.streaming-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 1px;
+  background-color: var(--accent);
+  animation: blink 0.7s step-end infinite;
+  vertical-align: text-bottom;
 }
 
 @keyframes status-in {

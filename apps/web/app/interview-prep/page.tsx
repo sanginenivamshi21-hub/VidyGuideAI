@@ -503,22 +503,22 @@ export default function InterviewPrepPage() {
               
               <div className="grid grid-cols-2 gap-4 text-xs">
                 <div className="flex flex-col gap-1 bg-slate-950/40 border border-slate-800/80 p-3.5 rounded-xl">
-                  <span className="text-slate-500 font-semibold uppercase tracking-wider text-[9px]">Job Target Role</span>
+                  <span className="text-slate-500 font-semibold uppercase tracking-wider text-[10px]">Job Target Role</span>
                   <span className="text-slate-200 font-bold">{role}</span>
                 </div>
 
                 <div className="flex flex-col gap-1 bg-slate-950/40 border border-slate-800/80 p-3.5 rounded-xl">
-                  <span className="text-slate-500 font-semibold uppercase tracking-wider text-[9px]">Company Environment</span>
+                  <span className="text-slate-500 font-semibold uppercase tracking-wider text-[10px]">Company Environment</span>
                   <span className="text-slate-200 font-bold">{company || 'General MNC'}</span>
                 </div>
 
                 <div className="flex flex-col gap-1 bg-slate-950/40 border border-slate-800/80 p-3.5 rounded-xl">
-                  <span className="text-slate-500 font-semibold uppercase tracking-wider text-[9px]">Difficulty Scale</span>
+                  <span className="text-slate-500 font-semibold uppercase tracking-wider text-[10px]">Difficulty Scale</span>
                   <span className="text-slate-200 font-bold">{difficulty}</span>
                 </div>
 
                 <div className="flex flex-col gap-1 bg-slate-950/40 border border-slate-800/80 p-3.5 rounded-xl">
-                  <span className="text-slate-500 font-semibold uppercase tracking-wider text-[9px]">Career Level</span>
+                  <span className="text-slate-500 font-semibold uppercase tracking-wider text-[10px]">Career Level</span>
                   <span className="text-slate-200 font-bold">{experienceLevel}</span>
                 </div>
               </div>
@@ -551,17 +551,17 @@ export default function InterviewPrepPage() {
                   {/* Body question answers feedback */}
                   <div className="p-6 flex flex-col gap-4 text-xs leading-relaxed">
                     <div className="flex flex-col gap-1 bg-slate-950/20 p-3 rounded-lg border border-slate-800/50">
-                      <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500">Question Asked</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Question Asked</span>
                       <p className="text-slate-300 font-semibold">{q}</p>
                     </div>
 
                     <div className="flex flex-col gap-1 bg-slate-950/20 p-3 rounded-lg border border-slate-800/50">
-                      <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500">Your Response Answer</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Your Response Answer</span>
                       <p className="text-slate-400 italic break-words">{answers[idx]}</p>
                     </div>
 
                     <div className="flex flex-col gap-2">
-                      <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500">Recruiter Evaluation</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Recruiter Evaluation</span>
                       <div className="p-4 bg-slate-950/40 rounded-lg text-slate-200 whitespace-pre-wrap select-text break-words border border-slate-800/60 leading-normal">
                         {feedbacks[idx]?.content}
                       </div>

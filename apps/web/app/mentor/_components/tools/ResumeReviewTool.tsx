@@ -38,7 +38,7 @@ export default function ResumeReviewTool({ onComplete }: ResumeReviewToolProps) 
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-xs text-slate-400 leading-relaxed">
+      <p className="text-xs text-tertiary leading-relaxed">
         Paste your resume text below and I'll analyze it for ATS compatibility, keyword density, grammar, and provide an enhanced version.
       </p>
       <textarea
@@ -46,7 +46,7 @@ export default function ResumeReviewTool({ onComplete }: ResumeReviewToolProps) 
         onChange={(e) => setResumeText(e.target.value)}
         placeholder="Paste your resume text here..."
         rows={8}
-        className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 text-white rounded-xl p-3 outline-none text-sm transition-all resize-none placeholder:text-slate-600"
+        className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 text-primary rounded-xl p-3 outline-none text-sm transition-all resize-none placeholder:text-muted"
       />
       {error && (
         <div className="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-xs text-red-400">
@@ -57,7 +57,7 @@ export default function ResumeReviewTool({ onComplete }: ResumeReviewToolProps) 
       <button
         onClick={handleSubmit}
         disabled={loading || !resumeText.trim()}
-        className="w-full py-3 bg-indigo-500 hover:bg-indigo-600 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+        className="w-full py-3 bg-indigo-500 hover:bg-indigo-600 disabled:opacity-40 disabled:cursor-not-allowed text-primary text-sm font-bold rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2"
       >
         {loading ? (
           <><Loader2 size={16} className="animate-spin" /> Analyzing...</>

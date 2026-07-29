@@ -8,7 +8,6 @@ import Sidebar from './Sidebar';
 import MobileShell from './mobile/MobileShell';
 import SoftAurora from './SoftAuroraWrapper';
 import { ToastProvider } from './Toast';
-import Logo from './Logo';
 
 function ProfileDropdown({ onClose }: { onClose: () => void }) {
   const { user, logout } = useAuth();
@@ -61,53 +60,10 @@ function ProfileDropdown({ onClose }: { onClose: () => void }) {
   );
 }
 
-function FloatingActionButton() {
-  const router = useRouter();
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <>
-      {isOpen && (
-        <div className="fixed inset-0 z-30" onClick={() => setIsOpen(false)} />
-      )}
-      <div
-        className="fixed bottom-6 right-6 z-30 flex flex-col items-end gap-2"
-        style={{ display: isOpen ? 'flex' : 'none' }}
-      >
-        {[
-          { label: 'New Chat', href: '/mentor' },
-          { label: 'Resume Builder', href: '/resume/builder' },
-          { label: 'Interview Prep', href: '/interview-prep' },
-        ].map((a) => (
-          <button
-            key={a.label}
-            onClick={() => { setIsOpen(false); router.push(a.href); }}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold shadow-lg transition-all active:scale-95"
-            style={{ backgroundColor: 'var(--bg-elevated)', border: '1px solid var(--border-default)', color: 'var(--text-primary)' }}
-          >
-            {a.label}
-          </button>
-        ))}
-      </div>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-30 w-12 h-12 rounded-full flex items-center justify-center shadow-xl transition-all active:scale-90"
-        style={{ backgroundColor: 'var(--accent)', color: 'white', display: 'flex' }}
-      >
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-          <line x1="12" y1="5" x2="12" y2="19" />
-          <line x1="5" y1="12" x2="19" y2="12" />
-        </svg>
-      </button>
-    </>
-  );
-}
-
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, loading, user } = useAuth();
   const [profileOpen, setProfileOpen] = useState(false);
   const router = useRouter();
-  const [searchOpen, setSearchOpen] = useState(false);
 
   if (loading) return null;
 
@@ -123,11 +79,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           {/* Desktop top bar */}
           <header className="flex items-center justify-between h-11 px-4 shrink-0 z-10" style={{ backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-subtle)' }}>
             <div className="flex items-center gap-4">
-              <Logo size={16} showText textSize="text-xs" />
+              <span className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>VidyGuideAI</span>
             </div>
             <div className="flex items-center gap-2">
               <button
-                onClick={() => setSearchOpen(true)}
+                onClick={() => router.push('/search')}
                 className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs transition-all"
                 style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-muted)' }}
               >

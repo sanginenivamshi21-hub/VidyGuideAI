@@ -474,7 +474,7 @@ export default function CareerPage() {
               {showAdvanced && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 pt-4 border-t border-slate-800/80 animate-fadeIn">
                   <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">CGPA / Percentage Marks</label>
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">CGPA / Percentage Marks</label>
                     <input
                       type="text"
                       value={cgpa}
@@ -485,7 +485,7 @@ export default function CareerPage() {
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Programming Languages</label>
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Programming Languages</label>
                     <input
                       type="text"
                       value={languages}
@@ -496,7 +496,7 @@ export default function CareerPage() {
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Dream Job / Destination</label>
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Dream Job / Destination</label>
                     <input
                       type="text"
                       value={dreamJob}
@@ -507,7 +507,7 @@ export default function CareerPage() {
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Expected Salary (LPA)</label>
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Expected Salary (LPA)</label>
                     <input
                       type="text"
                       value={expectedSalary}
@@ -518,7 +518,7 @@ export default function CareerPage() {
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Target Companies</label>
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Target Companies</label>
                     <input
                       type="text"
                       value={targetCompany}
@@ -529,7 +529,7 @@ export default function CareerPage() {
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Preferred Work Country</label>
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Preferred Work Country</label>
                     <input
                       type="text"
                       value={preferredCountry}
@@ -540,7 +540,7 @@ export default function CareerPage() {
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Study Hours Per Day</label>
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Study Hours Per Day</label>
                     <input
                       type="text"
                       value={studyHours}
@@ -551,7 +551,7 @@ export default function CareerPage() {
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Timeline Period</label>
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Timeline Period</label>
                     <input
                       type="text"
                       value={timeline}
@@ -562,7 +562,7 @@ export default function CareerPage() {
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Portfolio URLs (GitHub/LinkedIn/LeetCode)</label>
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Portfolio URLs (GitHub/LinkedIn/LeetCode)</label>
                     <div className="grid grid-cols-2 gap-2">
                       <input
                         type="text"
@@ -582,7 +582,7 @@ export default function CareerPage() {
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Projects & Certifications</label>
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Projects & Certifications</label>
                     <input
                       type="text"
                       value={certificates}
@@ -595,7 +595,7 @@ export default function CareerPage() {
                   <div className="flex flex-col gap-1 sm:col-span-2">
                     <div className="grid grid-cols-2 gap-3">
                       <div className="flex flex-col gap-0.5">
-                        <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Key Strengths</label>
+                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Key Strengths</label>
                         <input
                           type="text"
                           value={strengths}
@@ -605,7 +605,7 @@ export default function CareerPage() {
                         />
                       </div>
                       <div className="flex flex-col gap-0.5">
-                        <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Weaknesses / Areas to Improve</label>
+                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Weaknesses / Areas to Improve</label>
                         <input
                           type="text"
                           value={weaknesses}
@@ -752,7 +752,7 @@ export default function CareerPage() {
                 {/* Progress metrics */}
                 <div className="flex items-center gap-3 bg-slate-900 border border-slate-800 rounded-2xl p-3 shrink-0">
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-[8px] font-bold text-slate-500 uppercase tracking-widest leading-none">Overall Progress</span>
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none">Overall Progress</span>
                     <span className="text-xs font-extrabold text-white">{roadmapProgress}% Complete</span>
                   </div>
                   <div className="w-16 h-1.5 bg-slate-950 border border-slate-800 rounded-full overflow-hidden shrink-0">
@@ -770,7 +770,7 @@ export default function CareerPage() {
                   const isCompleted = completedMilestones.includes(idx);
                   return (
                     <div key={idx} className="flex items-center shrink-0">
-                      <div className={`w-[240px] bg-slate-900/60 border rounded-2xl p-5 flex flex-col justify-between gap-4 relative transition-all duration-200 ${
+                      <div className={`w-[200px] sm:w-[240px] bg-slate-900/60 border rounded-2xl p-5 flex flex-col justify-between gap-4 relative transition-all duration-200 ${
                         isCompleted 
                           ? 'border-emerald-500/50 bg-emerald-500/[0.02] shadow-lg shadow-emerald-500/[0.02]' 
                           : 'border-slate-800 hover:border-slate-700 shadow-inner'
@@ -779,7 +779,7 @@ export default function CareerPage() {
                         {/* Top bar with label and checkmark */}
                         <div className="flex justify-between items-center">
                           <div
-                            className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border"
+                            className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border"
                             style={{ 
                               backgroundColor: isCompleted ? 'rgba(16, 185, 129, 0.1)' : `${m.color}15`, 
                               color: isCompleted ? '#34d399' : m.color, 
@@ -813,7 +813,7 @@ export default function CareerPage() {
                         </div>
 
                         {/* Expandable Resource checkpoint info */}
-                        <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[9px] font-semibold text-slate-500 uppercase">
+                        <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] font-semibold text-slate-500 uppercase">
                           <span>Timeline Stage</span>
                           <span className={isCompleted ? 'text-emerald-400' : 'text-slate-400'}>
                             {isCompleted ? 'Completed' : 'Action Pending'}

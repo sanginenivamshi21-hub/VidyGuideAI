@@ -95,7 +95,7 @@ export default function ConversationDrawer({
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 250 }}
-            className="fixed left-0 top-0 bottom-0 w-72 z-50 flex flex-col"
+            className="fixed left-0 top-0 bottom-0 w-[280px] max-w-[85vw] z-50 flex flex-col"
             style={{ backgroundColor: 'var(--bg-primary)', borderRight: '1px solid var(--border-default)' }}
           >
             <div className="flex items-center justify-between px-4 py-3.5 shrink-0" style={{ borderBottom: '1px solid var(--border-default)' }}>

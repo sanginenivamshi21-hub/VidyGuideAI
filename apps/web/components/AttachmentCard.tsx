@@ -32,7 +32,7 @@ export default function AttachmentCard({ file, index, onRemove, uploading, previ
     if (isDoc) return <FileText size={20} className="text-blue-500" />;
     if (isCode) return <File size={20} className="text-emerald-400" />;
     if (isCsv) return <FileText size={20} className="text-green-400" />;
-    return <File size={20} className="text-slate-400" />;
+    return <File size={20} className="text-tertiary" />;
   };
 
   return (
@@ -49,14 +49,14 @@ export default function AttachmentCard({ file, index, onRemove, uploading, previ
         </div>
       )}
       <div className="flex flex-col min-w-0 max-w-[160px]">
-        <span className="text-xs text-slate-200 truncate font-medium">{file.name}</span>
-        <span className="text-[10px] text-slate-500">{formatSize(file.size)}</span>
+        <span className="text-xs text-primary truncate font-medium">{file.name}</span>
+        <span className="text-[10px] text-muted">{formatSize(file.size)}</span>
       </div>
       {uploading && (
         <Loader2 size={14} className="animate-spin text-emerald-400 ml-1" />
       )}
       <button onClick={() => onRemove(index)}
-        className="p-0.5 rounded hover:bg-slate-700 text-slate-500 hover:text-red-400 transition-all ml-1">
+        className="p-0.5 rounded hover:bg-slate-700 text-muted hover:text-red-400 transition-all ml-1">
         <X size={12} />
       </button>
     </div>

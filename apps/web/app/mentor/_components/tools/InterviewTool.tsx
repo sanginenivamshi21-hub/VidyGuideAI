@@ -49,38 +49,38 @@ export default function InterviewTool({ onComplete }: InterviewToolProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-xs text-slate-400 leading-relaxed">
+      <p className="text-xs text-tertiary leading-relaxed">
         Configure your interview practice session. I'll generate realistic questions based on your target role.
       </p>
       <div className="flex flex-col gap-2">
-        <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Target Role</label>
+        <label className="text-[10px] font-semibold text-muted uppercase tracking-wider">Target Role</label>
         <input
           value={role}
           onChange={(e) => setRole(e.target.value)}
           placeholder="e.g., Software Engineer, Data Analyst"
-          className="w-full bg-slate-950 border border-slate-800 focus:border-violet-500 text-white rounded-xl p-3 outline-none text-sm transition-all placeholder:text-slate-600"
+          className="w-full bg-slate-950 border border-slate-800 focus:border-violet-500 text-primary rounded-xl p-3 outline-none text-sm transition-all placeholder:text-muted"
         />
       </div>
       <div className="flex flex-col gap-2">
-        <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Target Company (optional)</label>
+        <label className="text-[10px] font-semibold text-muted uppercase tracking-wider">Target Company (optional)</label>
         <input
           value={company}
           onChange={(e) => setCompany(e.target.value)}
           placeholder="e.g., Google, TCS, Microsoft"
-          className="w-full bg-slate-950 border border-slate-800 focus:border-violet-500 text-white rounded-xl p-3 outline-none text-sm transition-all placeholder:text-slate-600"
+          className="w-full bg-slate-950 border border-slate-800 focus:border-violet-500 text-primary rounded-xl p-3 outline-none text-sm transition-all placeholder:text-muted"
         />
       </div>
       <div className="flex flex-col gap-2">
-        <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Key Skills</label>
+        <label className="text-[10px] font-semibold text-muted uppercase tracking-wider">Key Skills</label>
         <input
           value={skills}
           onChange={(e) => setSkills(e.target.value)}
           placeholder="e.g., React, Python, SQL, System Design"
-          className="w-full bg-slate-950 border border-slate-800 focus:border-violet-500 text-white rounded-xl p-3 outline-none text-sm transition-all placeholder:text-slate-600"
+          className="w-full bg-slate-950 border border-slate-800 focus:border-violet-500 text-primary rounded-xl p-3 outline-none text-sm transition-all placeholder:text-muted"
         />
       </div>
       <div className="flex flex-col gap-2">
-        <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Difficulty</label>
+        <label className="text-[10px] font-semibold text-muted uppercase tracking-wider">Difficulty</label>
         <div className="flex gap-2">
           {['Easy', 'Medium', 'Hard'].map((d) => (
             <button
@@ -89,7 +89,7 @@ export default function InterviewTool({ onComplete }: InterviewToolProps) {
               className={`flex-1 py-2 rounded-xl text-xs font-semibold transition-all border ${
                 difficulty === d
                   ? 'bg-violet-500/20 border-violet-500/40 text-violet-300'
-                  : 'bg-slate-950 border-slate-800 text-slate-500 hover:text-slate-300'
+                  : 'bg-slate-950 border-slate-800 text-muted hover:text-secondary'
               }`}
             >
               {d}
@@ -106,7 +106,7 @@ export default function InterviewTool({ onComplete }: InterviewToolProps) {
       <button
         onClick={handleSubmit}
         disabled={loading || !role.trim() || !skills.trim()}
-        className="w-full py-3 bg-violet-500 hover:bg-violet-600 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+        className="w-full py-3 bg-violet-500 hover:bg-violet-600 disabled:opacity-40 disabled:cursor-not-allowed text-primary text-sm font-bold rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2"
       >
         {loading ? (
           <><Loader2 size={16} className="animate-spin" /> Generating Questions...</>

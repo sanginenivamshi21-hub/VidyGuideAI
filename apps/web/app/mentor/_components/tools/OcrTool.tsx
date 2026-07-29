@@ -45,7 +45,7 @@ export default function OcrTool({ onComplete }: OcrToolProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-xs text-slate-400 leading-relaxed">
+      <p className="text-xs text-tertiary leading-relaxed">
         Upload a scanned resume, document, or image. I'll extract the text using OCR.
       </p>
       <div
@@ -59,18 +59,18 @@ export default function OcrTool({ onComplete }: OcrToolProps) {
           onChange={handleFileChange}
           className="hidden"
         />
-        <div className="p-3 bg-slate-900 border border-slate-800 rounded-full text-slate-400">
+        <div className="p-3 bg-slate-900 border border-slate-800 rounded-full text-tertiary">
           {loading ? <Loader2 className="animate-spin" size={24} /> : <ScanLine size={24} />}
         </div>
         <div className="text-center">
-          <p className="text-sm font-semibold text-white">{file ? file.name : 'Tap to select file'}</p>
-          <p className="text-xs text-slate-500 mt-0.5">PDF, JPG, PNG, WebP</p>
+          <p className="text-sm font-semibold text-primary">{file ? file.name : 'Tap to select file'}</p>
+          <p className="text-xs text-muted mt-0.5">PDF, JPG, PNG, WebP</p>
         </div>
       </div>
       {file && !loading && (
         <div className="flex items-center gap-2 px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl">
-          <span className="flex-1 text-xs text-slate-400 truncate">{file.name}</span>
-          <button onClick={() => setFile(null)} className="p-1 rounded hover:bg-slate-800 text-slate-500 hover:text-red-400">
+          <span className="flex-1 text-xs text-tertiary truncate">{file.name}</span>
+          <button onClick={() => setFile(null)} className="p-1 rounded hover:bg-slate-800 text-muted hover:text-red-400">
             <Trash2 size={14} />
           </button>
         </div>
@@ -84,7 +84,7 @@ export default function OcrTool({ onComplete }: OcrToolProps) {
       <button
         onClick={handleSubmit}
         disabled={loading || !file}
-        className="w-full py-3 bg-amber-500 hover:bg-amber-600 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+        className="w-full py-3 bg-amber-500 hover:bg-amber-600 disabled:opacity-40 disabled:cursor-not-allowed text-primary text-sm font-bold rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2"
       >
         {loading ? (
           <><Loader2 size={16} className="animate-spin" /> Scanning...</>
