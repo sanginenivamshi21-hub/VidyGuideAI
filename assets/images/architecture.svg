@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" fill="none">
+  <defs>
+    <linearGradient id="web" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0f172a"/><stop offset="100%" stop-color="#1e293b"/></linearGradient>
+    <linearGradient id="api" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1e293b"/><stop offset="100%" stop-color="#0f172a"/></linearGradient>
+    <linearGradient id="ai" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#065f46"/><stop offset="100%" stop-color="#047857"/></linearGradient>
+    <linearGradient id="db" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1e3a5f"/><stop offset="100%" stop-color="#1e40af"/></linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="900" height="620" rx="16" fill="#0f172a"/>
+  <rect width="900" height="620" rx="16" stroke="#1e293b" stroke-width="2"/>
+
+  <!-- Title -->
+  <text x="450" y="40" text-anchor="middle" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="18" font-weight="700">VidyGuideAI — Architecture</text>
+
+  <!-- Layer 1: Frontend -->
+  <rect x="50" y="65" width="800" height="110" rx="12" fill="url(#web)" stroke="#334155" stroke-width="1.5"/>
+  <text x="70" y="95" fill="#94a3b8" font-family="monospace" font-size="10" font-weight="700" letter-spacing="2">LAYER 1</text>
+  <text x="70" y="120" fill="#f8fafc" font-family="system-ui" font-size="15" font-weight="700">Next.js 15 Frontend</text>
+  <text x="70" y="142" fill="#64748b" font-family="system-ui" font-size="11">React 19 · Tailwind CSS 4 · Framer Motion · Lucide Icons · OGL (WebGL)</text>
+  <text x="450" y="120" text-anchor="middle" fill="#94a3b8" font-family="monospace" font-size="10">App Router · SSR · Streaming · PWA</text>
+
+  <!-- Arrow 1 -->
+  <line x1="450" y1="175" x2="450" y2="215" stroke="#334155" stroke-width="2"/>
+  <polygon points="450,220 444,210 456,210" fill="#334155"/>
+  <text x="465" y="200" fill="#64748b" font-family="monospace" font-size="9">HTTP/JSON · credentials: include</text>
+
+  <!-- Layer 2: API -->
+  <rect x="50" y="225" width="800" height="130" rx="12" fill="url(#api)" stroke="#334155" stroke-width="1.5"/>
+  <text x="70" y="255" fill="#94a3b8" font-family="monospace" font-size="10" font-weight="700" letter-spacing="2">LAYER 2</text>
+  <text x="70" y="280" fill="#f8fafc" font-family="system-ui" font-size="15" font-weight="700">NestJS 11 API Gateway</text>
+  <text x="70" y="302" fill="#64748b" font-family="system-ui" font-size="11">Helmet · CORS · Rate Limiting · JWT Auth · Validation</text>
+  <line x1="70" y1="315" x2="830" y2="315" stroke="#1e293b" stroke-width="1"/>
+  <text x="70" y="338" fill="#94a3b8" font-family="monospace" font-size="10">Auth</text>
+  <text x="120" y="338" fill="#94a3b8" font-family="monospace" font-size="10">Career</text>
+  <text x="175" y="338" fill="#94a3b8" font-family="monospace" font-size="10">Resume</text>
+  <text x="235" y="338" fill="#94a3b8" font-family="monospace" font-size="10">Mentor</text>
+  <text x="290" y="338" fill="#94a3b8" font-family="monospace" font-size="10">OCR</text>
+  <text x="330" y="338" fill="#94a3b8" font-family="monospace" font-size="10">Translator</text>
+  <text x="400" y="338" fill="#94a3b8" font-family="monospace" font-size="10">Conversations</text>
+  <text x="490" y="338" fill="#94a3b8" font-family="monospace" font-size="10">History</text>
+  <text x="550" y="338" fill="#94a3b8" font-family="monospace" font-size="10">Users</text>
+  <text x="600" y="338" fill="#94a3b8" font-family="monospace" font-size="10">Settings</text>
+
+  <!-- Arrow 2 (left) -->
+  <line x1="200" y1="355" x2="200" y2="415" stroke="#334155" stroke-width="2"/>
+  <polygon points="200,420 194,410 206,410" fill="#334155"/>
+
+  <!-- Arrow 2 (right) -->
+  <line x1="650" y1="355" x2="650" y2="415" stroke="#334155" stroke-width="2"/>
+  <polygon points="650,420 644,410 656,410" fill="#334155"/>
+
+  <text x="200" y="393" text-anchor="middle" fill="#64748b" font-family="monospace" font-size="9">Prisma ORM</text>
+  <text x="650" y="393" text-anchor="middle" fill="#64748b" font-family="monospace" font-size="9">HTTP / SDK</text>
+
+  <!-- Layer 3: Database -->
+  <rect x="50" y="425" width="350" height="90" rx="12" fill="url(#db)" stroke="#1e40af" stroke-width="1.5"/>
+  <text x="70" y="450" fill="#60a5fa" font-family="monospace" font-size="10" font-weight="700" letter-spacing="2">LAYER 3A</text>
+  <text x="70" y="470" fill="#f8fafc" font-family="system-ui" font-size="14" font-weight="700">PostgreSQL 16</text>
+  <text x="70" y="490" fill="#93c5fd" font-family="system-ui" font-size="11">Neon Serverless · Prisma Migrations</text>
+  <text x="70" y="505" fill="#64748b" font-family="monospace" font-size="9">Users · Conversations · Resumes · Settings · History</text>
+
+  <!-- Layer 3: AI Providers -->
+  <rect x="500" y="425" width="350" height="90" rx="12" fill="url(#ai)" stroke="#047857" stroke-width="1.5"/>
+  <text x="520" y="450" fill="#6ee7b7" font-family="monospace" font-size="10" font-weight="700" letter-spacing="2">LAYER 3B</text>
+  <text x="520" y="470" fill="#f8fafc" font-family="system-ui" font-size="14" font-weight="700">AI Provider Factory</text>
+  <text x="520" y="490" fill="#a7f3d0" font-family="system-ui" font-size="11">Automatic Fallback · Streaming · Memory</text>
+  <text x="520" y="505" fill="#6ee7b7" font-family="monospace" font-size="10">Groq (LLaMA 3) → Gemini 1.5 → OpenRouter</text>
+
+  <!-- Layer 4: Extras -->
+  <rect x="50" y="535" width="800" height="60" rx="12" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+  <text x="100" y="560" fill="#94a3b8" font-family="system-ui" font-size="11">Resend API (Email)</text>
+  <text x="250" y="560" fill="#94a3b8" font-family="system-ui" font-size="11">Cloudinary (Files)</text>
+  <text x="400" y="560" fill="#94a3b8" font-family="system-ui" font-size="11">EasyOCR + Tesseract</text>
+  <text x="570" y="560" fill="#94a3b8" font-family="system-ui" font-size="11">ReportLab (PDF)</text>
+  <text x="700" y="560" fill="#94a3b8" font-family="system-ui" font-size="11">Redis (Cache)</text>
+</svg>
