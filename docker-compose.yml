@@ -30,8 +30,9 @@ services:
       - REDIS_URL=redis://redis:6379
       - JWT_SECRET=development-secret-key-token-generation
       - GROQ_API_KEY=${GROQ_API_KEY}
-      - RESEND_API_KEY=${RESEND_API_KEY}
-      - RESEND_FROM_EMAIL=${RESEND_FROM_EMAIL}
+      - BREVO_API_KEY=${BREVO_API_KEY}
+      - BREVO_SENDER_EMAIL=${BREVO_SENDER_EMAIL}
+      - BREVO_SENDER_NAME=${BREVO_SENDER_NAME}
     ports:
       - "8000:8000"
     depends_on:

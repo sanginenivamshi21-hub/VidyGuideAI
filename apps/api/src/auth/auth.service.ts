@@ -207,10 +207,9 @@ export class AuthService {
         });
         this.logger.log(`[RESEND_OTP] New OTP stored (hashed) for email: ${emailLower}`);
 
-        const emailSent = await this.mailService.sendOtp(
-            emailLower,
-            otp,
-        );
+        const emailSent = purpose === 'reset_password'
+            ? await this.mailService.sendPasswordReset(emailLower, otp)
+            : await this.mailService.sendOtp(emailLower, otp);
 
         if (!emailSent) {
             this.logger.error(`[RESEND_OTP] FAILED to send OTP email to: ${emailLower}`);

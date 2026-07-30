@@ -53,7 +53,7 @@ const PASSWORD_RESET_TEMPLATE = (otp: string) => `<!DOCTYPE html>
           <tr>
             <td style="background:linear-gradient(135deg,#f59e0b,#d97706);padding:32px;text-align:center">
               <h1 style="margin:0;color:#ffffff;font-size:24px;font-weight:700;letter-spacing:-0.5px">VidyGuideAI</h1>
-              <p style="margin:8px 0 0;#fde68a;font-size:14px">Password reset request</p>
+              <p style="margin:8px 0 0;color:#fde68a;font-size:14px">Password reset request</p>
             </td>
           </tr>
           <tr>
