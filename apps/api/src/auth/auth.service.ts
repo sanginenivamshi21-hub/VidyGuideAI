@@ -71,7 +71,10 @@ export class AuthService {
 
         if (!emailSent) {
             this.logger.error(`[REGISTER] FAILED to send OTP email to: ${email}`);
-            await this.prisma.user.delete({ where: { id: user.id } }).catch(() => {});
+            await this.prisma.$transaction([
+                this.prisma.oTP.deleteMany({ where: { email, purpose: 'register', isUsed: false } }),
+                this.prisma.user.delete({ where: { id: user.id } }),
+            ]).catch(() => {});
             throw new BadRequestException('Unable to send verification email. Email service is unavailable. Please try again later.');
         }
 
@@ -133,9 +136,7 @@ export class AuthService {
 
             if (!emailSent) {
                 this.logger.error(`[LOGIN] FAILED to send OTP email to: ${email}`);
-                return {
-                    message: 'Unable to send verification email. Email service is unavailable. Please try again later.',
-                };
+                throw new BadRequestException('Unable to send verification email. Email service is unavailable. Please try again later.');
             }
 
             return {
@@ -150,7 +151,7 @@ export class AuthService {
         }
 
         this.logger.log(`[LOGIN] User verified, issuing tokens for: ${email}`);
-        return { tokens: this._issueTokens(user) };
+        return { tokens: await this._issueTokens(user) };
     }
 
     async resendOtp(email: string, purpose: string, password?: string) {
@@ -256,15 +257,14 @@ export class AuthService {
 
         let matchedRecord: typeof otpRecords[0] | null = null;
         for (const record of otpRecords) {
-            let isValid = false;
             try {
-                isValid = await bcrypt.compare(code, record.code);
+                const isValid = await bcrypt.compare(code, record.code);
+                if (isValid) {
+                    matchedRecord = record;
+                    break;
+                }
             } catch {
-                isValid = code === record.code;
-            }
-            if (isValid) {
-                matchedRecord = record;
-                break;
+                continue;
             }
         }
 
@@ -280,17 +280,14 @@ export class AuthService {
         this.logger.log(`[VERIFY_OTP] OTP marked as used for email: ${emailLower}`);
 
         if (purpose === 'register' || purpose === 'login') {
-            await this.prisma.user.update({
-                where: { email: emailLower },
-                data: { isVerified: true },
-            });
-            this.logger.log(`[VERIFY_OTP] User verified for email: ${emailLower}`);
-
-            const user = await this.prisma.user.findUnique({
-                where: { email: emailLower },
-            });
+            const [user] = await this.prisma.$transaction([
+                this.prisma.user.update({
+                    where: { email: emailLower },
+                    data: { isVerified: true, lastLogin: new Date() },
+                }),
+            ]);
             if (user) {
-                const tokens = this._issueTokens(user);
+                const tokens = await this._issueTokens(user);
                 const msg = purpose === 'register'
                     ? 'Registration verified. You are now logged in.'
                     : 'Login verified. You are now logged in.';
@@ -318,9 +315,7 @@ export class AuthService {
 
         let payload: any;
         try {
-            payload = this.jwtService.verify(refreshToken, {
-                secret: process.env.JWT_SECRET || 'fallback-secret-key-development',
-            });
+            payload = this.jwtService.verify(refreshToken);
         } catch {
             throw new UnauthorizedException('Invalid or expired refresh token. Please log in again.');
         }
@@ -342,7 +337,7 @@ export class AuthService {
 
         await this.prisma.session.delete({ where: { id: session.id } }).catch(() => {});
 
-        const newTokens = this._issueTokens(user);
+        const newTokens = await this._issueTokens(user);
         this.logger.log(`[REFRESH] Tokens refreshed for user: ${user.email}`);
 
         return newTokens;
@@ -350,9 +345,7 @@ export class AuthService {
 
     async invalidateSession(refreshToken: string) {
         try {
-            const payload = this.jwtService.verify(refreshToken, {
-                secret: process.env.JWT_SECRET || 'fallback-secret-key-development',
-            });
+            const payload = this.jwtService.verify(refreshToken);
             await this.prisma.session.deleteMany({
                 where: { token: refreshToken, userId: payload.sub },
             });
@@ -433,15 +426,14 @@ export class AuthService {
 
         let matchedRecord: typeof otpRecords[0] | null = null;
         for (const record of otpRecords) {
-            let isValid = false;
             try {
-                isValid = await bcrypt.compare(code, record.code);
+                const isValid = await bcrypt.compare(code, record.code);
+                if (isValid) {
+                    matchedRecord = record;
+                    break;
+                }
             } catch {
-                isValid = code === record.code;
-            }
-            if (isValid) {
-                matchedRecord = record;
-                break;
+                continue;
             }
         }
 
@@ -473,7 +465,7 @@ export class AuthService {
         return Math.floor(100000 + Math.random() * 900000).toString();
     }
 
-    private _issueTokens(user: {
+    private async _issueTokens(user: {
         id: number;
         username: string;
         email: string;
@@ -487,17 +479,18 @@ export class AuthService {
         const accessToken = this.jwtService.sign(payload, { expiresIn: '1d' });
         const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
 
-        this.prisma.session
-            .create({
+        try {
+            await this.prisma.session.create({
                 data: {
                     userId: user.id,
                     token: refreshToken,
                     expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
                 },
-            })
-            .catch((err) =>
-                this.logger.error(`[SESSION] Failed to create session: ${(err as Error).message}`),
-            );
+            });
+        } catch (err) {
+            this.logger.error(`[SESSION] Failed to create session: ${(err as Error).message}`);
+            throw new Error('Failed to establish session. Please try again.');
+        }
 
         return {
             accessToken,

@@ -8,7 +8,7 @@ import {
   ArrowRight, TrendingUp, AlertCircle,
 } from 'lucide-react';
 import { ROUTES, DASHBOARD_CARDS } from '@/lib/routes';
-import { API_BASE } from '@/lib/api';
+import { api } from '@/lib/api';
 import { useAuth, useRequireAuth } from '@/hooks/useAuth';
 
 interface Stats {
@@ -88,20 +88,20 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const fetchProfile = () => {
+  const fetchProfile = async () => {
     if (isGuest || !isAuthenticated) {
       setLoading(false);
       return;
     }
     setError('');
-    fetch(`${API_BASE}/users/profile`, { credentials: 'include' })
-      .then((r) => {
-        if (!r.ok) throw new Error('Failed to load profile');
-        return r.json();
-      })
-      .then((data) => { if (data?.stats) setStats(data.stats); })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+    try {
+      const data = await api('/users/profile');
+      if (data?.stats) setStats(data.stats);
+    } catch (err: any) {
+      setError(err.message || 'Failed to load profile');
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {

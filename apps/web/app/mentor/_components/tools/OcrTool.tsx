@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { API_BASE } from '@/lib/api';
+import { fetchWithAuth } from '@/lib/api';
 import { ScanLine, Upload, Loader2, AlertCircle, Trash2 } from 'lucide-react';
 
 interface OcrToolProps {
@@ -26,9 +26,8 @@ export default function OcrTool({ onComplete }: OcrToolProps) {
     try {
       const formData = new FormData();
       formData.append('file', file);
-      const resp = await fetch(`${API_BASE}/ocr/scan`, {
+      const resp = await fetchWithAuth('/ocr/scan', {
         method: 'POST',
-        credentials: 'include',
         body: formData,
       });
       const data = await resp.json();

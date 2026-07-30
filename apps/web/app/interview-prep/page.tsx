@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { API_BASE } from '@/lib/api';
+import { api } from '@/lib/api';
 import { 
   Briefcase, 
   Sparkles, 
@@ -70,23 +70,16 @@ export default function InterviewPrepPage() {
     setCurrentAnswer('');
 
     try {
-      const resp = await fetch(`${API_BASE}/mentor/interview`, {
+      const data = await api('/mentor/interview', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
+        body: {
           role,
           company,
           skills,
           experience_level: experienceLevel,
           difficulty,
-        }),
+        },
       });
-
-      const data = await resp.json();
-      if (!resp.ok) {
-        throw new Error(data.message || 'Failed to generate interview questions.');
-      }
 
       const generatedQuestions = data.questions || [];
       if (generatedQuestions.length === 0) {
@@ -113,19 +106,12 @@ export default function InterviewPrepPage() {
 
     try {
       const currentQuestion = questions[currentIndex];
-      const resp = await fetch(`${API_BASE}/mentor/interview/feedback`, {
+      const data = await api('/mentor/interview/feedback', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
+        body: {
           items: [{ question: currentQuestion, answer: currentAnswer }]
-        }),
+        },
       });
-
-      const data = await resp.json();
-      if (!resp.ok) {
-        throw new Error(data.message || 'Answer evaluation failed.');
-      }
 
       const feedbackText = data.feedback || '';
       const score = parseScore(feedbackText);
@@ -168,11 +154,9 @@ export default function InterviewPrepPage() {
           // Average score calculation
           const avgScore = feedbacks.reduce((acc, f) => acc + f.score, 0) / feedbacks.length;
           
-          await fetch(`${API_BASE}/history`, {
+          await api('/history', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify({
+            body: {
               actionType: 'interview',
               title: `Interview Simulation - ${role} at ${company || 'General MNC'}`,
               payload: {
@@ -184,7 +168,7 @@ export default function InterviewPrepPage() {
                 averageScore: avgScore.toFixed(1)
               },
               result: feedbacks.map((f, i) => `Q: ${questions[i]}\nAnswer: ${answers[i]}\nScore: ${f.score}/10\nFeedback: ${f.content}`).join('\n\n')
-            }),
+            },
           });
         }
       }

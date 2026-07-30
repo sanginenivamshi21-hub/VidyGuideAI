@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { API_BASE } from '@/lib/api';
+import { api } from '@/lib/api';
 import { Compass, Loader2, AlertCircle } from 'lucide-react';
 
 interface CareerToolProps {
@@ -20,21 +20,17 @@ export default function CareerTool({ onComplete }: CareerToolProps) {
     setLoading(true);
     setError('');
     try {
-      const resp = await fetch(`${API_BASE}/career`, {
+      const data = await api('/career', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
+        body: {
           skills,
           interests: goal,
           education,
           education_level: education,
           goal,
           reply_language: 'en',
-        }),
+        },
       });
-      const data = await resp.json();
-      if (!resp.ok) throw new Error(data.message || 'Career guidance failed');
       const result = data.career_suggestions || data.response || '';
       const header = '## 💼 Career Guidance Report\n\nBased on your profile, here\'s a personalized career roadmap:\n\n---\n\n';
       onComplete(header + result);

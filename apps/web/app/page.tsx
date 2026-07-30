@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { ROUTES } from '@/lib/routes';
 import { useAuth } from '@/hooks/useAuth';
-import { API_BASE } from '@/lib/api';
+import { api } from '@/lib/api';
 
 const QUICK_ACTIONS = [
   { icon: Bot, label: 'AI Mentor', href: ROUTES.MENTOR, color: 'text-emerald-400', gradient: 'from-emerald-500/20 to-emerald-500/5', border: 'border-emerald-500/20' },
@@ -50,8 +50,8 @@ export default function Home() {
   useEffect(() => {
     if (!isAuthenticated) { setLoading(false); return; }
     Promise.all([
-      fetch(`${API_BASE}/users/profile`, { credentials: 'include' }).then(r => r.ok ? r.json() : null),
-      fetch(`${API_BASE}/conversations?limit=1`, { credentials: 'include' }).then(r => r.ok ? r.json() : []),
+      api('/users/profile').catch(() => null),
+      api('/conversations?limit=1').catch(() => []),
     ]).then(([profile, convs]) => {
       if (profile?.stats) setStats(profile.stats);
       if (profile?.streak) setStreak(profile.streak);

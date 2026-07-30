@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { RefreshCw, Lock, Mail, User as UserIcon, ShieldAlert, Send } from 'lucide-react';
+import { API_BASE, api } from '@/lib/api';
 import { ROUTES } from '@/lib/routes';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -107,17 +108,10 @@ export default function AuthPage() {
     setLoading(true);
 
     try {
-      const resp = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/forgot-password`, {
+      await api('/auth/forgot-password', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ email }),
+        body: { email },
       });
-
-      const data = await resp.json();
-      if (!resp.ok) {
-        throw new Error(data.message || 'Request failed. Please try again.');
-      }
 
       setMessage('If an account exists, a 6-digit verification code has been sent to your email.');
       setMode('reset');
@@ -136,17 +130,10 @@ export default function AuthPage() {
     setLoading(true);
 
     try {
-      const resp = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/reset-password`, {
+      await api('/auth/reset-password', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ email, code: otpCode, password }),
+        body: { email, code: otpCode, password },
       });
-
-      const data = await resp.json();
-      if (!resp.ok) {
-        throw new Error(data.message || 'Reset failed. Check your code and try again.');
-      }
 
       setMessage('Password reset successful! You can now sign in with your new password.');
       setMode('login');

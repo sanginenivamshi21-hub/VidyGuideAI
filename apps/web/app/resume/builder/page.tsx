@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { useRouter } from 'next/navigation';
-import { API_BASE } from '@/lib/api';
+import { api, fetchWithAuth } from '@/lib/api';
 import { ROUTES } from '@/lib/routes';
 import {
   ResumeData, ResumeTemplate,
@@ -245,12 +245,10 @@ export default function ResumeBuilderPage() {
     if (!role.trim()) { setRoleSuggestions([]); setRoleInvalid(false); return; }
     setValidatingRole(true);
     try {
-      const resp = await fetch(`${API_BASE}/resume/validate-role`, {
+      const result = await api('/resume/validate-role', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ role }),
+        body: { role },
       });
-      const result = await resp.json();
       if (result.valid) {
         setRoleSuggestions(result.suggestions || []);
         setRoleInvalid(false);
@@ -320,30 +318,24 @@ export default function ResumeBuilderPage() {
         certifications: data.certifications.map(c => `${c.name} - ${c.issuer}${c.date ? ' (' + c.date + ')' : ''}`).join(', '),
       };
 
-      const resp = await fetch(`${API_BASE}/resume`, {
+      const result = await api('/resume', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(dataToSend),
+        body: dataToSend,
       });
-      const result = await resp.json();
-      if (!resp.ok) throw new Error(result.message || 'Generation failed.');
       setGeneratedResume(result.resume);
 
       const userStr = localStorage.getItem('user');
       if (userStr) {
         const user = JSON.parse(userStr);
         if (user.id) {
-          fetch(`${API_BASE}/history`, {
+          api('/history', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify({
+            body: {
               actionType: 'resume',
               title: `Resume - ${data.target.role}`,
               payload: { name: data.personalInfo.fullName, target_role: data.target.role },
               result: result.resume,
-            }),
+            },
           }).catch(() => {});
         }
       }
@@ -357,10 +349,9 @@ export default function ResumeBuilderPage() {
 
   const handleDownloadPdf = async () => {
     try {
-      const resp = await fetch(`${API_BASE}/resume/pdf`, {
+      const resp = await fetchWithAuth('/resume/pdf', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({
           resume_text: generatedResume,
           name: data.personalInfo.fullName,
