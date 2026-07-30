@@ -3,6 +3,7 @@ import {
     UnauthorizedException,
     BadRequestException,
     ConflictException,
+    Logger,
 } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { JwtService } from '@nestjs/jwt';
@@ -13,6 +14,8 @@ import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
+    private readonly logger = new Logger(AuthService.name);
+
     constructor(
         private readonly prisma: PrismaService,
         private readonly jwtService: JwtService,
@@ -21,6 +24,8 @@ export class AuthService {
 
     async register(dto: RegisterDto) {
         const email = dto.email.trim().toLowerCase();
+        this.logger.log(`[REGISTER] Attempting registration for email: ${email}`);
+
         const existing = await this.prisma.user.findFirst({
             where: {
                 OR: [{ username: dto.username }, { email }],
@@ -28,6 +33,7 @@ export class AuthService {
         });
 
         if (existing) {
+            this.logger.warn(`[REGISTER] FAILED: Username or email already exists: ${dto.username} / ${email}`);
             throw new ConflictException('Username or email already exists.');
         }
 
@@ -42,18 +48,21 @@ export class AuthService {
                 fullName: dto.fullName,
             },
         });
+        this.logger.log(`[REGISTER] User created: id=${user.id}, email=${email}`);
 
         const otp = this._generateOtp();
+        const otpHash = await bcrypt.hash(otp, 6);
         const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
         await this.prisma.oTP.create({
             data: {
                 email,
-                code: otp,
+                code: otpHash,
                 purpose: 'register',
                 expiresAt,
             },
         });
+        this.logger.log(`[REGISTER] OTP stored (hashed) for email: ${email}`);
 
         const emailSent = await this.mailService.sendEmail(
             email,
@@ -62,12 +71,14 @@ export class AuthService {
         );
 
         if (!emailSent) {
+            this.logger.error(`[REGISTER] FAILED to send OTP email to: ${email}`);
             return {
-                message: 'Unable to send OTP email. Please try again later.',
+                message: 'Unable to send verification email. Email service is unavailable. Please try again later.',
                 userId: user.id,
             };
         }
 
+        this.logger.log(`[REGISTER] OTP email sent successfully to: ${email}`);
         return {
             message: 'Registration successful. OTP sent to email.',
             userId: user.id,
@@ -77,44 +88,46 @@ export class AuthService {
 
     async login(dto: LoginDto) {
         const email = dto.email.trim().toLowerCase();
-        console.log(`[LOGIN INST] Checking login for email: ${email}`);
+        this.logger.log(`[LOGIN] Attempting login for email: ${email}`);
+
         const user = await this.prisma.user.findUnique({
             where: { email },
         });
 
         if (!user) {
-            console.log(`[LOGIN INST] FAILED: User not found for email: ${email}`);
+            this.logger.warn(`[LOGIN] FAILED: User not found for email: ${email}`);
             throw new UnauthorizedException('Invalid credentials.');
         }
-        console.log(`[LOGIN INST] SUCCESS: User found. Stored email: ${user.email}, passwordHash exists: ${!!user.passwordHash}`);
 
         let isMatch = false;
         try {
             isMatch = await bcrypt.compare(dto.password, user.passwordHash);
-            console.log(`[LOGIN INST] bcrypt.compare result: ${isMatch}`);
         } catch (error) {
-            console.log(`[LOGIN INST] FAILED: bcrypt.compare threw error: ${(error as Error).message}`);
-            throw new UnauthorizedException('Invalid credentials.');
-        }
-        if (!isMatch) {
-            console.log(`[LOGIN INST] FAILED: Password does not match hash.`);
+            this.logger.error(`[LOGIN] bcrypt.compare threw error: ${(error as Error).message}`);
             throw new UnauthorizedException('Invalid credentials.');
         }
 
-        console.log(`[LOGIN INST] SUCCESS: Authentication check passed.`);
+        if (!isMatch) {
+            this.logger.warn(`[LOGIN] FAILED: Password does not match for email: ${email}`);
+            throw new UnauthorizedException('Invalid credentials.');
+        }
+
+        this.logger.log(`[LOGIN] Password validated for email: ${email}`);
 
         if (!user.isVerified) {
             const otp = this._generateOtp();
+            const otpHash = await bcrypt.hash(otp, 6);
             const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
             await this.prisma.oTP.create({
                 data: {
                     email,
-                    code: otp,
+                    code: otpHash,
                     purpose: 'login',
                     expiresAt,
                 },
             });
+            this.logger.log(`[LOGIN] OTP stored (hashed) for unverified user: ${email}`);
 
             const emailSent = await this.mailService.sendEmail(
                 email,
@@ -123,8 +136,9 @@ export class AuthService {
             );
 
             if (!emailSent) {
+                this.logger.error(`[LOGIN] FAILED to send OTP email to: ${email}`);
                 return {
-                    message: 'Unable to send OTP email. Please try again later.',
+                    message: 'Unable to send verification email. Email service is unavailable. Please try again later.',
                 };
             }
 
@@ -139,6 +153,7 @@ export class AuthService {
             };
         }
 
+        this.logger.log(`[LOGIN] User verified, issuing tokens for: ${email}`);
         return { tokens: this._issueTokens(user) };
     }
 
@@ -156,90 +171,155 @@ export class AuthService {
         message: string;
     }> {
         const emailLower = email.trim().toLowerCase();
-        const otpRecord = await this.prisma.oTP.findFirst({
+        this.logger.log(`[VERIFY_OTP] Verifying OTP for email: ${emailLower}, purpose: ${purpose}`);
+
+        const otpRecords = await this.prisma.oTP.findMany({
             where: {
                 email: emailLower,
-                code,
                 purpose,
                 isUsed: false,
                 expiresAt: { gt: new Date() },
             },
+            orderBy: { createdAt: 'desc' },
         });
 
-        if (!otpRecord) {
-            throw new BadRequestException('Invalid or expired OTP code.');
+        if (!otpRecords.length) {
+            this.logger.warn(`[VERIFY_OTP] FAILED: No valid OTP found for email: ${emailLower}`);
+            throw new BadRequestException('Verification code expired. Please request another verification code.');
+        }
+
+        let matchedRecord: typeof otpRecords[0] | null = null;
+        for (const record of otpRecords) {
+            let isValid = false;
+            try {
+                isValid = await bcrypt.compare(code, record.code);
+            } catch {
+                isValid = code === record.code;
+            }
+            if (isValid) {
+                matchedRecord = record;
+                break;
+            }
+        }
+
+        if (!matchedRecord) {
+            this.logger.warn(`[VERIFY_OTP] FAILED: Invalid OTP code for email: ${emailLower}`);
+            throw new BadRequestException('Invalid OTP. Please check the code and try again.');
         }
 
         await this.prisma.oTP.update({
-            where: { id: otpRecord.id },
+            where: { id: matchedRecord.id },
             data: { isUsed: true },
         });
+        this.logger.log(`[VERIFY_OTP] OTP marked as used for email: ${emailLower}`);
 
-        if (purpose === 'register') {
+        if (purpose === 'register' || purpose === 'login') {
             await this.prisma.user.update({
                 where: { email: emailLower },
                 data: { isVerified: true },
             });
+            this.logger.log(`[VERIFY_OTP] User verified for email: ${emailLower}`);
 
             const user = await this.prisma.user.findUnique({
                 where: { email: emailLower },
             });
             if (user) {
                 const tokens = this._issueTokens(user);
+                const msg = purpose === 'register'
+                    ? 'Registration verified. You are now logged in.'
+                    : 'Login verified. You are now logged in.';
                 return {
                     success: true,
                     tokens,
-                    message: 'Registration verified. You are now logged in.',
+                    message: msg,
                 };
             }
         }
 
-        if (purpose === 'login') {
-            const user = await this.prisma.user.findUnique({
-                where: { email: emailLower },
-            });
-            if (user && user.isVerified) {
-                const tokens = this._issueTokens(user);
-                return {
-                    success: true,
-                    tokens,
-                    message: 'Login verified. You are now logged in.',
-                };
-            }
+        if (purpose === 'reset_password') {
+            return { success: true, message: 'OTP verified successfully. You can now reset your password.' };
         }
 
         return { success: true, message: 'OTP verified successfully.' };
+    }
+
+    async refreshToken(refreshToken: string): Promise<{
+        accessToken: string;
+        refreshToken: string;
+        user: { id: number; username: string; email: string };
+    }> {
+        this.logger.log('[REFRESH] Attempting token refresh');
+
+        let payload: any;
+        try {
+            payload = this.jwtService.verify(refreshToken, {
+                secret: process.env.JWT_SECRET || 'fallback-secret-key-development',
+            });
+        } catch {
+            throw new UnauthorizedException('Invalid or expired refresh token. Please log in again.');
+        }
+
+        const session = await this.prisma.session.findUnique({
+            where: { token: refreshToken },
+            include: { user: true },
+        });
+
+        if (!session || session.expiresAt < new Date()) {
+            this.logger.warn('[REFRESH] Session not found or expired');
+            if (session) {
+                await this.prisma.session.delete({ where: { id: session.id } }).catch(() => {});
+            }
+            throw new UnauthorizedException('Session expired. Please log in again.');
+        }
+
+        const user = session.user;
+
+        const newTokens = this._issueTokens(user);
+        this.logger.log(`[REFRESH] Tokens refreshed for user: ${user.email}`);
+
+        await this.prisma.session.delete({ where: { id: session.id } }).catch(() => {});
+
+        return newTokens;
     }
 
     async forgotPassword(
         email: string,
     ): Promise<{ success: boolean; devOtp?: string }> {
         const emailLower = email.trim().toLowerCase();
+        this.logger.log(`[FORGOT_PASSWORD] Processing request for email: ${emailLower}`);
+
         const user = await this.prisma.user.findUnique({
             where: { email: emailLower },
         });
 
         if (!user) {
+            this.logger.log(`[FORGOT_PASSWORD] No account found for: ${emailLower} (returning success for security)`);
             return { success: true };
         }
 
         const otp = this._generateOtp();
+        const otpHash = await bcrypt.hash(otp, 6);
         const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
         await this.prisma.oTP.create({
             data: {
                 email: emailLower,
-                code: otp,
+                code: otpHash,
                 purpose: 'reset_password',
                 expiresAt,
             },
         });
+        this.logger.log(`[FORGOT_PASSWORD] OTP stored (hashed) for email: ${emailLower}`);
 
-        await this.mailService.sendEmail(
+        const emailSent = await this.mailService.sendEmail(
             emailLower,
             'VidyGuideAI - Password Reset OTP',
             `<p>You requested a password reset. Your OTP is: <strong>${otp}</strong>. It will expire in 10 minutes.</p>`,
         );
+
+        if (!emailSent) {
+            this.logger.error(`[FORGOT_PASSWORD] FAILED to send OTP email to: ${emailLower}`);
+        }
 
         return {
             success: true,
@@ -251,24 +331,46 @@ export class AuthService {
         email: string,
         code: string,
         passwordPlain: string,
-    ): Promise<boolean> {
+    ): Promise<{ message: string }> {
         const emailLower = email.trim().toLowerCase();
-        const otpRecord = await this.prisma.oTP.findFirst({
+        this.logger.log(`[RESET_PASSWORD] Attempting password reset for email: ${emailLower}`);
+
+        const otpRecords = await this.prisma.oTP.findMany({
             where: {
                 email: emailLower,
-                code,
                 purpose: 'reset_password',
                 isUsed: false,
                 expiresAt: { gt: new Date() },
             },
+            orderBy: { createdAt: 'desc' },
         });
 
-        if (!otpRecord) {
-            throw new BadRequestException('Invalid or expired OTP code.');
+        if (!otpRecords.length) {
+            this.logger.warn(`[RESET_PASSWORD] FAILED: No valid OTP found for email: ${emailLower}`);
+            throw new BadRequestException('Verification code expired. Please request another verification code.');
+        }
+
+        let matchedRecord: typeof otpRecords[0] | null = null;
+        for (const record of otpRecords) {
+            let isValid = false;
+            try {
+                isValid = await bcrypt.compare(code, record.code);
+            } catch {
+                isValid = code === record.code;
+            }
+            if (isValid) {
+                matchedRecord = record;
+                break;
+            }
+        }
+
+        if (!matchedRecord) {
+            this.logger.warn(`[RESET_PASSWORD] FAILED: Invalid OTP code for email: ${emailLower}`);
+            throw new BadRequestException('Invalid OTP. Please check the code and try again.');
         }
 
         await this.prisma.oTP.update({
-            where: { id: otpRecord.id },
+            where: { id: matchedRecord.id },
             data: { isUsed: true },
         });
 
@@ -280,7 +382,8 @@ export class AuthService {
             data: { passwordHash },
         });
 
-        return true;
+        this.logger.log(`[RESET_PASSWORD] Password reset successful for email: ${emailLower}`);
+        return { message: 'Password reset successful. You can now log in with your new password.' };
     }
 
     private _generateOtp(): string {
@@ -297,6 +400,7 @@ export class AuthService {
             username: user.username,
             email: user.email,
         };
+
         const accessToken = this.jwtService.sign(payload, { expiresIn: '1d' });
         const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
 
@@ -308,7 +412,9 @@ export class AuthService {
                     expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
                 },
             })
-            .catch((err) => console.error('[SESSION] Failed to create session:', (err as Error).message));
+            .catch((err) =>
+                this.logger.error(`[SESSION] Failed to create session: ${(err as Error).message}`),
+            );
 
         return {
             accessToken,

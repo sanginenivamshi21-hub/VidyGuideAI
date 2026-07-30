@@ -14,9 +14,16 @@ export const envSchema = z.object({
             16,
             'JWT_SECRET must be at least 16 characters long for security.',
         ),
-    GROQ_API_KEY: z.string().optional(),
-    CLOUDINARY_URL: z.string().optional(),
+    NODE_ENV: z
+        .enum(['development', 'production', 'test'])
+        .default('development'),
+    CLIENT_URL: z.string().url('CLIENT_URL must be a valid URL').optional(),
     RESEND_API_KEY: z.string().optional(),
+    RESEND_FROM_EMAIL: z.string().email('RESEND_FROM_EMAIL must be a valid email').optional(),
+    GROQ_API_KEY: z.string().optional(),
+    GEMINI_API_KEY: z.string().optional(),
+    OPENROUTER_API_KEY: z.string().optional(),
+    REDIS_URL: z.string().optional(),
 });
 
 export function validateEnv() {
@@ -24,6 +31,10 @@ export function validateEnv() {
     if (!result.success) {
         console.error('Invalid environment variables:', result.error.format());
         process.exit(1);
+    }
+
+    if (result.data.RESEND_FROM_EMAIL === 'onboarding@resend.dev') {
+        console.warn('WARNING: RESEND_FROM_EMAIL is onboarding@resend.dev - emails will ONLY reach the Resend account owner. Configure a verified custom domain for production delivery to all users.');
     }
 }
 export type EnvConfig = z.infer<typeof envSchema>;

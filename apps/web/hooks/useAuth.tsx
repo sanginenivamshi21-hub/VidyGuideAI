@@ -19,8 +19,10 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isGuest: boolean;
   loading: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; requiresOtp?: boolean }>;
-  register: (username: string, email: string, password: string, fullName: string) => Promise<{ success: boolean; error?: string }>;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; requiresOtp?: boolean; purpose?: string }>;
+  register: (username: string, email: string, password: string, fullName: string) => Promise<{ success: boolean; error?: string; userId?: number }>;
+  verifyOtp: (email: string, code: string, purpose: string) => Promise<{ success: boolean; error?: string }>;
+  refreshSession: () => Promise<boolean>;
   logout: () => Promise<void>;
   loginAsGuest: () => void;
   refreshUser: () => void;
@@ -39,14 +41,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const stored = localStorage.getItem('user');
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        setUser(parsed);
-      } catch { setUser(null); }
-    }
-    setLoading(false);
+    const init = async () => {
+      const stored = localStorage.getItem('user');
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          setUser(parsed);
+        } catch { setUser(null); }
+      }
+      setLoading(false);
+    };
+    init();
   }, []);
 
   const isAuthenticated = user !== null && user.id !== null;
@@ -57,6 +62,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (stored) {
       try { setUser(JSON.parse(stored)); } catch { setUser(null); }
     } else { setUser(null); }
+  }, []);
+
+  const refreshSession = useCallback(async () => {
+    try {
+      const resp = await fetch(`${API_BASE}/auth/refresh`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      const data = await resp.json();
+      if (resp.ok && data.user) {
+        localStorage.setItem('user', JSON.stringify(data.user));
+        setUser(data.user);
+        return true;
+      }
+      if (data.authenticated === false) {
+        localStorage.removeItem('user');
+        setUser(null);
+      }
+      return false;
+    } catch {
+      return false;
+    }
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
@@ -70,15 +97,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const data = await resp.json();
       if (!resp.ok) {
         if (data.requiresOtp || (data.message && data.message.includes('OTP'))) {
-          return { success: false, requiresOtp: true, error: data.message || 'OTP required' };
+          return { success: false, requiresOtp: true, purpose: data.purpose || 'login', error: data.message || 'OTP required' };
         }
         return { success: false, error: data.message || 'Invalid credentials' };
       }
-      localStorage.setItem('user', JSON.stringify(data.user));
-      setUser(data.user);
+      if (data.user) {
+        localStorage.setItem('user', JSON.stringify(data.user));
+        setUser(data.user);
+      }
       return { success: true };
     } catch (err: any) {
-      return { success: false, error: err.message || 'Connection error' };
+      return { success: false, error: err.message || 'Network error. Please check your connection.' };
     }
   }, []);
 
@@ -91,10 +120,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify({ username, email, password, fullName }),
       });
       const data = await resp.json();
-      if (!resp.ok) return { success: false, error: data.message || 'Registration failed' };
+      if (!resp.ok) return { success: false, error: data.message || 'Registration failed. Email or username might already exist.' };
+      return { success: true, userId: data.userId };
+    } catch (err: any) {
+      return { success: false, error: err.message || 'Network error. Please check your connection.' };
+    }
+  }, []);
+
+  const verifyOtp = useCallback(async (email: string, code: string, purpose: string) => {
+    try {
+      const resp = await fetch(`${API_BASE}/auth/verify-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email, code, purpose }),
+      });
+      const data = await resp.json();
+      if (!resp.ok) {
+        return { success: false, error: data.message || 'Invalid or expired OTP code.' };
+      }
+      if (data.user) {
+        localStorage.setItem('user', JSON.stringify(data.user));
+        setUser(data.user);
+      }
       return { success: true };
     } catch (err: any) {
-      return { success: false, error: err.message || 'Connection error' };
+      return { success: false, error: err.message || 'Network error. Please check your connection.' };
     }
   }, []);
 
@@ -119,7 +170,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, isGuest, loading, login, register, logout, loginAsGuest, refreshUser }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, isGuest, loading, login, register, verifyOtp, refreshSession, logout, loginAsGuest, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { RefreshCw, Lock, Mail, User as UserIcon, ShieldAlert } from 'lucide-react';
+import { RefreshCw, Lock, Mail, User as UserIcon, ShieldAlert, Clock, Send } from 'lucide-react';
 import { ROUTES } from '@/lib/routes';
 import { API_BASE } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
@@ -10,7 +10,7 @@ import { useAuth } from '@/hooks/useAuth';
 export default function AuthPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isAuthenticated, login, register, loginAsGuest } = useAuth();
+  const { isAuthenticated, login, register, verifyOtp, refreshSession, logout, loginAsGuest } = useAuth();
   const [mode, setMode] = useState<'login' | 'register' | 'otp' | 'forgot' | 'reset'>('login');
   
   const [email, setEmail] = useState('');
@@ -23,6 +23,7 @@ export default function AuthPage() {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resending, setResending] = useState(false);
 
   useEffect(() => {
     if (searchParams.get('mode') === 'register') setMode('register');
@@ -41,10 +42,11 @@ export default function AuthPage() {
     const result = await login(email, password);
     if (!result.success) {
       if (result.requiresOtp) {
+        setOtpPurpose(result.purpose || 'login');
         setMode('otp');
-        setMessage(result.error || 'Please complete your OTP verification to log in.');
+        setMessage('Please check your email and enter the verification code to complete sign in.');
       } else {
-        setError(result.error || 'Invalid credentials or login failed.');
+        setError(result.error || 'Invalid credentials. Please try again.');
       }
     }
     setLoading(false);
@@ -60,7 +62,7 @@ export default function AuthPage() {
     if (result.success) {
       setOtpPurpose('register');
       setMode('otp');
-      setMessage('Registration successful! A 6-digit OTP code has been dispatched to your email.');
+      setMessage('Account created! A 6-digit verification code has been sent to your email. Please check your inbox (and spam folder).');
     } else {
       setError(result.error || 'Registration failed. Email or username might already exist.');
     }
@@ -73,33 +75,46 @@ export default function AuthPage() {
     setMessage('');
     setLoading(true);
 
-    try {
-      const resp = await fetch(`${API_BASE}/auth/verify-otp`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ email, code: otpCode, purpose: otpPurpose }),
-      });
+    const result = await verifyOtp(email, otpCode, otpPurpose);
+    if (!result.success) {
+      setError(result.error || 'Verification failed. Check your code and try again.');
+    } else {
+      setMessage('Verification successful! Redirecting to dashboard...');
+      setTimeout(() => router.push(ROUTES.DASHBOARD), 500);
+    }
+    setLoading(false);
+  };
 
-      const data = await resp.json();
-      if (!resp.ok) {
-        throw new Error(data.message || 'Invalid or expired OTP code.');
+  const handleResendOtp = async () => {
+    setError('');
+    setMessage('');
+    setResending(true);
+
+    try {
+      if (otpPurpose === 'register') {
+        const resp = await fetch(`${API_BASE}/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ username, email, password, fullName }),
+        });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.message || 'Resend failed');
       } else {
-        if (data.user) {
-          localStorage.setItem('user', JSON.stringify(data.user));
-        }
-        setMessage(data.message || 'Verification successful!');
-        setMode('login');
-        setPassword('');
-        setOtpCode('');
-        if (data.user) {
-          router.push(ROUTES.DASHBOARD);
-        }
+        const resp = await fetch(`${API_BASE}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ email, password }),
+        });
+        const data = await resp.json();
+        if (!resp.ok && !data.requiresOtp) throw new Error(data.message || 'Resend failed');
       }
+      setMessage('A new verification code has been sent to your email.');
     } catch (err: any) {
-      setError(err.message || '🚫 Verification failed. Check your OTP code.');
+      setError(err.message || 'Unable to resend verification code.');
     } finally {
-      setLoading(false);
+      setResending(false);
     }
   };
 
@@ -119,14 +134,14 @@ export default function AuthPage() {
 
       const data = await resp.json();
       if (!resp.ok) {
-        throw new Error(data.message || 'Forgot password request failed.');
+        throw new Error(data.message || 'Request failed. Please try again.');
       }
 
-      setMessage('If your account exists, a 6-digit OTP has been sent to your email.');
+      setMessage('If an account exists, a 6-digit verification code has been sent to your email.');
       setMode('reset');
       setOtpCode('');
     } catch (err: any) {
-      setError(err.message || '🚫 Something went wrong. We couldn\'t process your request.');
+      setError(err.message || 'Unable to process request. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -148,7 +163,7 @@ export default function AuthPage() {
 
       const data = await resp.json();
       if (!resp.ok) {
-        throw new Error(data.message || 'Reset password verification failed.');
+        throw new Error(data.message || 'Reset failed. Check your code and try again.');
       }
 
       setMessage('Password reset successful! You can now sign in with your new password.');
@@ -156,7 +171,7 @@ export default function AuthPage() {
       setPassword('');
       setOtpCode('');
     } catch (err: any) {
-      setError(err.message || '🚫 Reset password failed. Make sure the code is correct.');
+      setError(err.message || 'Unable to reset password. Make sure the code is correct.');
     } finally {
       setLoading(false);
     }
@@ -165,6 +180,12 @@ export default function AuthPage() {
   const handleGuest = () => {
     loginAsGuest();
     router.push(ROUTES.CAREER);
+  };
+
+  const changeMode = (newMode: typeof mode) => {
+    setError('');
+    setMessage('');
+    setMode(newMode);
   };
 
   return (
@@ -191,7 +212,7 @@ export default function AuthPage() {
           </div>
         )}
 
-        {/* LOGIN MODE */}
+        {/* LOGIN */}
         {mode === 'login' && (
           <form onSubmit={handleLogin} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
@@ -214,11 +235,7 @@ export default function AuthPage() {
                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Password</label>
                 <button
                   type="button"
-                  onClick={() => {
-                    setError('');
-                    setMessage('');
-                    setMode('forgot');
-                  }}
+                  onClick={() => changeMode('forgot')}
                   className="text-[10px] font-semibold text-emerald-400 hover:underline"
                 >
                   Forgot Password?
@@ -251,11 +268,7 @@ export default function AuthPage() {
                 New to VidyGuideAI?{' '}
                 <button
                   type="button"
-                  onClick={() => {
-                    setError('');
-                    setMessage('');
-                    setMode('register');
-                  }}
+                  onClick={() => changeMode('register')}
                   className="text-emerald-400 hover:underline font-semibold"
                 >
                   Create account
@@ -265,7 +278,7 @@ export default function AuthPage() {
           </form>
         )}
 
-        {/* REGISTER MODE */}
+        {/* REGISTER */}
         {mode === 'register' && (
           <form onSubmit={handleRegister} className="flex flex-col gap-4 animate-fadeIn">
             <div className="flex flex-col gap-1.5">
@@ -331,7 +344,7 @@ export default function AuthPage() {
               className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none text-white font-bold text-sm rounded-xl shadow-lg shadow-emerald-500/25 transition-all flex items-center justify-center gap-2"
             >
               {loading && <RefreshCw className="animate-spin" size={14} />}
-              <span>{loading ? 'Registering...' : 'Register & Send OTP'}</span>
+              <span>{loading ? 'Sending verification code...' : 'Register & Send OTP'}</span>
             </button>
 
             <div className="text-center mt-2">
@@ -339,11 +352,7 @@ export default function AuthPage() {
                 Already have an account?{' '}
                 <button
                   type="button"
-                  onClick={() => {
-                    setError('');
-                    setMessage('');
-                    setMode('login');
-                  }}
+                  onClick={() => changeMode('login')}
                   className="text-emerald-400 hover:underline font-semibold"
                 >
                   Sign In
@@ -353,51 +362,62 @@ export default function AuthPage() {
           </form>
         )}
 
-        {/* OTP VERIFICATION MODE */}
+        {/* OTP */}
         {mode === 'otp' && (
           <form onSubmit={handleVerifyOtp} className="flex flex-col gap-4 animate-fadeIn">
             <div className="flex flex-col gap-1.5">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider text-center">Enter 6-Digit OTP</label>
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider text-center">
+                Enter 6-Digit Verification Code
+              </label>
+              <p className="text-[10px] text-slate-500 text-center">
+                Sent to <span className="text-slate-300 font-semibold">{email}</span>
+              </p>
               <input
                 type="text"
                 required
                 maxLength={6}
                 value={otpCode}
-                onChange={(e) => setOtpCode(e.target.value)}
+                onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                 placeholder="123456"
-                className="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm text-center tracking-widest font-mono font-bold transition-all"
+                className="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm text-center tracking-[0.5em] font-mono font-bold transition-all"
               />
             </div>
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || otpCode.length !== 6}
               className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none text-white font-bold text-sm rounded-xl shadow-lg shadow-emerald-500/25 transition-all flex items-center justify-center gap-2"
             >
               {loading && <RefreshCw className="animate-spin" size={14} />}
-              <span>{loading ? 'Verifying OTP...' : 'Verify OTP'}</span>
+              <span>{loading ? 'Verifying code...' : 'Verify Code'}</span>
             </button>
 
-            <div className="text-center mt-2">
-              <span className="text-xs text-slate-400">
-                Wrong email or need to go back?{' '}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setError('');
-                    setMessage('');
-                    setMode('login');
-                  }}
-                  className="text-emerald-400 hover:underline font-semibold"
-                >
-                  Back to Login
-                </button>
-              </span>
+            <div className="flex flex-col items-center gap-2 mt-2">
+              <button
+                type="button"
+                onClick={handleResendOtp}
+                disabled={resending}
+                className="flex items-center gap-1.5 text-xs text-emerald-400 hover:underline font-semibold disabled:text-slate-600 disabled:pointer-events-none"
+              >
+                {resending ? (
+                  <><RefreshCw size={12} className="animate-spin" /> Resending...</>
+                ) : (
+                  <><Send size={12} /> Resend verification code</>
+                )}
+              </button>
+              <p className="text-[10px] text-slate-500">Code expires in 10 minutes</p>
+              <button
+                type="button"
+                onClick={() => changeMode('login')}
+                className="text-xs text-slate-400 hover:text-white font-semibold"
+              >
+                Back to Login
+              </button>
             </div>
           </form>
         )}
 
-        {/* FORGOT PASSWORD REQUEST MODE */}
+        {/* FORGOT PASSWORD */}
         {mode === 'forgot' && (
           <form onSubmit={handleForgotPassword} className="flex flex-col gap-4 animate-fadeIn">
             <div className="flex flex-col gap-1.5">
@@ -421,7 +441,7 @@ export default function AuthPage() {
               className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none text-white font-bold text-sm rounded-xl shadow-lg shadow-emerald-500/25 transition-all flex items-center justify-center gap-2"
             >
               {loading && <RefreshCw className="animate-spin" size={14} />}
-              <span>{loading ? 'Sending OTP...' : 'Request Password Reset'}</span>
+              <span>{loading ? 'Sending reset code...' : 'Request Password Reset'}</span>
             </button>
 
             <div className="text-center mt-2">
@@ -429,11 +449,7 @@ export default function AuthPage() {
                 Remember your password?{' '}
                 <button
                   type="button"
-                  onClick={() => {
-                    setError('');
-                    setMessage('');
-                    setMode('login');
-                  }}
+                  onClick={() => changeMode('login')}
                   className="text-emerald-400 hover:underline font-semibold"
                 >
                   Back to Login
@@ -443,19 +459,24 @@ export default function AuthPage() {
           </form>
         )}
 
-        {/* RESET PASSWORD CONFIRM MODE */}
+        {/* RESET PASSWORD */}
         {mode === 'reset' && (
           <form onSubmit={handleResetPassword} className="flex flex-col gap-4 animate-fadeIn">
             <div className="flex flex-col gap-1.5">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider text-center font-mono">Enter 6-Digit Password Reset OTP</label>
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider text-center font-mono">
+                Enter Password Reset Code
+              </label>
+              <p className="text-[10px] text-slate-500 text-center">
+                Sent to <span className="text-slate-300 font-semibold">{email}</span>
+              </p>
               <input
                 type="text"
                 required
                 maxLength={6}
                 value={otpCode}
-                onChange={(e) => setOtpCode(e.target.value)}
+                onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                 placeholder="123456"
-                className="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm text-center tracking-widest font-mono font-bold transition-all"
+                className="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm text-center tracking-[0.5em] font-mono font-bold transition-all"
               />
             </div>
 
@@ -476,23 +497,18 @@ export default function AuthPage() {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || otpCode.length !== 6}
               className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none text-white font-bold text-sm rounded-xl shadow-lg shadow-emerald-500/25 transition-all flex items-center justify-center gap-2"
             >
               {loading && <RefreshCw className="animate-spin" size={14} />}
-              <span>{loading ? 'Resetting Password...' : 'Verify & Reset Password'}</span>
+              <span>{loading ? 'Resetting password...' : 'Verify & Reset Password'}</span>
             </button>
 
             <div className="text-center mt-2">
               <span className="text-xs text-slate-400">
-                Cancel and go back?{' '}
                 <button
                   type="button"
-                  onClick={() => {
-                    setError('');
-                    setMessage('');
-                    setMode('login');
-                  }}
+                  onClick={() => changeMode('login')}
                   className="text-emerald-400 hover:underline font-semibold"
                 >
                   Back to Login
