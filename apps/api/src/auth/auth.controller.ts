@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Res, Req, Logger } from '@nestjs/common';
+import { Controller, Post, Get, Body, Res, Req, UseGuards, Logger, HttpException, HttpStatus } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
@@ -6,6 +6,8 @@ import { LoginDto } from './dto/login.dto';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ResendOtpDto } from './dto/resend-otp.dto';
+import { JwtAuthGuard } from './jwt-auth.guard';
 import * as express from 'express';
 
 const COOKIE_OPTIONS = {
@@ -45,7 +47,7 @@ export class AuthController {
     ) {
         const start = Date.now();
         try {
-            const result = await this.authService.login(dto) as any;
+            const result = await this.authService.login(dto);
 
             if (result.tokens) {
                 this._setAuthCookies(res, result.tokens.accessToken, result.tokens.refreshToken);
@@ -77,7 +79,7 @@ export class AuthController {
                 dto.email,
                 dto.code,
                 dto.purpose,
-            ) as any;
+            );
 
             if (result.tokens) {
                 this._setAuthCookies(res, result.tokens.accessToken, result.tokens.refreshToken);
@@ -96,6 +98,20 @@ export class AuthController {
             };
         } catch (error) {
             this.logger.error(`[VERIFY_OTP] Error: ${(error as Error).message}, email: ${dto.email}`);
+            throw error;
+        }
+    }
+
+    @Post('resend-otp')
+    @Throttle({ default: { ttl: 60000, limit: 3 } })
+    async resendOtp(@Body() dto: ResendOtpDto) {
+        const start = Date.now();
+        try {
+            const result = await this.authService.resendOtp(dto.email, dto.purpose, dto.password);
+            this.logger.log(`[RESEND_OTP] Duration: ${Date.now() - start}ms, email: ${dto.email}, purpose: ${dto.purpose}`);
+            return result;
+        } catch (error) {
+            this.logger.error(`[RESEND_OTP] Error: ${(error as Error).message}, email: ${dto.email}`);
             throw error;
         }
     }
@@ -131,6 +147,20 @@ export class AuthController {
         }
     }
 
+    @Get('me')
+    @UseGuards(JwtAuthGuard)
+    async me(@Req() req: any) {
+        const user = req.user;
+        return {
+            authenticated: true,
+            user: {
+                id: user.userId,
+                username: user.username,
+                email: user.email,
+            },
+        };
+    }
+
     @Post('forgot-password')
     @Throttle({ default: { ttl: 60000, limit: 3 } })
     async forgotPassword(@Body() dto: ForgotPasswordDto) {
@@ -160,10 +190,21 @@ export class AuthController {
     }
 
     @Post('logout')
-    async logout(@Res({ passthrough: true }) res: express.Response) {
+    async logout(
+        @Req() req: express.Request,
+        @Res({ passthrough: true }) res: express.Response,
+    ) {
+        const refreshToken = req.cookies?.refreshToken;
+        if (refreshToken) {
+            try {
+                await this.authService.invalidateSession(refreshToken);
+            } catch {
+                // Session cleanup is best-effort
+            }
+        }
         res.clearCookie('accessToken', COOKIE_OPTIONS);
         res.clearCookie('refreshToken', COOKIE_OPTIONS);
-        this.logger.log('[LOGOUT] User logged out, cookies cleared');
+        this.logger.log('[LOGOUT] User logged out, cookies cleared, session invalidated');
         return { message: 'Logged out successfully.' };
     }
 

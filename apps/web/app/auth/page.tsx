@@ -2,15 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { RefreshCw, Lock, Mail, User as UserIcon, ShieldAlert, Clock, Send } from 'lucide-react';
+import { RefreshCw, Lock, Mail, User as UserIcon, ShieldAlert, Send } from 'lucide-react';
 import { ROUTES } from '@/lib/routes';
-import { API_BASE } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
 
 export default function AuthPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isAuthenticated, login, register, verifyOtp, refreshSession, logout, loginAsGuest } = useAuth();
+  const { isAuthenticated, login, register, verifyOtp, resendOtp } = useAuth();
   const [mode, setMode] = useState<'login' | 'register' | 'otp' | 'forgot' | 'reset'>('login');
   
   const [email, setEmail] = useState('');
@@ -90,32 +89,15 @@ export default function AuthPage() {
     setMessage('');
     setResending(true);
 
-    try {
-      if (otpPurpose === 'register') {
-        const resp = await fetch(`${API_BASE}/auth/register`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ username, email, password, fullName }),
-        });
-        const data = await resp.json();
-        if (!resp.ok) throw new Error(data.message || 'Resend failed');
-      } else {
-        const resp = await fetch(`${API_BASE}/auth/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ email, password }),
-        });
-        const data = await resp.json();
-        if (!resp.ok && !data.requiresOtp) throw new Error(data.message || 'Resend failed');
-      }
+    const passwordForResend = otpPurpose === 'login' || otpPurpose === 'register' ? password : undefined;
+    const result = await resendOtp(email, otpPurpose, passwordForResend);
+
+    if (!result.success) {
+      setError(result.error || 'Unable to resend verification code.');
+    } else {
       setMessage('A new verification code has been sent to your email.');
-    } catch (err: any) {
-      setError(err.message || 'Unable to resend verification code.');
-    } finally {
-      setResending(false);
     }
+    setResending(false);
   };
 
   const handleForgotPassword = async (e: React.FormEvent) => {
@@ -125,7 +107,7 @@ export default function AuthPage() {
     setLoading(true);
 
     try {
-      const resp = await fetch(`${API_BASE}/auth/forgot-password`, {
+      const resp = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/forgot-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -154,7 +136,7 @@ export default function AuthPage() {
     setLoading(true);
 
     try {
-      const resp = await fetch(`${API_BASE}/auth/reset-password`, {
+      const resp = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -178,7 +160,8 @@ export default function AuthPage() {
   };
 
   const handleGuest = () => {
-    loginAsGuest();
+    const guestUser = { id: null, username: 'Guest', fullName: 'Guest Candidate', email: '', isVerified: true };
+    localStorage.setItem('user', JSON.stringify(guestUser));
     router.push(ROUTES.CAREER);
   };
 
@@ -374,10 +357,21 @@ export default function AuthPage() {
               </p>
               <input
                 type="text"
+                inputMode="numeric"
+                autoComplete="one-time-code"
                 required
                 maxLength={6}
                 value={otpCode}
-                onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/\D/g, '').slice(0, 6);
+                  setOtpCode(val);
+                  if (val.length === 6) {
+                    setTimeout(() => {
+                      const form = e.target.closest('form');
+                      if (form) form.requestSubmit();
+                    }, 100);
+                  }
+                }}
                 placeholder="123456"
                 className="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm text-center tracking-[0.5em] font-mono font-bold transition-all"
               />
@@ -471,10 +465,21 @@ export default function AuthPage() {
               </p>
               <input
                 type="text"
+                inputMode="numeric"
+                autoComplete="one-time-code"
                 required
                 maxLength={6}
                 value={otpCode}
-                onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/\D/g, '').slice(0, 6);
+                  setOtpCode(val);
+                  if (val.length === 6) {
+                    setTimeout(() => {
+                      const form = e.target.closest('form');
+                      if (form) form.requestSubmit();
+                    }, 100);
+                  }
+                }}
                 placeholder="123456"
                 className="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm text-center tracking-[0.5em] font-mono font-bold transition-all"
               />

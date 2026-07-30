@@ -22,7 +22,9 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string; requiresOtp?: boolean; purpose?: string }>;
   register: (username: string, email: string, password: string, fullName: string) => Promise<{ success: boolean; error?: string; userId?: number }>;
   verifyOtp: (email: string, code: string, purpose: string) => Promise<{ success: boolean; error?: string }>;
+  resendOtp: (email: string, purpose: string, password?: string) => Promise<{ success: boolean; error?: string }>;
   refreshSession: () => Promise<boolean>;
+  checkSession: () => Promise<boolean>;
   logout: () => Promise<void>;
   loginAsGuest: () => void;
   refreshUser: () => void;
@@ -46,7 +48,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (stored) {
         try {
           const parsed = JSON.parse(stored);
-          setUser(parsed);
+          if (parsed && parsed.id !== null) {
+            const resp = await fetch(`${API_BASE}/auth/me`, { credentials: 'include' });
+            const data = await resp.json();
+            if (resp.ok && data.authenticated && data.user) {
+              localStorage.setItem('user', JSON.stringify(data.user));
+              setUser(data.user);
+            } else {
+              const refreshResp = await fetch(`${API_BASE}/auth/refresh`, {
+                method: 'POST', credentials: 'include',
+              });
+              const refreshData = await refreshResp.json();
+              if (refreshResp.ok && refreshData.user) {
+                localStorage.setItem('user', JSON.stringify(refreshData.user));
+                setUser(refreshData.user);
+              } else {
+                localStorage.removeItem('user');
+                setUser(null);
+              }
+            }
+          } else {
+            setUser(parsed);
+          }
         } catch { setUser(null); }
       }
       setLoading(false);
@@ -62,6 +85,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (stored) {
       try { setUser(JSON.parse(stored)); } catch { setUser(null); }
     } else { setUser(null); }
+  }, []);
+
+  const checkSession = useCallback(async () => {
+    try {
+      const resp = await fetch(`${API_BASE}/auth/me`, { credentials: 'include' });
+      const data = await resp.json();
+      if (resp.ok && data.authenticated && data.user) {
+        localStorage.setItem('user', JSON.stringify(data.user));
+        setUser(data.user);
+        return true;
+      }
+      return false;
+    } catch {
+      return false;
+    }
   }, []);
 
   const refreshSession = useCallback(async () => {
@@ -149,6 +187,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  const resendOtp = useCallback(async (email: string, purpose: string, password?: string) => {
+    try {
+      const resp = await fetch(`${API_BASE}/auth/resend-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email, purpose, ...(password ? { password } : {}) }),
+      });
+      const data = await resp.json();
+      if (!resp.ok) {
+        return { success: false, error: data.message || 'Unable to resend verification code.' };
+      }
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message || 'Network error. Please check your connection.' };
+    }
+  }, []);
+
   const logout = useCallback(async () => {
     try {
       await fetch(`${API_BASE}/auth/logout`, { method: 'POST', credentials: 'include' });
@@ -170,7 +226,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, isGuest, loading, login, register, verifyOtp, refreshSession, logout, loginAsGuest, refreshUser }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, isGuest, loading, login, register, verifyOtp, resendOtp, refreshSession, checkSession, logout, loginAsGuest, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

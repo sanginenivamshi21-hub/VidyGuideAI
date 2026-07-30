@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+const WEAK_JWT_PATTERNS = ['fallback', 'development', 'test', 'password', 'changeme'];
+
 export const envSchema = z.object({
     PORT: z
         .string()
@@ -33,8 +35,22 @@ export function validateEnv() {
         process.exit(1);
     }
 
-    if (result.data.RESEND_FROM_EMAIL === 'onboarding@resend.dev') {
-        console.warn('WARNING: RESEND_FROM_EMAIL is onboarding@resend.dev - emails will ONLY reach the Resend account owner. Configure a verified custom domain for production delivery to all users.');
+    const { JWT_SECRET, RESEND_FROM_EMAIL, NODE_ENV } = result.data;
+
+    if (NODE_ENV === 'production') {
+        const lowerSecret = JWT_SECRET.toLowerCase();
+        const isWeak = WEAK_JWT_PATTERNS.some(pattern => lowerSecret.includes(pattern));
+        if (isWeak) {
+            console.warn('WARNING: JWT_SECRET contains a common development pattern. Generate a strong random secret for production security. Use: openssl rand -hex 32');
+        }
+
+        if (RESEND_FROM_EMAIL === 'onboarding@resend.dev') {
+            console.warn('WARNING: RESEND_FROM_EMAIL is onboarding@resend.dev. This sender can ONLY deliver to the Resend account owner\'s email. For production delivery to all users, verify a custom domain in https://resend.com/domains');
+        }
+
+        if (!process.env.RESEND_API_KEY) {
+            console.warn('WARNING: RESEND_API_KEY is not set. Email sending will be disabled.');
+        }
     }
 }
 export type EnvConfig = z.infer<typeof envSchema>;
