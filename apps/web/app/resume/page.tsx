@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { API_BASE } from '@/lib/api';
+import { api } from '@/lib/api';
 import { ROUTES } from '@/lib/routes';
 import { useAuth } from '@/hooks/useAuth';
 import {
@@ -51,7 +51,7 @@ export default function ResumeDashboard() {
   useEffect(() => {
     if (!isAuthenticated) { setLoading(false); return; }
     Promise.all([
-      fetch(`${API_BASE}/history?type=resume&limit=1`, { credentials: 'include' }).then((r) => r.ok ? r.json() : []),
+      api('/history?type=resume&limit=1').catch(() => []),
     ]).then(([history]) => {
       if (Array.isArray(history) && history.length > 0) {
         const latest = history[0];

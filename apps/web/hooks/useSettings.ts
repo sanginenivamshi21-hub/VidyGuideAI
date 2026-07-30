@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '@/lib/api';
+import { useAuth } from '@/hooks/useAuth';
 
 export interface UserSettings {
   theme: string;
@@ -45,12 +46,10 @@ export function useSettings() {
   const [settings, setSettings] = useState<UserSettings>(DEFAULTS);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const { isAuthenticated } = useAuth();
 
   const fetchSettings = useCallback(async () => {
-    const user = localStorage.getItem('user');
-    if (!user) { setLoading(false); return; }
-    const parsedUser = JSON.parse(user);
-    if (parsedUser.id === null) { setLoading(false); return; }
+    if (!isAuthenticated) { setLoading(false); return; }
     try {
       const data = await api<any>('/settings');
       setSettings({ ...DEFAULTS, ...data });
@@ -63,7 +62,7 @@ export function useSettings() {
       }
     }
     setLoading(false);
-  }, []);
+  }, [isAuthenticated]);
 
   useEffect(() => { fetchSettings(); }, [fetchSettings]);
 
@@ -81,8 +80,7 @@ export function useSettings() {
       localStorage.setItem('vidyguide_animations', String(updates.animations));
     }
 
-    const user = localStorage.getItem('user');
-    if (!user) return;
+    if (!isAuthenticated) return;
 
     setSaving(true);
     try {
@@ -91,7 +89,7 @@ export function useSettings() {
       /* silent fail - already applied locally */
     }
     setSaving(false);
-  }, []);
+  }, [isAuthenticated]);
 
   return { settings, updateSettings, loading, saving };
 }

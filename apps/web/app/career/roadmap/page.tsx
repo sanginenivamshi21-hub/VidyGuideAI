@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { API_BASE } from '@/lib/api';
+import { api } from '@/lib/api';
 import { Map, ArrowRight, Sparkles, RefreshCw, AlertCircle } from 'lucide-react';
 
 export default function CareerRoadmapPage() {
@@ -23,17 +23,10 @@ export default function CareerRoadmapPage() {
     setMilestones([]);
 
     try {
-      const resp = await fetch(`${API_BASE}/career/roadmap`, {
+      const data = await api('/career/roadmap', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ text }),
+        body: { text },
       });
-
-      const data = await resp.json();
-      if (!resp.ok) {
-        throw new Error(data.message || 'Failed to parse roadmap');
-      }
 
       setMilestones(data.milestones || []);
       setParsed(true);

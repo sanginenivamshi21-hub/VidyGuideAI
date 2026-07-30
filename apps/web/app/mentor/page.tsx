@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useSettings } from '@/hooks/useSettings';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
-import { API_BASE } from '@/lib/api';
+import { fetchWithAuth } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
 import { useMemory } from '@/hooks/useMemory';
 import { setCache, getCache } from '@/lib/offlineCache';
@@ -48,7 +48,7 @@ export default function MentorPage() {
 
   const fetchConversations = async () => {
     try {
-      const res = await fetch(`${API_BASE}/conversations`, { credentials: 'include' });
+      const res = await fetchWithAuth('/conversations');
       if (res.ok) {
         const data = await res.json();
         const convs = Array.isArray(data) ? data : [];
@@ -78,7 +78,7 @@ export default function MentorPage() {
 
   const loadConversation = useCallback(async (id: number) => {
     try {
-      const res = await fetch(`${API_BASE}/conversations/${id}`, { credentials: 'include' });
+      const res = await fetchWithAuth(`/conversations/${id}`);
       if (res.ok) {
         const conv = await res.json();
         setActiveConvId(conv.id);
@@ -95,7 +95,7 @@ export default function MentorPage() {
 
   const deleteConversation = useCallback(async (id: number) => {
     try {
-      await fetch(`${API_BASE}/conversations/${id}`, { method: 'DELETE', credentials: 'include' });
+      await fetchWithAuth(`/conversations/${id}`, { method: 'DELETE' });
       if (activeConvId === id) {
         setActiveConvId(null);
         setMessages([]);
@@ -106,9 +106,8 @@ export default function MentorPage() {
 
   const togglePin = useCallback(async (conv: Conversation) => {
     try {
-      await fetch(`${API_BASE}/conversations/${conv.id}`, {
+      await fetchWithAuth(`/conversations/${conv.id}`, {
         method: 'PUT',
-        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ pinned: !conv.pinned }),
       });
@@ -118,9 +117,8 @@ export default function MentorPage() {
 
   const renameConversation = useCallback(async (id: number, title: string) => {
     try {
-      await fetch(`${API_BASE}/conversations/${id}`, {
+      await fetchWithAuth(`/conversations/${id}`, {
         method: 'PUT',
-        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title }),
       });
@@ -131,9 +129,8 @@ export default function MentorPage() {
   const saveMessage = useCallback(async (role: string, content: string) => {
     if (!activeConvId) return;
     try {
-      await fetch(`${API_BASE}/conversations/${activeConvId}/messages`, {
+      await fetchWithAuth(`/conversations/${activeConvId}/messages`, {
         method: 'POST',
-        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ role, content }),
       });
@@ -270,7 +267,7 @@ export default function MentorPage() {
         const fd = new FormData();
         fd.append('file', file);
         try {
-          const res = await fetch(`${API_BASE}/ocr/scan`, { method: 'POST', body: fd });
+          const res = await fetchWithAuth('/ocr/scan', { method: 'POST', body: fd });
           if (res.ok) {
             const data = await res.json();
             extraText += `--- ${file.name} ---\n${data.text || '(no text extracted)'}\n`;
@@ -302,9 +299,8 @@ export default function MentorPage() {
       let convId = activeConvId;
       if (!convId) {
         try {
-          const res = await fetch(`${API_BASE}/conversations`, {
+          const res = await fetchWithAuth('/conversations', {
             method: 'POST',
-            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ title: text.slice(0, 50) }),
           });
@@ -356,7 +352,7 @@ export default function MentorPage() {
         const contextualizedQuestion = memoryContext
           ? `[User context: ${memoryContext}]\n\n${fullText}`
           : fullText;
-        const res = await fetch(`${API_BASE}/mentor/stream`, {
+        const res = await fetchWithAuth('/mentor/stream', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -430,9 +426,8 @@ export default function MentorPage() {
 
           if (convId && !activeConvId) {
             const title = fullContent.replace(/[#*_~`\[\]()>|]/g, '').trim().slice(0, 50);
-            fetch(`${API_BASE}/conversations/${convId}`, {
+            fetchWithAuth(`/conversations/${convId}`, {
               method: 'PUT',
-              credentials: 'include',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ title }),
             }).then(() => fetchConversations()).catch(() => {});

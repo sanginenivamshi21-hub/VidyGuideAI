@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { API_BASE } from '@/lib/api';
+import { api } from '@/lib/api';
 import { Upload, FileText, Check, AlertCircle, Loader2 } from 'lucide-react';
 
 interface ResumeReviewToolProps {
@@ -18,14 +18,10 @@ export default function ResumeReviewTool({ onComplete }: ResumeReviewToolProps) 
     setLoading(true);
     setError('');
     try {
-      const resp = await fetch(`${API_BASE}/resume/feedback`, {
+      const data = await api('/resume/feedback', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ resume: resumeText, reply_language: 'en' }),
+        body: { resume: resumeText, reply_language: 'en' },
       });
-      const data = await resp.json();
-      if (!resp.ok) throw new Error(data.message || 'Review failed');
       const feedback = data.feedback || data.response || '';
       const header = '## 📄 Resume Review Results\n\nI analyzed your resume. Here\'s the detailed feedback:\n\n---\n\n';
       onComplete(header + feedback);

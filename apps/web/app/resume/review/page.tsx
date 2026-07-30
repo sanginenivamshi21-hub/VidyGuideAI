@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { API_BASE } from '@/lib/api';
+import { api, fetchWithAuth } from '@/lib/api';
 import {
   Sparkles, RefreshCw, Upload, AlertCircle, CheckCircle2,
   XCircle, TrendingUp, FileText, Lightbulb, Sword,
@@ -55,8 +55,8 @@ export default function ResumeReviewPage() {
 
     try {
       setScanMessage(`Extracting text from ${selectedFile.name}...`);
-      const resp = await fetch(`${API_BASE}/ocr/scan`, {
-        method: 'POST', credentials: 'include', body: formData,
+      const resp = await fetchWithAuth('/ocr/scan', {
+        method: 'POST', body: formData,
       });
       const data = await resp.json();
       if (!resp.ok) throw new Error(data.message || 'OCR processing failed.');
@@ -75,22 +75,16 @@ export default function ResumeReviewPage() {
     setActiveTab('analyze');
 
     try {
-      const [analyzeResp, feedbackResp] = await Promise.all([
-        fetch(`${API_BASE}/resume/analyze`, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include',
-          body: JSON.stringify({ resume: text }),
+      const [analyzeData, feedbackData] = await Promise.all([
+        api('/resume/analyze', {
+          method: 'POST',
+          body: { resume: text },
         }),
-        fetch(`${API_BASE}/resume/feedback`, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include',
-          body: JSON.stringify({ resume: text, reply_language: SUPPORTED_LANGUAGES[language] || 'en' }),
+        api('/resume/feedback', {
+          method: 'POST',
+          body: { resume: text, reply_language: SUPPORTED_LANGUAGES[language] || 'en' },
         }),
       ]);
-
-      const analyzeData = await analyzeResp.json();
-      const feedbackData = await feedbackResp.json();
-
-      if (!analyzeResp.ok) throw new Error(analyzeData.message || 'Analysis failed.');
-      if (!feedbackResp.ok) throw new Error(feedbackData.message || 'Feedback failed.');
 
       const merged: ResumeAnalysis = {
         ...analyzeData,
@@ -105,14 +99,14 @@ export default function ResumeReviewPage() {
         try {
           const parsedUser = JSON.parse(userStr);
           if (parsedUser.id !== null) {
-            await fetch(`${API_BASE}/history`, {
-              method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include',
-              body: JSON.stringify({
+            await api('/history', {
+              method: 'POST',
+              body: {
                 actionType: 'analysis',
                 title: `Resume Review - ${file ? file.name.substring(0, 30) : 'Text Input'}`,
                 payload: { hasFile: !!file, filename: file ? file.name : '', language },
                 result: JSON.stringify(merged),
-              }),
+              },
             });
           }
         } catch {}
@@ -144,8 +138,8 @@ export default function ResumeReviewPage() {
     try {
       const lines = analysis.enhancedResume.split('\n').map(l => l.trim()).filter(Boolean);
       const candidateName = lines[0] || 'Candidate';
-      const resp = await fetch(`${API_BASE}/resume/pdf`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include',
+      const resp = await fetchWithAuth('/resume/pdf', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ resume_text: analysis.enhancedResume, name: candidateName }),
       });
       if (!resp.ok) throw new Error('PDF compilation failed.');

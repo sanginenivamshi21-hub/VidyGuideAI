@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSettings, GROQ_MODELS, LANGUAGES, ACCENT_COLORS, applyTheme, applyAccent } from '@/hooks/useSettings';
 import { useRouter } from 'next/navigation';
-import { API_BASE } from '@/lib/api';
+import { api, fetchWithAuth } from '@/lib/api';
 import { Palette, Volume2, Bell, Shield, Keyboard, Eye, GripVertical, Sun, Moon, Monitor, Check, Upload, Trash2, Download, LogOut, AlertTriangle } from 'lucide-react';
 import { useAuth, useRequireRegistered } from '@/hooks/useAuth';
 
@@ -17,7 +17,17 @@ export default function SettingsPage() {
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [activeTab, setActiveTab] = useState('general');
   const [profilePicture, setProfilePicture] = useState<string>('');
-  const [subNotifs, setSubNotifs] = useState({ resume: true, interview: true, career: true, marketing: false });
+  const [subNotifs, setSubNotifs] = useState<Record<string, boolean>>(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('vidyguide_subnotifs');
+      if (stored) { try { return { resume: true, interview: true, career: true, marketing: false, ...JSON.parse(stored) }; } catch {} }
+    }
+    return { resume: true, interview: true, career: true, marketing: false };
+  });
+
+  useEffect(() => {
+    localStorage.setItem('vidyguide_subnotifs', JSON.stringify(subNotifs));
+  }, [subNotifs]);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.speechSynthesis) {
@@ -87,12 +97,10 @@ export default function SettingsPage() {
   const handlePasswordUpdate = async () => {
     if (password.length < 6) { setPasswordMsg('Password must be at least 6 characters.'); return; }
     try {
-      const res = await fetch(`${API_BASE}/users/profile`, {
-        method: 'PUT', credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
+      const data = await api('/users/profile', {
+        method: 'PUT',
+        body: { password },
       });
-      const data = await res.json();
       setPasswordMsg(data.success ? 'Password updated successfully. All sessions invalidated.' : 'Failed to update password.');
       if (data.success) setPassword('');
     } catch { setPasswordMsg('Network error. Please try again.'); }
@@ -102,7 +110,7 @@ export default function SettingsPage() {
     if (!confirm('Are you sure you want to permanently delete your account?\n\nThis action CANNOT be undone. All your data will be erased.')) return;
     if (!confirm('This will delete ALL your:\n- Profile & settings\n- Chat conversations\n- Career history\n- Resumes\n- OCR history\n\nAre you absolutely sure?')) return;
     try {
-      const res = await fetch(`${API_BASE}/users/account`, { method: 'DELETE', credentials: 'include' });
+      const res = await fetchWithAuth('/users/account', { method: 'DELETE' });
       if (res.ok) {
         localStorage.clear();
         router.push('/auth');
@@ -112,7 +120,7 @@ export default function SettingsPage() {
 
   const handleExportData = async () => {
     try {
-      const res = await fetch(`${API_BASE}/users/export`, { credentials: 'include' });
+      const res = await fetchWithAuth('/users/export');
       if (res.ok) {
         const blob = await res.blob();
         const url = URL.createObjectURL(blob);
@@ -129,8 +137,8 @@ export default function SettingsPage() {
     const formData = new FormData();
     formData.append('file', file);
     try {
-      const res = await fetch(`${API_BASE}/users/profile/picture`, {
-        method: 'POST', credentials: 'include', body: formData,
+      const res = await fetchWithAuth('/users/profile/picture', {
+        method: 'POST', body: formData,
       });
       if (res.ok) {
         const data = await res.json();
@@ -141,7 +149,7 @@ export default function SettingsPage() {
 
   const handleDeleteProfilePicture = async () => {
     try {
-      await fetch(`${API_BASE}/users/profile/picture`, { method: 'DELETE', credentials: 'include' });
+      await fetchWithAuth('/users/profile/picture', { method: 'DELETE' });
       setProfilePicture('');
     } catch {}
   };
@@ -363,7 +371,7 @@ export default function SettingsPage() {
                 <Download size={14} /> Download my data (JSON)
               </button>
               <button onClick={() => {
-                fetch(`${API_BASE}/auth/logout`, { method: 'POST', credentials: 'include' }).catch(() => {});
+                fetchWithAuth('/auth/logout', { method: 'POST' }).catch(() => {});
                 localStorage.clear();
                 router.push('/auth');
               }} className="w-full text-left px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-lg transition-colors flex items-center gap-2">

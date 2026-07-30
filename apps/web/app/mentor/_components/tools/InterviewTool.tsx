@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { API_BASE } from '@/lib/api';
+import { api } from '@/lib/api';
 import { Briefcase, Loader2, AlertCircle } from 'lucide-react';
 
 interface InterviewToolProps {
@@ -21,21 +21,17 @@ export default function InterviewTool({ onComplete }: InterviewToolProps) {
     setLoading(true);
     setError('');
     try {
-      const resp = await fetch(`${API_BASE}/mentor/interview`, {
+      const data = await api('/mentor/interview', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
+        body: {
           role,
           company: company || 'General',
           experience_level: 'Entry Level',
           skills,
           difficulty,
           temperature: 0.8,
-        }),
+        },
       });
-      const data = await resp.json();
-      if (!resp.ok) throw new Error(data.message || 'Interview prep failed');
       const questions = data.questions || [];
       const formatted = questions.map((q: string, i: number) => `**Q${i + 1}.** ${q}`).join('\n\n');
       const header = `## 🎤 Interview Practice: ${role}\n\nHere are ${difficulty} difficulty questions${company ? ` for ${company}` : ''}:\n\n---\n\n`;

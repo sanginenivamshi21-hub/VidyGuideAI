@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { API_BASE } from '@/lib/api';
+import { api } from '@/lib/api';
 import { 
   Compass, 
   Sparkles, 
@@ -229,11 +229,9 @@ export default function CareerPage() {
     setCompletedMilestones([]);
 
     try {
-      const resp = await fetch(`${API_BASE}/career`, {
+      const data = await api('/career', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
+        body: {
           skills,
           interests,
           education: eduKey,
@@ -243,7 +241,6 @@ export default function CareerPage() {
           location: locationInput,
           extra_context: note,
           reply_language: SUPPORTED_LANGUAGES[language as keyof typeof SUPPORTED_LANGUAGES] || 'en',
-          // Advanced fields
           cgpa,
           languages,
           target_company: targetCompany,
@@ -260,56 +257,47 @@ export default function CareerPage() {
           certificates,
           strengths,
           weaknesses,
-        }),
+        },
       });
-
-      const data = await resp.json();
-      if (!resp.ok) {
-        throw new Error(data.message || 'API failed');
-      }
 
       setResult(data.career_suggestions);
 
       // Parse milestones
-      const roadmapResp = await fetch(`${API_BASE}/career/roadmap`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ text: data.career_suggestions }),
-      });
-
-      if (roadmapResp.ok) {
-        const roadmapData = await roadmapResp.json();
+      try {
+        const roadmapData = await api('/career/roadmap', {
+          method: 'POST',
+          body: { text: data.career_suggestions },
+        });
         setMilestones(roadmapData.milestones || []);
         setShowRoadmap(true);
-      }
+      } catch {}
 
       // Log history
       const user = localStorage.getItem('user');
       if (user) {
         const parsedUser = JSON.parse(user);
         if (parsedUser.id !== null) {
-          await fetch(`${API_BASE}/history`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify({
-              actionType: 'career',
-              title: `Career Guidance (${eduKey.split(' ', 2)[1] || eduKey})`,
-              payload: {
-                skills,
-                interests,
-                education: eduKey,
-                education_level: eduLvl,
-                education_detail: extraInfo,
-                goal,
-                location: locationInput,
-                extra_context: note,
-                language,
+          try {
+            await api('/history', {
+              method: 'POST',
+              body: {
+                actionType: 'career',
+                title: `Career Guidance (${eduKey.split(' ', 2)[1] || eduKey})`,
+                payload: {
+                  skills,
+                  interests,
+                  education: eduKey,
+                  education_level: eduLvl,
+                  education_detail: extraInfo,
+                  goal,
+                  location: locationInput,
+                  extra_context: note,
+                  language,
+                },
+                result: data.career_suggestions,
               },
-              result: data.career_suggestions,
-            }),
-          });
+            });
+          } catch {}
         }
       }
     } catch (err: any) {

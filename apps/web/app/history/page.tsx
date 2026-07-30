@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Clock, Search, Trash2, Eye, Calendar } from 'lucide-react';
-import { API_BASE } from '@/lib/api';
+import { fetchWithAuth } from '@/lib/api';
 import { ROUTES } from '@/lib/routes';
 import { useAuth, useRequireRegistered } from '@/hooks/useAuth';
 
@@ -31,7 +31,7 @@ export default function HistoryPage() {
     setError('');
     setLoading(true);
     try {
-      const resp = await fetch(`${API_BASE}/history`, {
+      const resp = await fetchWithAuth('/history', {
         method: 'GET', headers: { 'Content-Type': 'application/json' }, credentials: 'include',
       });
       if (resp.status === 401) { setGuest(true); setLoading(false); return; }
@@ -54,9 +54,8 @@ export default function HistoryPage() {
     if (!confirm('Are you sure you want to delete this log?')) return;
 
     try {
-      const resp = await fetch(`${API_BASE}/history/${id}`, {
+      const resp = await fetchWithAuth('/history/' + id, {
         method: 'DELETE',
-        credentials: 'include',
       });
 
       if (resp.ok) {
@@ -76,9 +75,8 @@ export default function HistoryPage() {
     if (!confirm('Are you sure you want to clear your entire history? This cannot be undone.')) return;
 
     try {
-      const resp = await fetch(`${API_BASE}/history`, {
+      const resp = await fetchWithAuth('/history', {
         method: 'DELETE',
-        credentials: 'include',
       });
 
       if (resp.ok) {

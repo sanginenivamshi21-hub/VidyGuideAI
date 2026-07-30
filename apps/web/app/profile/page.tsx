@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { User, RefreshCw, Save } from 'lucide-react';
-import { API_BASE } from '@/lib/api';
+import { api, fetchWithAuth } from '@/lib/api';
 import { ROUTES } from '@/lib/routes';
 import { useAuth, useRequireRegistered } from '@/hooks/useAuth';
 
@@ -23,7 +23,7 @@ interface Stats {
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { user, isGuest, isAuthenticated, loading: authLoading } = useAuth();
+  const { user, isGuest, isAuthenticated, loading: authLoading, refreshUser } = useAuth();
   const { loading: reqLoading } = useRequireRegistered();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
@@ -40,7 +40,7 @@ export default function ProfilePage() {
     setError('');
     setLoading(true);
     try {
-      const resp = await fetch(`${API_BASE}/users/profile`, {
+      const resp = await fetchWithAuth('/users/profile', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -76,30 +76,20 @@ export default function ProfilePage() {
     setSaving(true);
 
     try {
-      const resp = await fetch(`${API_BASE}/users/profile`, {
+      const data = await api('/users/profile', {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          fullName,
-          ...(password ? { password } : {}),
-        }),
+        body: { fullName, ...(password ? { password } : {}) },
       });
-
-      const data = await resp.json();
-      if (!resp.ok) {
-        throw new Error(data.message || 'Failed to update profile.');
-      }
 
       setMessage('Profile updated successfully!');
       setPassword('');
       setConfirmPassword('');
-      // Update local storage user object
       const userStr = localStorage.getItem('user');
       if (userStr) {
         const u = JSON.parse(userStr);
         u.fullName = data.user.fullName;
         localStorage.setItem('user', JSON.stringify(u));
+        refreshUser();
       }
     } catch (err: any) {
       setError(err.message || 'Failed to update profile.');
