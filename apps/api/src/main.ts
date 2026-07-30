@@ -111,6 +111,6 @@ async function bootstrap() {
     logger.log(`VidyGuideAI API running on port ${port}`);
     logger.log(`CORS origins: ${corsOrigins.join(', ')}`);
     logger.log(`NODE_ENV: ${process.env.NODE_ENV || 'not set'}`);
-    logger.log(`Email sender: ${process.env.RESEND_FROM_EMAIL || 'not configured'}`);
+    logger.log(`Email sender: ${process.env.BREVO_SENDER_EMAIL || 'not configured'}`);
 }
 bootstrap();

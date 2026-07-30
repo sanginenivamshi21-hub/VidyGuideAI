@@ -64,10 +64,9 @@ export class AuthService {
         });
         this.logger.log(`[REGISTER] OTP stored (hashed) for email: ${email}`);
 
-        const emailSent = await this.mailService.sendEmail(
+        const emailSent = await this.mailService.sendOtp(
             email,
-            'VidyGuideAI - Registration OTP',
-            `<p>Your registration OTP is: <strong>${otp}</strong>. It will expire in 10 minutes.</p>`,
+            otp,
         );
 
         if (!emailSent) {
@@ -127,10 +126,9 @@ export class AuthService {
             });
             this.logger.log(`[LOGIN] OTP stored (hashed) for unverified user: ${email}`);
 
-            const emailSent = await this.mailService.sendEmail(
+            const emailSent = await this.mailService.sendOtp(
                 email,
-                'VidyGuideAI - Login Verification OTP',
-                `<p>Your login verification OTP is: <strong>${otp}</strong>. It will expire in 10 minutes.</p>`,
+                otp,
             );
 
             if (!emailSent) {
@@ -209,16 +207,9 @@ export class AuthService {
         });
         this.logger.log(`[RESEND_OTP] New OTP stored (hashed) for email: ${emailLower}`);
 
-        const subjectMap: Record<string, string> = {
-            register: 'VidyGuideAI - Registration OTP',
-            login: 'VidyGuideAI - Login Verification OTP',
-            reset_password: 'VidyGuideAI - Password Reset OTP',
-        };
-
-        const emailSent = await this.mailService.sendEmail(
+        const emailSent = await this.mailService.sendOtp(
             emailLower,
-            subjectMap[purpose] || 'VidyGuideAI - Verification Code',
-            `<p>Your verification code is: <strong>${otp}</strong>. It will expire in 10 minutes.</p>`,
+            otp,
         );
 
         if (!emailSent) {
@@ -403,10 +394,9 @@ export class AuthService {
         });
         this.logger.log(`[FORGOT_PASSWORD] OTP stored (hashed) for email: ${emailLower}`);
 
-        const emailSent = await this.mailService.sendEmail(
+        const emailSent = await this.mailService.sendPasswordReset(
             emailLower,
-            'VidyGuideAI - Password Reset OTP',
-            `<p>You requested a password reset. Your OTP is: <strong>${otp}</strong>. It will expire in 10 minutes.</p>`,
+            otp,
         );
 
         if (!emailSent) {

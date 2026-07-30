@@ -242,7 +242,7 @@ VidyGuideAI solves this with an **all-in-one AI-powered career platform** that a
 | **Auth** | JWT (http-only cookies) + bcryptjs | Secure sessions |
 | **OCR** | EasyOCR (PyTorch) + Tesseract | Text extraction |
 | **PDF** | ReportLab (Python) | Resume PDF generation |
-| **Email** | Resend API | OTP, notifications |
+| **Email** | Brevo (Sendinblue) API | OTP, notifications |
 | **Storage** | Cloudinary | File uploads |
 | **Cache** | Upstash Redis | Session, rate limiting |
 | **Infrastructure** | Docker Compose | Containerization |
@@ -352,8 +352,8 @@ cp .env.example .env
 | `GROQ_API_KEY` | Yes | Groq AI API key | `gsk_your_key` |
 | `DATABASE_URL` | Yes | PostgreSQL connection string | `postgresql://user:pass@host:5432/vidyguide` |
 | `JWT_SECRET` | Yes | JWT signing secret (min 16 chars) | `your_jwt_secret_min_16_chars` |
-| `RESEND_API_KEY` | Yes | Resend email API key | `re_your_resend_key` |
-| `RESEND_FROM_EMAIL` | Yes | Verified sender email | `noreply@yourdomain.com` |
+| `BREVO_API_KEY` | Yes | Brevo email API key | `your_brevo_api_key` |
+| `BREVO_SENDER_EMAIL` | Yes | Verified sender email | `your-sender@example.com` |
 | `NEXT_PUBLIC_API_URL` | Yes | API base URL (frontend) | `http://localhost:8000` |
 | `APP_BASE_URL` | Yes | Frontend base URL | `http://localhost:3000` |
 | `GEMINI_API_KEY` | No | Gemini API key (fallback) | `your_gemini_key` |
