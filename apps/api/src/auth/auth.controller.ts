@@ -129,8 +129,13 @@ export class AuthController {
         const start = Date.now();
         const refreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
 
+        this.logger.log(`[REFRESH] cookie header: ${req.headers?.cookie ? 'present' : 'MISSING'}`);
+        this.logger.log(`[REFRESH] cookies parsed: ${JSON.stringify(Object.keys(req.cookies || {}))}`);
+        this.logger.log(`[REFRESH] refreshToken from cookie: ${req.cookies?.refreshToken ? 'present' : 'MISSING'}`);
+
         if (!refreshToken) {
             this.logger.warn('[REFRESH] No refresh token provided');
+            this.logger.warn(`[REFRESH] req.headers.cookie: ${req.headers?.cookie || '(empty)'}`);
             return { message: 'Refresh token is required.', authenticated: false };
         }
 
@@ -226,13 +231,18 @@ export class AuthController {
         accessToken: string,
         refreshToken: string,
     ) {
-        res.cookie('accessToken', accessToken, {
+        const opts = {
             ...COOKIE_OPTIONS,
             maxAge: ACCESS_TOKEN_MAX_AGE,
-        });
+            path: '/',
+        };
+        res.cookie('accessToken', accessToken, opts);
         res.cookie('refreshToken', refreshToken, {
             ...COOKIE_OPTIONS,
             maxAge: REFRESH_TOKEN_MAX_AGE,
+            path: '/',
         });
+        this.logger.log(`[COOKIE] Set-Cookie: accessToken ${accessToken.length} chars, maxAge=${ACCESS_TOKEN_MAX_AGE}, secure=${opts.secure}, sameSite=${opts.sameSite}`);
+        this.logger.log(`[COOKIE] Set-Cookie: refreshToken ${refreshToken.length} chars, maxAge=${REFRESH_TOKEN_MAX_AGE}, secure=${opts.secure}, sameSite=${opts.sameSite}`);
     }
 }

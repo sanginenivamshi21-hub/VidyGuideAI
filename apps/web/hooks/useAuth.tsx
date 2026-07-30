@@ -59,7 +59,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 method: 'POST', credentials: 'include',
               });
               const refreshData = await refreshResp.json();
-              if (refreshResp.ok && refreshData.user) {
+              if (refreshResp.ok && refreshData.user && refreshData.authenticated !== false) {
                 localStorage.setItem('user', JSON.stringify(refreshData.user));
                 setUser(refreshData.user);
               } else {
@@ -70,7 +70,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           } else {
             setUser(parsed);
           }
-        } catch { setUser(null); }
+        } catch {
+          localStorage.removeItem('user');
+          setUser(null);
+        }
       }
       setLoading(false);
     };
@@ -122,13 +125,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         method: 'POST',
         credentials: 'include',
       });
-      const data = await resp.json();
-      if (resp.ok && data.user) {
-        localStorage.setItem('user', JSON.stringify(data.user));
-        setUser(data.user);
+      const refreshData = await resp.json();
+      if (resp.ok && refreshData.user) {
+        localStorage.setItem('user', JSON.stringify(refreshData.user));
+        setUser(refreshData.user);
         return true;
       }
-      if (data.authenticated === false) {
+      if (refreshData.authenticated === false) {
         localStorage.removeItem('user');
         setUser(null);
       }

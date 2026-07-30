@@ -1,17 +1,18 @@
 const rawUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 export const API_BASE = rawUrl.endsWith('/') ? rawUrl.slice(0, -1) : rawUrl;
 
-let refreshing: Promise<boolean> | null = null;
+let refreshing: Promise<{ ok: boolean; accessToken?: string }> | null = null;
 
-async function tryRefresh(): Promise<boolean> {
+async function tryRefresh(): Promise<{ ok: boolean; accessToken?: string }> {
   if (refreshing) return refreshing;
   refreshing = (async () => {
     try {
       const res = await fetch(`${API_BASE}/auth/refresh`, {
         method: 'POST', credentials: 'include',
       });
-      return res.ok;
-    } catch { return false; }
+      const data = await res.json();
+      return { ok: !!(data.user && data.authenticated !== false), accessToken: data.accessToken };
+    } catch { return { ok: false }; }
     finally { refreshing = null; }
   })();
   return refreshing;
@@ -24,7 +25,7 @@ export async function fetchWithAuth(path: string, options: RequestInit = {}): Pr
   let res = await doFetch();
   if (res.status === 401 && !path.startsWith('/auth/')) {
     const refreshed = await tryRefresh();
-    if (refreshed) res = await doFetch();
+    if (refreshed.ok) res = await doFetch();
   }
   return res;
 }
