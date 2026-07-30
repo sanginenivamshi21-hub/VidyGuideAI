@@ -6,6 +6,43 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [1.0.0] - 2026-07-30
+
+### Added
+- AI Mentor chat with server-sent event streaming
+- Interview preparation simulator with feedback
+- Multilingual translator (10+ Indian languages)
+- Career guidance and roadmap generation
+- ATS resume builder, feedback analyzer, and PDF export
+- OCR scanner (PDF/image text extraction)
+- Conversation management with pinning and search
+- Full interaction history audit trail
+- User settings with theme, accent, model, and voice configuration
+- JWT authentication with HTTP-only cookies, OTP verification, forgot/reset password
+- User dashboard with activity statistics
+- Profile management with picture upload
+- Account data export and deletion
+- Brevo email integration for OTP and password reset
+- Mobile-responsive UI with sidebar navigation
+- Keyboard shortcuts throughout the application
+- GitHub Actions CI pipeline
+- Prisma ORM with PostgreSQL
+
+### Improved
+- Session management with refresh token rotation
+- Production stability across all auth flows
+- Mobile UI layout and responsive design
+- API wrapper with automatic 401 retry
+
+### Fixed
+- `/auth/me` now fetches full user data from database (fullName, profilePicture, isVerified)
+- `refreshUser()` fetches from API instead of stale localStorage
+- Profile picture upload/deletion syncs with auth context
+- Login and verify-otp responses include fullName
+- Dashboard greeting uses correct fullName
+
+---
+
 ## [3.2.0] - 2026-07-29
 
 ### Added
