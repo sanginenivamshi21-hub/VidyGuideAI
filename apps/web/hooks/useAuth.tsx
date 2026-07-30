@@ -27,7 +27,7 @@ interface AuthContextType {
   checkSession: () => Promise<boolean>;
   logout: () => Promise<void>;
   loginAsGuest: () => void;
-  refreshUser: () => void;
+  refreshUser: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null);
@@ -80,11 +80,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const isAuthenticated = user !== null && user.id !== null;
   const isGuest = user !== null && user.id === null;
 
-  const refreshUser = useCallback(() => {
-    const stored = localStorage.getItem('user');
-    if (stored) {
-      try { setUser(JSON.parse(stored)); } catch { setUser(null); }
-    } else { setUser(null); }
+  const refreshUser = useCallback(async () => {
+    try {
+      const resp = await fetch(`${API_BASE}/auth/me`, { credentials: 'include' });
+      const data = await resp.json();
+      if (resp.ok && data.authenticated && data.user) {
+        localStorage.setItem('user', JSON.stringify(data.user));
+        setUser(data.user);
+      } else {
+        const stored = localStorage.getItem('user');
+        if (stored) {
+          try { setUser(JSON.parse(stored)); } catch { setUser(null); }
+        } else { setUser(null); }
+      }
+    } catch {
+      const stored = localStorage.getItem('user');
+      if (stored) {
+        try { setUser(JSON.parse(stored)); } catch { setUser(null); }
+      } else { setUser(null); }
+    }
   }, []);
 
   const checkSession = useCallback(async () => {

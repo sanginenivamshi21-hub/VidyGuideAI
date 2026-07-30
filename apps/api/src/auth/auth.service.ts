@@ -469,6 +469,9 @@ export class AuthService {
         id: number;
         username: string;
         email: string;
+        fullName?: string;
+        profilePicture?: string;
+        isVerified?: boolean;
     }) {
         const payload = {
             sub: user.id,
@@ -499,6 +502,9 @@ export class AuthService {
                 id: user.id,
                 username: user.username,
                 email: user.email,
+                fullName: user.fullName || '',
+                profilePicture: user.profilePicture || '',
+                isVerified: user.isVerified || false,
             },
         };
     }

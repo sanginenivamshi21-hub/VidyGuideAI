@@ -38,11 +38,8 @@ export default function SettingsPage() {
   }, []);
 
   useEffect(() => {
-    const u = localStorage.getItem('user');
-    if (u) {
-      try { const p = JSON.parse(u).profilePicture; if (p) setProfilePicture(p); } catch {}
-    }
-  }, []);
+    if (user?.profilePicture) setProfilePicture(user.profilePicture);
+  }, [user]);
 
   const update = (key: string, value: any) => {
     updateSettings({ [key]: value } as any);
@@ -143,6 +140,12 @@ export default function SettingsPage() {
       if (res.ok) {
         const data = await res.json();
         setProfilePicture(data.profilePicture);
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+          const u = JSON.parse(userStr);
+          u.profilePicture = data.profilePicture;
+          localStorage.setItem('user', JSON.stringify(u));
+        }
       }
     } catch {}
   };
@@ -151,6 +154,12 @@ export default function SettingsPage() {
     try {
       await fetchWithAuth('/users/profile/picture', { method: 'DELETE' });
       setProfilePicture('');
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        const u = JSON.parse(userStr);
+        u.profilePicture = '';
+        localStorage.setItem('user', JSON.stringify(u));
+      }
     } catch {}
   };
 

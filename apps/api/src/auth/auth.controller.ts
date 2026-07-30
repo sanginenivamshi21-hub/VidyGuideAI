@@ -8,6 +8,7 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ResendOtpDto } from './dto/resend-otp.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { PrismaService } from '../database/prisma.service';
 import * as express from 'express';
 
 const COOKIE_OPTIONS = {
@@ -23,7 +24,10 @@ const REFRESH_TOKEN_MAX_AGE = 7 * 24 * 60 * 60 * 1000;
 export class AuthController {
     private readonly logger = new Logger(AuthController.name);
 
-    constructor(private readonly authService: AuthService) {}
+    constructor(
+        private readonly authService: AuthService,
+        private readonly prisma: PrismaService,
+    ) {}
 
     @Post('register')
     @Throttle({ default: { ttl: 60000, limit: 3 } })
@@ -150,14 +154,23 @@ export class AuthController {
     @Get('me')
     @UseGuards(JwtAuthGuard)
     async me(@Req() req: any) {
-        const user = req.user;
+        const dbUser = await this.prisma.user.findUnique({
+            where: { id: req.user.userId },
+            select: {
+                id: true,
+                username: true,
+                email: true,
+                fullName: true,
+                profilePicture: true,
+                isVerified: true,
+            },
+        });
+        if (!dbUser) {
+            return { authenticated: false, message: 'User not found.' };
+        }
         return {
             authenticated: true,
-            user: {
-                id: user.userId,
-                username: user.username,
-                email: user.email,
-            },
+            user: dbUser,
         };
     }
 
