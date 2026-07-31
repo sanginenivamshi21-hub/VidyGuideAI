@@ -111,7 +111,7 @@ export default function CareerRoadmapPage() {
                 <p className="text-caption">{t('roadmap.visualSubtitle')}</p>
               </div>
             </div>
-            <div className="badge badge-accent">📍 {milestones.length} {t('roadmap.milestones')}</div>
+            <div className="badge badge-accent">{milestones.length} {t('roadmap.milestones')}</div>
           </div>
 
           <div className="overflow-x-auto pb-4 flex gap-4 pr-4 mt-6">

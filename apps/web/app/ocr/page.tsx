@@ -90,7 +90,7 @@ export default function OcrScannerPage() {
         </div>
       </div>
 
-      <div className="glass surface-card flex flex-col gap-6 p-6">
+      <div className="surface-card flex flex-col gap-6 p-6">
         <div className="flex flex-col gap-2">
           <label htmlFor="ocr-file" className="label">{t('ocr.uploadLabel')}</label>
           <motion.div

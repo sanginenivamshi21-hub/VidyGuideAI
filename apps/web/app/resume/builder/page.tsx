@@ -14,7 +14,7 @@ import {
 import ResumePreview from '@/components/resume/ResumePreview';
 import {
   ArrowLeft, ArrowRight, Check, Download, Sparkles, RefreshCw,
-  Save, Eye, EyeOff, ZoomIn, ZoomOut, Palette, Type,
+  Save, Eye, EyeOff, ZoomIn, ZoomOut, Palette, Type, Plus, X,
 } from 'lucide-react';
 
 const STEPS = [
@@ -459,7 +459,7 @@ export default function ResumeBuilderPage() {
         <div className={`grid gap-6 ${showPreview ? 'lg:grid-cols-2' : 'lg:grid-cols-1'}`}>
           {/* Form */}
           <div className="order-2 lg:order-1">
-            <div className="bg-slate-900/40 border border-slate-800 rounded-2xl p-4 sm:p-6 backdrop-blur-md min-h-[400px]">
+            <div className="bg-slate-900/40 border border-slate-800 rounded-2xl p-4 sm:p-6 backdrop-blur-md shadow-xl min-h-[400px]">
               {step === 0 && <TargetStep data={data} updateData={updateData} validateRole={validateRole} validatingRole={validatingRole} roleSuggestions={roleSuggestions} roleInvalid={roleInvalid} setRoleSuggestions={setRoleSuggestions} setRoleInvalid={setRoleInvalid} roleConfig={currentRoleConfig} />}
               {step === 1 && <PersonalStep data={data} updateData={updateData} />}
               {step === 2 && <EducationStep data={data} updateData={updateData} />}
@@ -731,24 +731,24 @@ function EducationStep({ data, updateData }: any) {
           <div className="p-2 bg-violet-500/10 border border-violet-500/20 rounded-xl text-violet-400"><Type size={20} /></div>
           <h2 className="text-xl font-bold text-white">Education</h2>
         </div>
-        <button onClick={add} className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold rounded-lg hover:bg-emerald-500/20 transition-all"><span className="text-lg leading-none">+</span> Add</button>
+        <button onClick={add} className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold rounded-lg hover:bg-emerald-500/20 transition-all"><Plus size={14} /> Add</button>
       </div>
       {data.education.length === 0 && <p className="text-sm text-slate-500 italic py-8 text-center">No education entries. Click "Add" to begin.</p>}
       {data.education.map((item: any, idx: number) => (
         <div key={item.id} className="p-4 bg-slate-950/50 border border-slate-800 rounded-xl flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Entry {idx + 1}</span>
-            <button onClick={() => remove(item.id)} className="p-1 text-slate-500 hover:text-red-400 transition-all"><span className="text-lg leading-none">&times;</span></button>
+            <button onClick={() => remove(item.id)} className="p-1 text-slate-500 hover:text-red-400 transition-all"><X size={16} /></button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <input value={item.degree} onChange={e => update(item.id, 'degree', e.target.value)} placeholder="Degree (e.g. B.Tech CSE)" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
-            <input value={item.institution} onChange={e => update(item.id, 'institution', e.target.value)} placeholder="Institution" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
-            <input value={item.field} onChange={e => update(item.id, 'field', e.target.value)} placeholder="Field / Branch" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
-            <input value={item.grade} onChange={e => update(item.id, 'grade', e.target.value)} placeholder="CGPA / Percentage" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
+            <input value={item.degree} onChange={e => update(item.id, 'degree', e.target.value)} placeholder="Degree (e.g. B.Tech CSE)" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm" />
+            <input value={item.institution} onChange={e => update(item.id, 'institution', e.target.value)} placeholder="Institution" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm" />
+            <input value={item.field} onChange={e => update(item.id, 'field', e.target.value)} placeholder="Field / Branch" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm" />
+            <input value={item.grade} onChange={e => update(item.id, 'grade', e.target.value)} placeholder="CGPA / Percentage" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm" />
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <input value={item.startYear} onChange={e => update(item.id, 'startYear', e.target.value)} placeholder="Start year" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
-            <input value={item.endYear} onChange={e => update(item.id, 'endYear', e.target.value)} placeholder="End year" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
+            <input value={item.startYear} onChange={e => update(item.id, 'startYear', e.target.value)} placeholder="Start year" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm" />
+            <input value={item.endYear} onChange={e => update(item.id, 'endYear', e.target.value)} placeholder="End year" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm" />
           </div>
         </div>
       ))}
@@ -768,32 +768,32 @@ function ExperienceStep({ data, updateData, roleConfig }: any) {
           <div className="p-2 bg-orange-500/10 border border-orange-500/20 rounded-xl text-orange-400"><RefreshCw size={20} /></div>
           <h2 className="text-xl font-bold text-white">Experience</h2>
         </div>
-        <button onClick={add} className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold rounded-lg hover:bg-emerald-500/20 transition-all"><span className="text-lg leading-none">+</span> Add</button>
+        <button onClick={add} className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold rounded-lg hover:bg-emerald-500/20 transition-all"><Plus size={14} /> Add</button>
       </div>
       {data.experience.length === 0 && <p className="text-sm text-slate-500 italic py-8 text-center">No experience yet (that's OK for freshers).</p>}
       {data.experience.map((item: any, idx: number) => (
         <div key={item.id} className="p-4 bg-slate-950/50 border border-slate-800 rounded-xl flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Entry {idx + 1}</span>
-            <button onClick={() => remove(item.id)} className="p-1 text-slate-500 hover:text-red-400"><span className="text-lg leading-none">&times;</span></button>
+            <button onClick={() => remove(item.id)} className="p-1 text-slate-500 hover:text-red-400"><X size={16} /></button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <input value={item.company} onChange={e => update(item.id, 'company', e.target.value)} placeholder="Company" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
-            <input value={item.role} onChange={e => update(item.id, 'role', e.target.value)} placeholder="Position / Role" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
-            <input value={item.location} onChange={e => update(item.id, 'location', e.target.value)} placeholder="Location" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
+            <input value={item.company} onChange={e => update(item.id, 'company', e.target.value)} placeholder="Company" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm" />
+            <input value={item.role} onChange={e => update(item.id, 'role', e.target.value)} placeholder="Position / Role" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm" />
+            <input value={item.location} onChange={e => update(item.id, 'location', e.target.value)} placeholder="Location" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm" />
             <div className="flex gap-2 items-center">
-              <input value={item.startDate} onChange={e => update(item.id, 'startDate', e.target.value)} placeholder="Start" className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
-              {!item.current && <input value={item.endDate} onChange={e => update(item.id, 'endDate', e.target.value)} placeholder="End" className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />}
+              <input value={item.startDate} onChange={e => update(item.id, 'startDate', e.target.value)} placeholder="Start" className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm" />
+              {!item.current && <input value={item.endDate} onChange={e => update(item.id, 'endDate', e.target.value)} placeholder="End" className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm" />}
             </div>
           </div>
           <label className="flex items-center gap-2 text-sm text-slate-400 cursor-pointer">
             <input type="checkbox" checked={item.current} onChange={e => update(item.id, 'current', e.target.checked)} className="accent-emerald-500" />
             Currently work here
           </label>
-          <textarea value={item.description} onChange={e => update(item.id, 'description', e.target.value)} placeholder="Describe your role, responsibilities, and impact. Use strong action verbs and quantify results where possible." rows={3} className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm resize-none" />
+          <textarea value={item.description} onChange={e => update(item.id, 'description', e.target.value)} placeholder="Describe your role, responsibilities, and impact. Use strong action verbs and quantify results where possible." rows={3} className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm resize-none" />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <input value={item.achievements} onChange={e => update(item.id, 'achievements', e.target.value)} placeholder="Key achievements (comma-separated)" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
-            <input value={item.technologies} onChange={e => update(item.id, 'technologies', e.target.value)} placeholder={roleConfig?.techPlaceholder || 'Technologies used'} className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
+            <input value={item.achievements} onChange={e => update(item.id, 'achievements', e.target.value)} placeholder="Key achievements (comma-separated)" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm" />
+            <input value={item.technologies} onChange={e => update(item.id, 'technologies', e.target.value)} placeholder={roleConfig?.techPlaceholder || 'Technologies used'} className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm" />
           </div>
         </div>
       ))}
@@ -813,25 +813,25 @@ function ProjectsStep({ data, updateData, roleConfig }: any) {
           <div className="p-2 bg-cyan-500/10 border border-cyan-500/20 rounded-xl text-cyan-400"><Sparkles size={20} /></div>
           <h2 className="text-xl font-bold text-white">Projects</h2>
         </div>
-        <button onClick={add} className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold rounded-lg hover:bg-emerald-500/20 transition-all"><span className="text-lg leading-none">+</span> Add</button>
+        <button onClick={add} className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold rounded-lg hover:bg-emerald-500/20 transition-all"><Plus size={14} /> Add</button>
       </div>
       {data.projects.length === 0 && <p className="text-sm text-slate-500 italic py-8 text-center">Add projects to showcase your practical experience.</p>}
       {data.projects.map((item: any, idx: number) => (
         <div key={item.id} className="p-4 bg-slate-950/50 border border-slate-800 rounded-xl flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Project {idx + 1}</span>
-            <button onClick={() => remove(item.id)} className="p-1 text-slate-500 hover:text-red-400"><span className="text-lg leading-none">&times;</span></button>
+            <button onClick={() => remove(item.id)} className="p-1 text-slate-500 hover:text-red-400"><X size={16} /></button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <input value={item.title} onChange={e => update(item.id, 'title', e.target.value)} placeholder={roleConfig?.projectTypeHint || 'Project title'} className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
-            <input value={item.technologies} onChange={e => update(item.id, 'technologies', e.target.value)} placeholder={roleConfig?.projectTechHint || 'Technologies used'} className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
-            <input value={item.techStack} onChange={e => update(item.id, 'techStack', e.target.value)} placeholder="Tech stack (detailed)" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
-            <input value={item.link || item.liveDemo} onChange={e => update(item.id, 'link', e.target.value)} placeholder="GitHub / Demo URL" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
+            <input value={item.title} onChange={e => update(item.id, 'title', e.target.value)} placeholder={roleConfig?.projectTypeHint || 'Project title'} className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm" />
+            <input value={item.technologies} onChange={e => update(item.id, 'technologies', e.target.value)} placeholder={roleConfig?.projectTechHint || 'Technologies used'} className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm" />
+            <input value={item.techStack} onChange={e => update(item.id, 'techStack', e.target.value)} placeholder="Tech stack (detailed)" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm" />
+            <input value={item.link || item.liveDemo} onChange={e => update(item.id, 'link', e.target.value)} placeholder="GitHub / Demo URL" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm" />
           </div>
-          <textarea value={item.description} onChange={e => update(item.id, 'description', e.target.value)} placeholder="Describe the project, your contributions, and key outcomes..." rows={2} className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm resize-none" />
+          <textarea value={item.description} onChange={e => update(item.id, 'description', e.target.value)} placeholder="Describe the project, your contributions, and key outcomes..." rows={2} className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm resize-none" />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <input value={item.contributions} onChange={e => update(item.id, 'contributions', e.target.value)} placeholder="Key contributions" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
-            <input value={item.results} onChange={e => update(item.id, 'results', e.target.value)} placeholder="Measurable results" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
+            <input value={item.contributions} onChange={e => update(item.id, 'contributions', e.target.value)} placeholder="Key contributions" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm" />
+            <input value={item.results} onChange={e => update(item.id, 'results', e.target.value)} placeholder="Measurable results" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm" />
           </div>
         </div>
       ))}
@@ -906,7 +906,7 @@ function SkillsStep({ data, updateData, roleConfig }: any) {
                 {items.map((s: any) => (
                   <span key={s.id} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-full text-xs text-slate-200">
                     {s.name}
-                    <button onClick={() => remove(s.id)} className="text-slate-500 hover:text-red-400 ml-0.5"><span className="text-lg leading-none">&times;</span></button>
+                    <button onClick={() => remove(s.id)} className="text-slate-500 hover:text-red-400 ml-0.5"><X size={16} /></button>
                   </span>
                 ))}
               </div>
@@ -930,20 +930,20 @@ function CertificationsStep({ data, updateData }: any) {
           <div className="p-2 bg-amber-500/10 border border-amber-500/20 rounded-xl text-amber-400"><Check size={20} /></div>
           <h2 className="text-xl font-bold text-white">Certifications</h2>
         </div>
-        <button onClick={add} className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold rounded-lg hover:bg-emerald-500/20 transition-all"><span className="text-lg leading-none">+</span> Add</button>
+        <button onClick={add} className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold rounded-lg hover:bg-emerald-500/20 transition-all"><Plus size={14} /> Add</button>
       </div>
       {data.certifications.length === 0 && <p className="text-sm text-slate-500 italic py-8 text-center">No certifications added yet.</p>}
       {data.certifications.map((item: any, idx: number) => (
         <div key={item.id} className="p-4 bg-slate-950/50 border border-slate-800 rounded-xl flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Cert {idx + 1}</span>
-            <button onClick={() => remove(item.id)} className="p-1 text-slate-500 hover:text-red-400"><span className="text-lg leading-none">&times;</span></button>
+            <button onClick={() => remove(item.id)} className="p-1 text-slate-500 hover:text-red-400"><X size={16} /></button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <input value={item.name} onChange={e => update(item.id, 'name', e.target.value)} placeholder="Certification name" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
-            <input value={item.issuer} onChange={e => update(item.id, 'issuer', e.target.value)} placeholder="Issuer" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
-            <input value={item.date} onChange={e => update(item.id, 'date', e.target.value)} placeholder="Date" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
-            <input value={item.link} onChange={e => update(item.id, 'link', e.target.value)} placeholder="Credential URL" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
+            <input value={item.name} onChange={e => update(item.id, 'name', e.target.value)} placeholder="Certification name" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm" />
+            <input value={item.issuer} onChange={e => update(item.id, 'issuer', e.target.value)} placeholder="Issuer" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm" />
+            <input value={item.date} onChange={e => update(item.id, 'date', e.target.value)} placeholder="Date" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm" />
+            <input value={item.link} onChange={e => update(item.id, 'link', e.target.value)} placeholder="Credential URL" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm" />
           </div>
         </div>
       ))}
@@ -963,20 +963,20 @@ function AchievementsStep({ data, updateData }: any) {
           <div className="p-2 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-400"><Sparkles size={20} /></div>
           <h2 className="text-xl font-bold text-white">Achievements</h2>
         </div>
-        <button onClick={add} className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold rounded-lg hover:bg-emerald-500/20 transition-all"><span className="text-lg leading-none">+</span> Add</button>
+        <button onClick={add} className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold rounded-lg hover:bg-emerald-500/20 transition-all"><Plus size={14} /> Add</button>
       </div>
       {data.achievements.length === 0 && <p className="text-sm text-slate-500 italic py-8 text-center">Hackathons, competitions, awards, rankings...</p>}
       {data.achievements.map((item: any, idx: number) => (
         <div key={item.id} className="p-4 bg-slate-950/50 border border-slate-800 rounded-xl flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Award {idx + 1}</span>
-            <button onClick={() => remove(item.id)} className="p-1 text-slate-500 hover:text-red-400"><span className="text-lg leading-none">&times;</span></button>
+            <button onClick={() => remove(item.id)} className="p-1 text-slate-500 hover:text-red-400"><X size={16} /></button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <input value={item.title} onChange={e => update(item.id, 'title', e.target.value)} placeholder="Achievement / Award" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
-            <input value={item.date} onChange={e => update(item.id, 'date', e.target.value)} placeholder="Date" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
+            <input value={item.title} onChange={e => update(item.id, 'title', e.target.value)} placeholder="Achievement / Award" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm" />
+            <input value={item.date} onChange={e => update(item.id, 'date', e.target.value)} placeholder="Date" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm" />
           </div>
-          <textarea value={item.description} onChange={e => update(item.id, 'description', e.target.value)} placeholder="Describe this achievement..." rows={2} className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm resize-none" />
+          <textarea value={item.description} onChange={e => update(item.id, 'description', e.target.value)} placeholder="Describe this achievement..." rows={2} className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm resize-none" />
         </div>
       ))}
     </div>
@@ -995,7 +995,7 @@ function LanguagesStep({ data, updateData }: any) {
           <div className="p-2 bg-teal-500/10 border border-teal-500/20 rounded-xl text-teal-400"><Type size={20} /></div>
           <h2 className="text-xl font-bold text-white">Languages & Interests</h2>
         </div>
-        <button onClick={add} className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold rounded-lg hover:bg-emerald-500/20 transition-all"><span className="text-lg leading-none">+</span> Add Language</button>
+        <button onClick={add} className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold rounded-lg hover:bg-emerald-500/20 transition-all"><Plus size={14} /> Add Language</button>
       </div>
       <div className="flex flex-wrap gap-2">
         {data.languages.map((item: any) => (
@@ -1007,7 +1007,7 @@ function LanguagesStep({ data, updateData }: any) {
               <option value="intermediate">Intermediate</option>
               <option value="basic">Basic</option>
             </select>
-            <button onClick={() => remove(item.id)} className="text-slate-500 hover:text-red-400"><span className="text-lg leading-none">&times;</span></button>
+            <button onClick={() => remove(item.id)} className="text-slate-500 hover:text-red-400"><X size={16} /></button>
           </div>
         ))}
       </div>
@@ -1036,28 +1036,28 @@ function VolunteerStep({ data, updateData }: any) {
           <div className="p-2 bg-purple-500/10 border border-purple-500/20 rounded-xl text-purple-400"><Sparkles size={20} /></div>
           <h2 className="text-xl font-bold text-white">Volunteer Experience</h2>
         </div>
-        <button onClick={add} className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold rounded-lg hover:bg-emerald-500/20 transition-all"><span className="text-lg leading-none">+</span> Add</button>
+        <button onClick={add} className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold rounded-lg hover:bg-emerald-500/20 transition-all"><Plus size={14} /> Add</button>
       </div>
       {data.volunteer.length === 0 && <p className="text-sm text-slate-500 italic py-8 text-center">Add volunteer or community service experience.</p>}
       {data.volunteer.map((item: any, idx: number) => (
         <div key={item.id} className="p-4 bg-slate-950/50 border border-slate-800 rounded-xl flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Entry {idx + 1}</span>
-            <button onClick={() => remove(item.id)} className="p-1 text-slate-500 hover:text-red-400"><span className="text-lg leading-none">&times;</span></button>
+            <button onClick={() => remove(item.id)} className="p-1 text-slate-500 hover:text-red-400"><X size={16} /></button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <input value={item.organization} onChange={e => update(item.id, 'organization', e.target.value)} placeholder="Organization" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
-            <input value={item.role} onChange={e => update(item.id, 'role', e.target.value)} placeholder="Role" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
-            <input value={item.startDate} onChange={e => update(item.id, 'startDate', e.target.value)} placeholder="Start date" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
+            <input value={item.organization} onChange={e => update(item.id, 'organization', e.target.value)} placeholder="Organization" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm" />
+            <input value={item.role} onChange={e => update(item.id, 'role', e.target.value)} placeholder="Role" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm" />
+            <input value={item.startDate} onChange={e => update(item.id, 'startDate', e.target.value)} placeholder="Start date" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm" />
             <div className="flex gap-2 items-center">
-              {!item.current && <input value={item.endDate} onChange={e => update(item.id, 'endDate', e.target.value)} placeholder="End date" className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />}
+              {!item.current && <input value={item.endDate} onChange={e => update(item.id, 'endDate', e.target.value)} placeholder="End date" className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm" />}
             </div>
           </div>
           <label className="flex items-center gap-2 text-sm text-slate-400 cursor-pointer">
             <input type="checkbox" checked={item.current} onChange={e => update(item.id, 'current', e.target.checked)} className="accent-emerald-500" />
             Currently active
           </label>
-          <textarea value={item.description} onChange={e => update(item.id, 'description', e.target.value)} placeholder="Describe your volunteer work and impact..." rows={2} className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm resize-none" />
+          <textarea value={item.description} onChange={e => update(item.id, 'description', e.target.value)} placeholder="Describe your volunteer work and impact..." rows={2} className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm resize-none" />
         </div>
       ))}
     </div>
@@ -1076,22 +1076,22 @@ function PublicationsStep({ data, updateData }: any) {
           <div className="p-2 bg-sky-500/10 border border-sky-500/20 rounded-xl text-sky-400"><Sparkles size={20} /></div>
           <h2 className="text-xl font-bold text-white">Publications</h2>
         </div>
-        <button onClick={add} className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold rounded-lg hover:bg-emerald-500/20 transition-all"><span className="text-lg leading-none">+</span> Add</button>
+        <button onClick={add} className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold rounded-lg hover:bg-emerald-500/20 transition-all"><Plus size={14} /> Add</button>
       </div>
       {data.publications.length === 0 && <p className="text-sm text-slate-500 italic py-8 text-center">Add research papers, articles, blog posts, or other publications.</p>}
       {data.publications.map((item: any, idx: number) => (
         <div key={item.id} className="p-4 bg-slate-950/50 border border-slate-800 rounded-xl flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Pub {idx + 1}</span>
-            <button onClick={() => remove(item.id)} className="p-1 text-slate-500 hover:text-red-400"><span className="text-lg leading-none">&times;</span></button>
+            <button onClick={() => remove(item.id)} className="p-1 text-slate-500 hover:text-red-400"><X size={16} /></button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <input value={item.title} onChange={e => update(item.id, 'title', e.target.value)} placeholder="Title" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
-            <input value={item.venue} onChange={e => update(item.id, 'venue', e.target.value)} placeholder="Conference / Journal / Venue" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
-            <input value={item.date} onChange={e => update(item.id, 'date', e.target.value)} placeholder="Date" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
-            <input value={item.link} onChange={e => update(item.id, 'link', e.target.value)} placeholder="DOI / URL" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm" />
+            <input value={item.title} onChange={e => update(item.id, 'title', e.target.value)} placeholder="Title" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm" />
+            <input value={item.venue} onChange={e => update(item.id, 'venue', e.target.value)} placeholder="Conference / Journal / Venue" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm" />
+            <input value={item.date} onChange={e => update(item.id, 'date', e.target.value)} placeholder="Date" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm" />
+            <input value={item.link} onChange={e => update(item.id, 'link', e.target.value)} placeholder="DOI / URL" className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm" />
           </div>
-          <textarea value={item.description} onChange={e => update(item.id, 'description', e.target.value)} placeholder="Brief description, key findings, or abstract..." rows={2} className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-sm resize-none" />
+          <textarea value={item.description} onChange={e => update(item.id, 'description', e.target.value)} placeholder="Brief description, key findings, or abstract..." rows={2} className="bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm resize-none" />
         </div>
       ))}
     </div>

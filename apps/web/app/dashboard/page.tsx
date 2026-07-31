@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
   Compass, Map, FileText, ScanSearch, Bot, Languages, Briefcase,
-  ArrowRight, TrendingUp, AlertCircle, Sparkles, Leaf,
+  ArrowRight, TrendingUp, AlertCircle, Leaf,
 } from 'lucide-react';
 import { ROUTES, DASHBOARD_CARDS } from '@/lib/routes';
 import { api } from '@/lib/api';
@@ -41,7 +41,7 @@ function StatCard({ label, value, icon: Icon, index }: { label: string; value: n
       variants={item}
       initial={animationsEnabled ? 'hidden' : false}
       animate="show"
-      className="glass surface-card flex flex-col items-center p-3.5 sm:p-4 min-w-[72px] flex-1"
+      className="surface-card flex flex-col items-center p-3.5 sm:p-4 min-w-[72px] flex-1"
     >
       <Icon size={15} className="mb-1" style={{ color: 'var(--accent)' }} />
       <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest leading-none" style={{ color: 'var(--text-muted)' }}>{label}</span>
@@ -75,7 +75,7 @@ function DashboardCard({ card, idx }: { card: typeof DASHBOARD_CARDS[number]; id
     <motion.div variants={item} initial={animationsEnabled ? 'hidden' : false} animate="show">
       <Link
         href={card.href}
-        className="glass surface-card p-4 sm:p-5 flex flex-col gap-4 group card-hover h-full"
+        className="surface-card p-4 sm:p-5 flex flex-col gap-4 group card-hover h-full"
         aria-label={card.title}
       >
         <div className="flex justify-between items-center">
@@ -247,16 +247,6 @@ export default function DashboardPage() {
         )}
       </div>
 
-      <motion.div
-        initial={animationsEnabled ? { opacity: 0 } : false}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
-        className="flex items-center gap-2 justify-center text-[10px] font-medium py-2"
-        style={{ color: 'var(--text-muted)' }}
-      >
-        <Sparkles size={12} style={{ color: 'var(--accent)' }} />
-        VidyGuideAI · Premium AI SaaS
-      </motion.div>
     </motion.div>
   );
 }

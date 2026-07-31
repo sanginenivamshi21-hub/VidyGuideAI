@@ -97,7 +97,7 @@ export default function TranslatorPage() {
         </div>
       </div>
 
-      <div className="glass surface-card flex flex-col sm:flex-row items-stretch sm:items-center justify-between p-4 gap-3 max-w-2xl">
+      <div className="surface-card flex flex-col sm:flex-row items-stretch sm:items-center justify-between p-4 gap-3 max-w-2xl">
         <select
           value={sourceLang}
           onChange={(e) => setSourceLang(e.target.value)}
@@ -132,7 +132,7 @@ export default function TranslatorPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="glass surface-card flex flex-col gap-3 p-5">
+        <div className="surface-card flex flex-col gap-3 p-5">
           <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
             <span>{t('translator.source')} ({sourceLang})</span>
             {text && (
@@ -151,7 +151,7 @@ export default function TranslatorPage() {
           />
         </div>
 
-        <div className="glass surface-card flex flex-col gap-3 p-5">
+        <div className="surface-card flex flex-col gap-3 p-5">
           <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
             <span>{t('translator.translated')} ({targetLang})</span>
             {translatedText && (

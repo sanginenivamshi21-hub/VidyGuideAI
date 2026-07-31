@@ -354,7 +354,7 @@ export default function CareerPage() {
           {/* Step 1 */}
           <div className="flex flex-col gap-2">
             <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
-              <span className="text-emerald-400 text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">Step 1</span>
+              <span className="text-emerald-400 text-[12px] px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">Step 1</span>
               Academic Level
             </h3>
             <select
@@ -370,7 +370,7 @@ export default function CareerPage() {
             </select>
             {ctx.hint && (
               <div className="p-2.5 bg-emerald-500/5 border border-emerald-500/10 text-emerald-400 text-xs rounded-xl mt-1 leading-normal font-semibold">
-                💡 {ctx.hint}
+                {ctx.hint}
               </div>
             )}
           </div>
@@ -380,12 +380,12 @@ export default function CareerPage() {
           {/* Step 2 */}
           <div className="flex flex-col gap-4">
             <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
-              <span className="text-emerald-400 text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">Step 2</span>
+              <span className="text-emerald-400 text-[12px] px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">Step 2</span>
               Profile Parameters
             </h3>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{ctx.extra}</label>
+              <label className="text-[12px] font-bold text-slate-400 uppercase tracking-wider">{ctx.extra}</label>
               <input
                 type="text"
                 required
@@ -398,7 +398,7 @@ export default function CareerPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">🛠 Key Skills (comma-separated)</label>
+                <label className="text-[12px] font-bold text-slate-400 uppercase tracking-wider">Key Skills (comma-separated)</label>
                 <input
                   type="text"
                   value={skills}
@@ -409,7 +409,7 @@ export default function CareerPage() {
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">💡 Interests & Passions</label>
+                <label className="text-[12px] font-bold text-slate-400 uppercase tracking-wider">Interests & Passions</label>
                 <input
                   type="text"
                   value={interests}
@@ -422,7 +422,7 @@ export default function CareerPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{ctx.goal}</label>
+                <label className="text-[12px] font-bold text-slate-400 uppercase tracking-wider">{ctx.goal}</label>
                 <select
                   value={goal}
                   onChange={(e) => setGoal(e.target.value)}
@@ -438,7 +438,7 @@ export default function CareerPage() {
 
               {ctx.loc && (
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">📍 Current City / State</label>
+                  <label className="text-[12px] font-bold text-slate-400 uppercase tracking-wider">Current City / State</label>
                   <input
                     type="text"
                     value={locationInput}
@@ -461,7 +461,7 @@ export default function CareerPage() {
                   <Sliders size={14} className="text-emerald-400" />
                   Advanced Profiling Parameters (Optional)
                 </span>
-                <span className="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 rounded px-2 py-0.5">
+                <span className="text-[12px] bg-slate-800 hover:bg-slate-700 text-slate-300 rounded px-2 py-0.5">
                   {showAdvanced ? 'Hide Options' : 'Show Options'}
                 </span>
               </button>
@@ -469,7 +469,7 @@ export default function CareerPage() {
               {showAdvanced && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 pt-4 border-t border-slate-800/80 animate-fadeIn">
                   <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">CGPA / Percentage Marks</label>
+                    <label className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">CGPA / Percentage Marks</label>
                     <input
                       type="text"
                       value={cgpa}
@@ -480,7 +480,7 @@ export default function CareerPage() {
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Programming Languages</label>
+                    <label className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">Programming Languages</label>
                     <input
                       type="text"
                       value={languages}
@@ -491,7 +491,7 @@ export default function CareerPage() {
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Dream Job / Destination</label>
+                    <label className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">Dream Job / Destination</label>
                     <input
                       type="text"
                       value={dreamJob}
@@ -502,7 +502,7 @@ export default function CareerPage() {
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Expected Salary (LPA)</label>
+                    <label className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">Expected Salary (LPA)</label>
                     <input
                       type="text"
                       value={expectedSalary}
@@ -513,7 +513,7 @@ export default function CareerPage() {
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Target Companies</label>
+                    <label className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">Target Companies</label>
                     <input
                       type="text"
                       value={targetCompany}
@@ -524,7 +524,7 @@ export default function CareerPage() {
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Preferred Work Country</label>
+                    <label className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">Preferred Work Country</label>
                     <input
                       type="text"
                       value={preferredCountry}
@@ -535,7 +535,7 @@ export default function CareerPage() {
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Study Hours Per Day</label>
+                    <label className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">Study Hours Per Day</label>
                     <input
                       type="text"
                       value={studyHours}
@@ -546,7 +546,7 @@ export default function CareerPage() {
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Timeline Period</label>
+                    <label className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">Timeline Period</label>
                     <input
                       type="text"
                       value={timeline}
@@ -557,27 +557,27 @@ export default function CareerPage() {
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Portfolio URLs (GitHub/LinkedIn/LeetCode)</label>
+                    <label className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">Portfolio URLs (GitHub/LinkedIn/LeetCode)</label>
                     <div className="grid grid-cols-2 gap-2">
                       <input
                         type="text"
                         value={linkedin}
                         onChange={(e) => setLinkedin(e.target.value)}
                         placeholder="LinkedIn"
-                        className="bg-slate-950/80 border border-slate-800 text-white rounded-lg p-1.5 outline-none text-[10px]"
+                        className="bg-slate-950/80 border border-slate-800 text-white rounded-lg p-1.5 outline-none text-[12px]"
                       />
                       <input
                         type="text"
                         value={github}
                         onChange={(e) => setGithub(e.target.value)}
                         placeholder="GitHub"
-                        className="bg-slate-950/80 border border-slate-800 text-white rounded-lg p-1.5 outline-none text-[10px]"
+                        className="bg-slate-950/80 border border-slate-800 text-white rounded-lg p-1.5 outline-none text-[12px]"
                       />
                     </div>
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Projects & Certifications</label>
+                    <label className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">Projects & Certifications</label>
                     <input
                       type="text"
                       value={certificates}
@@ -590,7 +590,7 @@ export default function CareerPage() {
                   <div className="flex flex-col gap-1 sm:col-span-2">
                     <div className="grid grid-cols-2 gap-3">
                       <div className="flex flex-col gap-0.5">
-                        <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Key Strengths</label>
+                        <label className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">Key Strengths</label>
                         <input
                           type="text"
                           value={strengths}
@@ -600,7 +600,7 @@ export default function CareerPage() {
                         />
                       </div>
                       <div className="flex flex-col gap-0.5">
-                        <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Weaknesses / Areas to Improve</label>
+                        <label className="text-[12px] font-bold text-slate-500 uppercase tracking-wider">Weaknesses / Areas to Improve</label>
                         <input
                           type="text"
                           value={weaknesses}
@@ -616,7 +616,7 @@ export default function CareerPage() {
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">💬 Any extra notes? (optional)</label>
+              <label className="text-[12px] font-bold text-slate-400 uppercase tracking-wider">Any extra notes? (optional)</label>
               <textarea
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
@@ -629,7 +629,7 @@ export default function CareerPage() {
             {/* Profile completeness bar */}
             <div className="flex flex-col gap-1.5 mt-2">
               <div className="flex justify-between items-center text-xs font-semibold">
-                <span className="text-slate-400 uppercase tracking-wider">📊 Profiling Score</span>
+                <span className="text-slate-400 uppercase tracking-wider">Profiling Score</span>
                 <span className="text-emerald-400">{completeness()}%</span>
               </div>
               <div className="w-full h-1.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
@@ -654,7 +654,7 @@ export default function CareerPage() {
                 className="p-4 bg-slate-900/60 border border-slate-800 hover:border-emerald-500/30 rounded-2xl hover:translate-x-1 transition-all duration-200"
               >
                 <div className="font-bold text-emerald-400 text-xs mb-1">{item}</div>
-                <div className="text-[11px] text-slate-400 leading-normal">{TRENDING_DESC[item]}</div>
+                <div className="text-[12px] text-slate-400 leading-normal">{TRENDING_DESC[item]}</div>
               </div>
             ))}
           </div>
@@ -740,7 +740,7 @@ export default function CareerPage() {
                   <span className="text-2xl">🗺️</span>
                   <div>
                     <h4 className="text-sm font-bold text-white">Visual Career Roadmap Timeline</h4>
-                    <p className="text-[10px] text-slate-400 leading-normal">Chronological steps matching your goal. Click checkboxes to track completed stages.</p>
+                    <p className="text-[12px] text-slate-400 leading-normal">Chronological steps matching your goal. Click checkboxes to track completed stages.</p>
                   </div>
                 </div>
 
@@ -774,7 +774,7 @@ export default function CareerPage() {
                         {/* Top bar with label and checkmark */}
                         <div className="flex justify-between items-center">
                           <div
-                            className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border"
+                            className="text-[12px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border"
                             style={{ 
                               backgroundColor: isCompleted ? 'rgba(16, 185, 129, 0.1)' : `${m.color}15`, 
                               color: isCompleted ? '#34d399' : m.color, 
@@ -808,7 +808,7 @@ export default function CareerPage() {
                         </div>
 
                         {/* Expandable Resource checkpoint info */}
-                        <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[9px] font-semibold text-slate-500 uppercase">
+                        <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[12px] font-semibold text-slate-500 uppercase">
                           <span>Timeline Stage</span>
                           <span className={isCompleted ? 'text-emerald-400' : 'text-slate-400'}>
                             {isCompleted ? 'Completed' : 'Action Pending'}

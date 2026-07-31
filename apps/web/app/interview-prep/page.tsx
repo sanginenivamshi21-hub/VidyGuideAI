@@ -200,7 +200,7 @@ export default function InterviewPrepPage() {
       </AnimatePresence>
 
       {stage === 'setup' && (
-        <motion.div {...stageProps} className="glass surface-card p-6 sm:p-8 flex flex-col gap-6">
+        <motion.div {...stageProps} className="surface-card p-6 sm:p-8 flex flex-col gap-6">
           <div className="flex items-center gap-2 font-bold text-h2 pb-3" style={{ borderBottom: '1px solid var(--border-default)' }}>
             <BrainCircuit size={18} style={{ color: 'var(--accent)' }} />
             {t('interview.customize')}
@@ -286,7 +286,7 @@ export default function InterviewPrepPage() {
             </div>
           </div>
 
-          <div className="glass surface-card p-6 sm:p-8 flex flex-col gap-6">
+          <div className="surface-card p-6 sm:p-8 flex flex-col gap-6">
             <div className="flex items-start gap-4">
               <span className="flex items-center justify-center w-8 h-8 rounded-full shrink-0 text-sm font-extrabold" style={{ backgroundColor: 'var(--accent-10)', color: 'var(--accent)', border: '1px solid var(--accent-ring)' }}>
                 Q
@@ -350,7 +350,7 @@ export default function InterviewPrepPage() {
             </h3>
           </div>
 
-          <div className="glass surface-card p-6 sm:p-8 flex flex-col gap-6 relative">
+          <div className="surface-card p-6 sm:p-8 flex flex-col gap-6 relative">
             <div className="flex items-center justify-between gap-3 pb-4 flex-wrap" style={{ borderBottom: '1px solid var(--border-default)' }}>
               <span className="text-md font-bold flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
                 <ThumbsUp size={16} style={{ color: 'var(--accent)' }} />
@@ -386,7 +386,7 @@ export default function InterviewPrepPage() {
       {stage === 'completed' && (
         <motion.div {...stageProps} className="flex flex-col gap-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="glass surface-card p-6 flex flex-col items-center justify-center text-center gap-3 col-span-1">
+            <div className="surface-card p-6 flex flex-col items-center justify-center text-center gap-3 col-span-1">
               <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
                 {t('interview.avgScore')}
               </span>
@@ -419,7 +419,7 @@ export default function InterviewPrepPage() {
               </p>
             </div>
 
-            <div className="glass surface-card p-6 col-span-2 flex flex-col gap-4">
+            <div className="surface-card p-6 col-span-2 flex flex-col gap-4">
               <span className="text-xs font-bold uppercase tracking-widest pb-2" style={{ color: 'var(--text-muted)', borderBottom: '1px solid var(--border-default)' }}>
                 {t('interview.sessionParams')}
               </span>
