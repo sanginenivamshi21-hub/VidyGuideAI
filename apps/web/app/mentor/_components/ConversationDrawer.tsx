@@ -190,8 +190,15 @@ export default function ConversationDrawer({
                 );
               })}
               {filtered.length === 0 && (
-                <div className="text-xs text-center py-8 px-4" style={{ color: 'var(--text-muted)' }}>
-                  {searchQuery ? 'No matching conversations' : 'No conversations yet'}
+                <div className="flex flex-col items-center gap-1 text-center py-8 px-4">
+                  <span className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
+                    {searchQuery ? 'No matching conversations' : 'No conversations yet'}
+                  </span>
+                  {!searchQuery && (
+                    <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>
+                      Start your first AI mentoring session below
+                    </span>
+                  )}
                 </div>
               )}
             </div>

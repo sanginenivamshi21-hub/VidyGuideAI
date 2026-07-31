@@ -9,7 +9,8 @@ import {
   ArrowRight, TrendingUp, AlertCircle, Leaf,
 } from 'lucide-react';
 import { ROUTES, DASHBOARD_CARDS } from '@/lib/routes';
-import { api } from '@/lib/api';
+import { api, fetchWithAuth } from '@/lib/api';
+import { getCache } from '@/lib/offlineCache';
 import { useAuth, useRequireAuth } from '@/hooks/useAuth';
 import { useI18n } from '@/lib/i18n';
 import { useAnimationsEnabled } from '@/hooks/useAnimations';
@@ -18,6 +19,13 @@ interface Stats {
   career_count: number;
   resume_count: number;
   mentor_count: number;
+}
+
+interface RecentConversation {
+  id: number;
+  title: string;
+  _count?: { messages: number };
+  updatedAt: string;
 }
 
 const CARD_ICONS: Record<string, any> = {
@@ -120,6 +128,7 @@ export default function DashboardPage() {
   const animationsEnabled = useAnimationsEnabled();
   const [userName, setUserName] = useState('');
   const [stats, setStats] = useState<Stats>({ career_count: 0, resume_count: 0, mentor_count: 0 });
+  const [recent, setRecent] = useState<RecentConversation | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -144,7 +153,21 @@ export default function DashboardPage() {
     if (!user) { router.push(ROUTES.AUTH); return; }
     setUserName(user.fullName || user.username || 'Candidate');
     fetchProfile();
+    if (!isGuest) fetchRecent();
   }, [authLoading, user, isGuest, router]);
+
+  const fetchRecent = async () => {
+    try {
+      const cached = getCache<RecentConversation[]>('conversations');
+      const convs: RecentConversation[] = cached ?? (await (await fetchWithAuth('/conversations')).json() as RecentConversation[]);
+      const latest = (convs || [])
+        .filter(c => c._count?.messages && c._count.messages > 0)
+        .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))[0];
+      setRecent(latest || null);
+    } catch {
+      setRecent(null);
+    }
+  };
 
   const hero = useMemo(() => (
     <div
@@ -215,6 +238,37 @@ export default function DashboardPage() {
       {hero}
 
       {error && <ErrorBanner message={error} onRetry={fetchProfile} retryLabel={t('common.retry')} />}
+
+      {recent && !isGuest && (
+        <motion.div variants={item} initial={animationsEnabled ? 'hidden' : false} animate="show">
+          <Link
+            href={ROUTES.MENTOR}
+            className="surface-card p-4 sm:p-5 flex items-center gap-3 sm:gap-4 card-hover"
+            aria-label={recent.title}
+          >
+            <div className="icon-box shrink-0" style={{ backgroundColor: 'var(--accent-10)' }}>
+              <Bot size={18} style={{ color: 'var(--accent)' }} />
+            </div>
+            <div className="flex flex-col gap-0.5 min-w-0 flex-1">
+              <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
+                {t('dashboard.resumeTitle')}
+              </span>
+              <h3 className="font-bold text-sm truncate" style={{ color: 'var(--text-primary)' }}>
+                {recent.title}
+              </h3>
+              <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                {t('dashboard.resumeMessages', { n: recent._count?.messages ?? 0 })} ·{' '}
+                {new Date(recent.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+              </span>
+            </div>
+            <span className="hidden sm:flex items-center gap-1.5 text-xs font-semibold shrink-0 px-3 py-1.5 rounded-full" style={{ backgroundColor: 'var(--accent-10)', color: 'var(--accent)' }}>
+              {t('dashboard.resumeOpen')}
+              <ArrowRight size={12} />
+            </span>
+            <ArrowRight size={16} className="sm:hidden shrink-0" style={{ color: 'var(--text-muted)' }} />
+          </Link>
+        </motion.div>
+      )}
 
       <div className="flex flex-col gap-3 sm:gap-4">
         <motion.h2

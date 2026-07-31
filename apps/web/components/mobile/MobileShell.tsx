@@ -82,6 +82,7 @@ export default function MobileShell({ children }: { children: React.ReactNode })
   const [searchQuery, setSearchQuery] = useState('');
   const [currentTheme, setCurrentTheme] = useState('dark');
   const [currentAccent, setCurrentAccent] = useState('emerald');
+  const [confirmLogout, setConfirmLogout] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const { t } = useI18n();
@@ -388,14 +389,36 @@ export default function MobileShell({ children }: { children: React.ReactNode })
                   </div>
 
                   {isAuthenticated ? (
+                    confirmLogout ? (
+                      <div className="flex items-center gap-2 px-1">
+                        <span className="flex-1 text-xs font-semibold" style={{ color: 'var(--error)' }}>
+                          {t('nav.logoutConfirm')}
+                        </span>
+                        <button
+                          onClick={() => setConfirmLogout(false)}
+                          className="px-3 py-2 rounded-xl text-xs font-semibold transition-all active:scale-95"
+                          style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-secondary)' }}
+                        >
+                          {t('nav.cancel')}
+                        </button>
+                        <button
+                          onClick={() => { setConfirmLogout(false); logout(); close(); }}
+                          className="px-3 py-2 rounded-xl text-xs font-semibold transition-all active:scale-95"
+                          style={{ backgroundColor: 'rgba(239,68,68,0.12)', color: 'var(--error)', border: '1px solid rgba(239,68,68,0.25)' }}
+                        >
+                          {t('nav.logout')}
+                        </button>
+                      </div>
+                    ) : (
                     <button
-                      onClick={() => { logout(); close(); }}
+                      onClick={() => setConfirmLogout(true)}
                       className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs transition-all active:scale-[0.98]"
                       style={{ color: 'var(--text-secondary)' }}
                     >
                       <LogOut size={16} />
                       <span>{t('nav.logout')}</span>
                     </button>
+                    )
                   ) : (
                     <button
                       onClick={() => navigateAndClose(ROUTES.AUTH)}
