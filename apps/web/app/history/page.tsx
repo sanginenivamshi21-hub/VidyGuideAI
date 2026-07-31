@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Clock, Search, Trash2, Eye, Calendar, Inbox } from 'lucide-react';
+import { Clock, Search, Trash2, Eye, Calendar, Bot } from 'lucide-react';
 import { fetchWithAuth } from '@/lib/api';
 import { ROUTES } from '@/lib/routes';
 import { useAuth, useRequireRegistered } from '@/hooks/useAuth';
@@ -192,10 +192,32 @@ export default function HistoryPage() {
             {[1, 2, 3, 4].map(i => <div key={i} className="skeleton-shimmer surface-card rounded-xl h-16" />)}
           </div>
         ) : filteredHistory.length === 0 ? (
-          <div className="surface-card p-8 flex flex-col items-center gap-2 text-center">
-            <Inbox size={22} style={{ color: 'var(--text-muted)' }} />
-            <p className="text-xs italic" style={{ color: 'var(--text-muted)' }}>{t('history.empty')}</p>
-          </div>
+          <motion.div
+            initial={animationsEnabled ? { opacity: 0, y: 10 } : false}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25 }}
+            className="surface-card p-10 flex flex-col items-center gap-3 text-center"
+          >
+            <div
+              className="w-14 h-14 rounded-2xl flex items-center justify-center mb-1"
+              style={{ backgroundColor: 'var(--accent-10)', border: '1px solid var(--accent-20)' }}
+            >
+              <Clock size={24} style={{ color: 'var(--accent)' }} />
+            </div>
+            <h3 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
+              {search || typeFilter !== 'all' ? t('history.emptyFiltered') : t('history.emptyTitle')}
+            </h3>
+            <p className="text-xs leading-relaxed max-w-[240px]" style={{ color: 'var(--text-secondary)' }}>
+              {t('history.emptyDesc')}
+            </p>
+            <button
+              onClick={() => router.push(ROUTES.MENTOR)}
+              className="btn btn-primary mt-2"
+            >
+              <Bot size={14} />
+              {t('history.emptyCta')}
+            </button>
+          </motion.div>
         ) : (
           <div className="flex-1 overflow-y-auto flex flex-col gap-2.5 pr-1 scrollbar-thin lg:max-h-[calc(100vh-260px)]">
             <AnimatePresence initial={false}>

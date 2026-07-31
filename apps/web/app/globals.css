@@ -191,6 +191,18 @@ body {
   color: var(--text-primary);
 }
 
+/* =========== Type polish =========== */
+/* Elevate the micro scale for readability (Linear/Vercel-style 11px floor) */
+.text-\[9px\] { font-size: 10px; }
+.text-\[10px\] { font-size: 11px; }
+
+/* Prevent iOS Safari auto-zoom when focusing form controls (<16px triggers it) */
+@media (max-width: 640px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+
 /* =========== Scrollbars =========== */
 * { scrollbar-width: thin; scrollbar-color: var(--border-default) transparent; }
 .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }

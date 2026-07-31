@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useState } from 'react';
-import { Copy, RefreshCw, Volume2, ChevronDown, Check, Clock, CircleCheck } from 'lucide-react';
+import { Copy, RefreshCw, Volume2, ChevronDown, Check, Clock, CircleCheck, Image as ImageIcon, FileText, Paperclip } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import type { ChatMessage as ChatMessageType } from '../types';
 
@@ -58,8 +58,14 @@ const ChatMessage = memo(function ChatMessage({
                     className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px]"
                     style={{ backgroundColor: 'var(--bg-tertiary)', border: '1px solid var(--border-default)' }}
                   >
-                    <span style={{ color: att.type.startsWith('image/') ? '#3b82f6' : 'var(--text-tertiary)' }}>
-                      {att.type.startsWith('image/') ? '🖼️' : att.type === 'application/pdf' ? '📄' : '📎'}
+                    <span style={{ color: att.type.startsWith('image/') ? 'var(--accent)' : 'var(--text-tertiary)' }}>
+                      {att.type.startsWith('image/') ? (
+                        <ImageIcon size={12} />
+                      ) : att.type === 'application/pdf' ? (
+                        <FileText size={12} />
+                      ) : (
+                        <Paperclip size={12} />
+                      )}
                     </span>
                     <span className="truncate max-w-[120px]" style={{ color: 'var(--text-secondary)' }}>{att.name}</span>
                   </div>
