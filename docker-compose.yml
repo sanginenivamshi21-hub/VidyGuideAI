@@ -46,7 +46,7 @@ services:
     container_name: vidyguide_web
     environment:
       - PORT=3000
-      - NEXT_PUBLIC_API_URL=http://api:8000
+      - API_PROXY_TARGET=http://api:8000
     ports:
       - "3000:3000"
     depends_on:

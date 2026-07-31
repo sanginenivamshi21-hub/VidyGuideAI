@@ -354,7 +354,7 @@ cp .env.example .env
 | `JWT_SECRET` | Yes | JWT signing secret (min 16 chars) | `your_jwt_secret_min_16_chars` |
 | `BREVO_API_KEY` | Yes | Brevo email API key | `your_brevo_api_key` |
 | `BREVO_SENDER_EMAIL` | Yes | Verified sender email | `your-sender@example.com` |
-| `NEXT_PUBLIC_API_URL` | Yes | API base URL (frontend) | `http://localhost:8000` |
+| `API_PROXY_TARGET` | Yes* | Backend origin proxied by the Next.js `/api/*` rewrite (web only; defaults to `https://vidyguideai-api.onrender.com`) | `http://localhost:8000` |
 | `APP_BASE_URL` | Yes | Frontend base URL | `http://localhost:3000` |
 | `GEMINI_API_KEY` | No | Gemini API key (fallback) | `your_gemini_key` |
 | `OPENROUTER_API_KEY` | No | OpenRouter key (fallback) | `your_openrouter_key` |
