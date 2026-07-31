@@ -18,6 +18,9 @@ import {
   Briefcase
 } from 'lucide-react';
 import MarkdownRenderer from '../../components/MarkdownRenderer';
+import { motion } from 'framer-motion';
+import { useI18n } from '@/lib/i18n';
+import { useAnimationsEnabled } from '@/hooks/useAnimations';
 
 const EDU_LEVELS: Record<string, string> = {
   '🏫 Class 10 (SSC/CBSE/ICSE)': '10th',
@@ -158,6 +161,8 @@ const SUPPORTED_LANGUAGES = {
 };
 
 export default function CareerPage() {
+  const { t } = useI18n();
+  const animationsEnabled = useAnimationsEnabled();
   const router = useRouter();
   const [eduKey, setEduKey] = useState('🏫 Class 10 (SSC/CBSE/ICSE)');
   const [extraInfo, setExtraInfo] = useState('');
@@ -327,17 +332,19 @@ export default function CareerPage() {
     : 0;
 
   return (
-    <div className="flex flex-col gap-10 max-w-5xl mx-auto py-4">
-      {/* Header section */}
+    <motion.div
+      initial={animationsEnabled ? { opacity: 0, y: 10 } : false}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.25 }}
+      className="flex flex-col gap-10 max-w-5xl mx-auto py-4"
+    >
       <div className="flex items-center gap-4">
-        <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-emerald-400 text-2xl shadow-inner">
-          🌱
+        <div className="icon-box" style={{ color: 'var(--accent)', backgroundColor: 'var(--accent-10)' }}>
+          <Compass size={20} />
         </div>
         <div className="flex flex-col">
-          <h1 className="text-3xl font-extrabold text-white tracking-tight">Career Guidance</h1>
-          <p className="text-slate-400 text-xs">
-            Personalised AI roadmaps, timelines, projects, target companies, and certifications.
-          </p>
+          <h1 className="text-h1">{t('career.title')}</h1>
+          <p className="text-caption mt-0.5">{t('career.subtitle')}</p>
         </div>
       </div>
 
@@ -827,6 +834,6 @@ export default function CareerPage() {
           </div>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }

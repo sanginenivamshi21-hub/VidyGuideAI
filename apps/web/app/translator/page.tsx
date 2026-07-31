@@ -1,10 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '@/lib/api';
-import { Languages, RefreshCw, Copy, Check, Trash2 } from 'lucide-react';
+import { Languages, RefreshCw, Copy, Check, Trash2, ArrowDownUp } from 'lucide-react';
+import { useI18n } from '@/lib/i18n';
+import { useAnimationsEnabled } from '@/hooks/useAnimations';
 
-const SUPPORTED_LANGUAGES = {
+const SUPPORTED_LANGUAGES: Record<string, string> = {
   English: 'en',
   Telugu: 'te',
   Hindi: 'hi',
@@ -27,27 +30,26 @@ export default function TranslatorPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
+  const { t } = useI18n();
+  const animationsEnabled = useAnimationsEnabled();
 
   const handleTranslate = async () => {
     if (!text.trim()) {
-      setError('Please enter text to translate.');
+      setError(t('translator.emptyError'));
       return;
     }
-
     setError('');
     setLoading(true);
     setTranslatedText('');
-
     try {
       const data = await api('/translator', {
         method: 'POST',
         body: {
           text,
-          source_lang: SUPPORTED_LANGUAGES[sourceLang as keyof typeof SUPPORTED_LANGUAGES] || 'en',
-          target_lang: SUPPORTED_LANGUAGES[targetLang as keyof typeof SUPPORTED_LANGUAGES] || 'te',
+          source_lang: SUPPORTED_LANGUAGES[sourceLang] || 'en',
+          target_lang: SUPPORTED_LANGUAGES[targetLang] || 'te',
         },
       });
-
       setTranslatedText(data.translated);
     } catch (err: any) {
       setError(err.message || 'Connection error.');
@@ -79,67 +81,62 @@ export default function TranslatorPage() {
   };
 
   return (
-    <div className="flex flex-col gap-8 max-w-5xl mx-auto py-4">
-      {/* Page Header */}
+    <motion.div
+      initial={animationsEnabled ? { opacity: 0, y: 10 } : false}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.25 }}
+      className="flex flex-col gap-6 max-w-5xl mx-auto py-4"
+    >
       <div className="flex items-center gap-4">
-        <div className="p-3 bg-orange-500/10 border border-orange-500/20 rounded-2xl text-orange-400 text-2xl">
-          🌐
+        <div className="icon-box" style={{ color: 'var(--accent)', backgroundColor: 'var(--accent-10)' }}>
+          <Languages size={20} />
         </div>
         <div className="flex flex-col">
-          <h1 className="text-3xl font-extrabold text-white tracking-tight">Translator</h1>
-          <p className="text-slate-400 text-sm">
-            Break language barriers — translate career documents and texts instantly between English and Indian regional languages.
-          </p>
+          <h1 className="text-h1">{t('translator.title')}</h1>
+          <p className="text-caption mt-0.5">{t('translator.subtitle')}</p>
         </div>
       </div>
 
-      {/* Language selections selectors */}
-      <div className="flex items-center justify-between bg-slate-900/40 border border-slate-800 rounded-xl p-4 gap-4 max-w-xl">
+      <div className="glass surface-card flex flex-col sm:flex-row items-stretch sm:items-center justify-between p-4 gap-3 max-w-2xl">
         <select
           value={sourceLang}
           onChange={(e) => setSourceLang(e.target.value)}
-          className="bg-slate-950 border border-slate-800 hover:border-slate-700 text-white rounded-lg px-3 py-1.5 outline-none text-xs font-semibold cursor-pointer"
+          className="select-field text-xs font-semibold cursor-pointer flex-1"
+          aria-label={t('translator.source')}
         >
           {Object.keys(SUPPORTED_LANGUAGES).map((l) => (
-            <option key={l} value={l}>
-              {l}
-            </option>
+            <option key={l} value={l}>{l}</option>
           ))}
         </select>
 
-        <button
+        <motion.button
+          whileTap={animationsEnabled ? { scale: 0.9, rotate: 180 } : undefined}
           onClick={handleSwap}
-          className="p-2 rounded-lg bg-slate-950 border border-slate-800 hover:border-emerald-500/40 text-slate-400 hover:text-white transition-all duration-200"
-          title="Swap Languages"
+          className="btn btn-secondary p-2.5 self-center"
+          title={t('translator.swap')}
+          aria-label={t('translator.swap')}
         >
-          <Languages size={15} />
-        </button>
+          <ArrowDownUp size={15} />
+        </motion.button>
 
         <select
           value={targetLang}
           onChange={(e) => setTargetLang(e.target.value)}
-          className="bg-slate-950 border border-slate-800 hover:border-slate-700 text-white rounded-lg px-3 py-1.5 outline-none text-xs font-semibold cursor-pointer"
+          className="select-field text-xs font-semibold cursor-pointer flex-1"
+          aria-label={t('translator.translated')}
         >
           {Object.keys(SUPPORTED_LANGUAGES).map((l) => (
-            <option key={l} value={l}>
-              {l}
-            </option>
+            <option key={l} value={l}>{l}</option>
           ))}
         </select>
       </div>
 
-      {/* Translation Panels grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Source Text Panel */}
-        <div className="flex flex-col gap-3 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
-          <div className="flex justify-between items-center text-xs font-bold text-slate-400 uppercase tracking-wider">
-            <span>Source text ({sourceLang})</span>
+        <div className="glass surface-card flex flex-col gap-3 p-5">
+          <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
+            <span>{t('translator.source')} ({sourceLang})</span>
             {text && (
-              <button
-                onClick={handleClear}
-                className="text-slate-500 hover:text-red-400 transition-all"
-                title="Clear input text"
-              >
+              <button onClick={handleClear} className="btn btn-ghost p-1" title={t('translator.clearInput')} aria-label={t('translator.clearInput')}>
                 <Trash2 size={14} />
               </button>
             )}
@@ -147,54 +144,79 @@ export default function TranslatorPage() {
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="Type or paste your text to translate..."
+            placeholder={t('translator.placeholder')}
             rows={10}
-            className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-3 outline-none text-sm transition-all resize-none"
+            className="input-field text-sm resize-none"
+            aria-label={t('translator.source')}
           />
         </div>
 
-        {/* Target Text Panel */}
-        <div className="flex flex-col gap-3 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
-          <div className="flex justify-between items-center text-xs font-bold text-slate-400 uppercase tracking-wider">
-            <span>Translated text ({targetLang})</span>
+        <div className="glass surface-card flex flex-col gap-3 p-5">
+          <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
+            <span>{t('translator.translated')} ({targetLang})</span>
             {translatedText && (
-              <button
-                onClick={handleCopy}
-                className="flex items-center gap-1 text-slate-500 hover:text-white transition-all"
-                title="Copy Translation"
-              >
-                {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
-                <span>{copied ? 'Copied' : 'Copy'}</span>
+              <button onClick={handleCopy} className="btn btn-ghost gap-1 text-xs normal-case font-semibold" title={t('translator.copyTranslation')}>
+                {copied ? <Check size={14} style={{ color: 'var(--success)' }} /> : <Copy size={14} />}
+                <span>{copied ? t('common.copied') : t('common.copy')}</span>
               </button>
             )}
           </div>
-          <div className="w-full bg-slate-950 border border-slate-800 text-slate-200 rounded-lg p-3 text-sm min-h-[224px] whitespace-pre-wrap leading-relaxed select-text font-sans">
-            {loading ? (
-              <div className="flex items-center gap-2 text-slate-500 text-xs font-semibold">
-                <RefreshCw className="animate-spin text-emerald-400" size={14} />
-                Translating...
-              </div>
-            ) : (
-              translatedText || <span className="text-slate-600 italic">Translation output will appear here...</span>
-            )}
+          <div
+            className="input-field min-h-[224px] text-sm whitespace-pre-wrap leading-relaxed select-text overflow-y-auto"
+            style={{ color: 'var(--text-primary)' }}
+            aria-live="polite"
+          >
+            <AnimatePresence mode="wait">
+              {loading ? (
+                <motion.div
+                  key="loading"
+                  initial={animationsEnabled ? { opacity: 0 } : false}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="flex items-center gap-2 text-xs font-semibold"
+                  style={{ color: 'var(--text-secondary)' }}
+                >
+                  <RefreshCw className="animate-spin" size={14} style={{ color: 'var(--accent)' }} />
+                  {t('translator.translating')}
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="result"
+                  initial={animationsEnabled ? { opacity: 0, y: 4 } : false}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {translatedText || <span className="italic" style={{ color: 'var(--text-muted)' }}>{t('translator.outputHint')}</span>}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </div>
 
-      {error && (
-        <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-lg font-medium text-center max-w-xl mx-auto w-full">
-          {error}
-        </div>
-      )}
+      <AnimatePresence>
+        {error && (
+          <motion.div
+            initial={animationsEnabled ? { opacity: 0, y: -6 } : false}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="alert alert-error max-w-xl mx-auto w-full"
+            role="alert"
+          >
+            {error}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* Action triggers */}
-      <button
+      <motion.button
+        whileTap={animationsEnabled ? { scale: 0.97 } : undefined}
         onClick={handleTranslate}
         disabled={loading || !text.trim()}
-        className="w-full md:w-auto px-8 py-3 bg-emerald-500 hover:bg-emerald-600 active:scale-95 disabled:opacity-40 disabled:pointer-events-none text-white font-bold text-sm rounded-lg shadow-lg shadow-emerald-500/25 transition-all w-fit"
+        className="btn btn-primary w-full md:w-auto px-8 py-3 text-sm"
       >
-        Translate
-      </button>
-    </div>
+        {loading ? <RefreshCw className="animate-spin" size={15} /> : <Languages size={15} />}
+        {loading ? t('translator.translating') : t('translator.translate')}
+      </motion.button>
+    </motion.div>
   );
 }

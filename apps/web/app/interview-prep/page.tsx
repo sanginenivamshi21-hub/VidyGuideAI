@@ -1,58 +1,52 @@
 'use client';
 
 import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '@/lib/api';
-import { 
-  Briefcase, 
-  Sparkles, 
-  RefreshCw, 
-  Send, 
-  CheckCircle2, 
-  ArrowRight, 
-  AlertCircle, 
-  ChevronRight, 
-  BrainCircuit, 
-  ThumbsUp, 
-  ThumbsDown, 
-  Award, 
-  RotateCcw,
-  Sparkle
+import {
+  Briefcase, Sparkles, RefreshCw, Send, CheckCircle2, ArrowRight, AlertCircle,
+  BrainCircuit, ThumbsUp, Award, RotateCcw,
 } from 'lucide-react';
+import { useI18n } from '@/lib/i18n';
+import { useAnimationsEnabled } from '@/hooks/useAnimations';
 
 interface QuestionFeedback {
   score: number;
   content: string;
 }
 
+const STAGE_VARIANTS = {
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeOut' as const } },
+};
+
 export default function InterviewPrepPage() {
-  // Setup inputs
   const [role, setRole] = useState('');
   const [company, setCompany] = useState('');
   const [skills, setSkills] = useState('');
   const [experienceLevel, setExperienceLevel] = useState('Entry Level');
   const [difficulty, setDifficulty] = useState('Medium');
 
-  // Interview state
   const [stage, setStage] = useState<'setup' | 'question' | 'evaluation' | 'completed'>('setup');
   const [questions, setQuestions] = useState<string[]>([]);
   const [answers, setAnswers] = useState<string[]>([]);
   const [feedbacks, setFeedbacks] = useState<QuestionFeedback[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Input states
   const [currentAnswer, setCurrentAnswer] = useState('');
   const [loading, setLoading] = useState(false);
   const [evaluating, setEvaluating] = useState(false);
   const [error, setError] = useState('');
+  const { t } = useI18n();
+  const animationsEnabled = useAnimationsEnabled();
 
-  // Helper to extract score from AI feedback string
   const parseScore = (text: string): number => {
     const match = text.match(/Score:\s*(\d+)\/10/i) || text.match(/(\d+)\s*\/\s*10/);
     if (match) {
       const parsed = parseInt(match[1], 10);
       return Math.min(Math.max(parsed, 0), 10);
     }
-    return 7; // Default fallback score
+    return 7;
   };
 
   const handleStartInterview = async () => {
@@ -60,7 +54,6 @@ export default function InterviewPrepPage() {
       setError('Please specify a target job role.');
       return;
     }
-
     setError('');
     setLoading(true);
     setQuestions([]);
@@ -72,24 +65,16 @@ export default function InterviewPrepPage() {
     try {
       const data = await api('/mentor/interview', {
         method: 'POST',
-        body: {
-          role,
-          company,
-          skills,
-          experience_level: experienceLevel,
-          difficulty,
-        },
+        body: { role, company, skills, experience_level: experienceLevel, difficulty },
       });
-
       const generatedQuestions = data.questions || [];
       if (generatedQuestions.length === 0) {
         throw new Error('No interview questions returned. Please try again.');
       }
-
       setQuestions(generatedQuestions);
       setStage('question');
     } catch (err: any) {
-      setError(err.message || '🚫 Something went wrong. We couldn\'t process your request. Please try again.');
+      setError(err.message || "🚫 Something went wrong. We couldn't process your request. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -100,30 +85,22 @@ export default function InterviewPrepPage() {
       setError('Please provide your answer response before evaluating.');
       return;
     }
-
     setError('');
     setEvaluating(true);
-
     try {
       const currentQuestion = questions[currentIndex];
       const data = await api('/mentor/interview/feedback', {
         method: 'POST',
-        body: {
-          items: [{ question: currentQuestion, answer: currentAnswer }]
-        },
+        body: { items: [{ question: currentQuestion, answer: currentAnswer }] },
       });
-
       const feedbackText = data.feedback || '';
       const score = parseScore(feedbackText);
-
       const updatedFeedbacks = [...feedbacks];
       updatedFeedbacks[currentIndex] = { score, content: feedbackText };
       setFeedbacks(updatedFeedbacks);
-
       const updatedAnswers = [...answers];
       updatedAnswers[currentIndex] = currentAnswer;
       setAnswers(updatedAnswers);
-
       setStage('evaluation');
     } catch (err: any) {
       setError(err.message || '🚫 Evaluation failed. Please check network connection and try again.');
@@ -139,7 +116,6 @@ export default function InterviewPrepPage() {
       setError('');
       setStage('question');
     } else {
-      // Save full interview session to database history
       saveToHistory();
       setStage('completed');
     }
@@ -151,23 +127,14 @@ export default function InterviewPrepPage() {
       if (user) {
         const parsedUser = JSON.parse(user);
         if (parsedUser.id !== null) {
-          // Average score calculation
           const avgScore = feedbacks.reduce((acc, f) => acc + f.score, 0) / feedbacks.length;
-          
           await api('/history', {
             method: 'POST',
             body: {
               actionType: 'interview',
               title: `Interview Simulation - ${role} at ${company || 'General MNC'}`,
-              payload: {
-                role,
-                company,
-                difficulty,
-                experienceLevel,
-                questionsCount: questions.length,
-                averageScore: avgScore.toFixed(1)
-              },
-              result: feedbacks.map((f, i) => `Q: ${questions[i]}\nAnswer: ${answers[i]}\nScore: ${f.score}/10\nFeedback: ${f.content}`).join('\n\n')
+              payload: { role, company, difficulty, experienceLevel, questionsCount: questions.length, averageScore: avgScore.toFixed(1) },
+              result: feedbacks.map((f, i) => `Q: ${questions[i]}\nAnswer: ${answers[i]}\nScore: ${f.score}/10\nFeedback: ${f.content}`).join('\n\n'),
             },
           });
         }
@@ -187,105 +154,84 @@ export default function InterviewPrepPage() {
     setError('');
   };
 
-  // Helper to calculate total average score
   const getAverageScore = () => {
     if (feedbacks.length === 0) return 0;
     const sum = feedbacks.reduce((acc, curr) => acc + curr.score, 0);
-    return (sum / feedbacks.length) * 10; // convert to percentage
+    return (sum / feedbacks.length) * 10;
   };
 
+  const stageProps = animationsEnabled ? { initial: 'hidden' as const, animate: 'show' as const, variants: STAGE_VARIANTS } : {};
+
   return (
-    <div className="flex flex-col gap-8 max-w-4xl mx-auto py-4 select-none">
-      {/* Page Header */}
+    <motion.div
+      initial={animationsEnabled ? { opacity: 0, y: 10 } : false}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.25 }}
+      className="flex flex-col gap-6 max-w-4xl mx-auto py-4"
+    >
       <div className="flex items-center gap-4">
-        <div className="p-3 bg-violet-500/10 border border-violet-500/20 rounded-2xl text-violet-400 text-2xl shadow-inner">
-          💼
+        <div className="icon-box" style={{ color: 'var(--accent)', backgroundColor: 'var(--accent-10)' }}>
+          <Briefcase size={20} />
         </div>
-        <div className="flex flex-col">
-          <h1 className="text-3xl font-extrabold text-white tracking-tight flex items-center gap-2">
-            Interview Preparation <span className="text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full px-2 py-0.5 font-bold uppercase tracking-wider">Turn-based Simulator</span>
+        <div className="flex flex-col gap-1">
+          <h1 className="text-h1 flex items-center gap-2 flex-wrap">
+            {t('interview.title')}
+            <span className="chip badge-success uppercase tracking-wider text-[9px]">{t('interview.turnBased')}</span>
           </h1>
-          <p className="text-slate-400 text-xs">
-            Experience premium interactive mock sessions tailored for Indian MNCs and civil services.
-          </p>
+          <p className="text-caption">{t('interview.subtitle')}</p>
         </div>
       </div>
 
-      {error && (
-        <div className="p-4 bg-red-950/20 border border-red-500/30 text-red-400 text-xs rounded-xl flex items-center gap-3 animate-fadeIn">
-          <AlertCircle size={16} className="shrink-0" />
-          <div className="flex flex-col gap-1">
-            <span className="font-bold">{error}</span>
-            <span className="opacity-80">You can try resubmitting or restart the process if the issue persists.</span>
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {error && (
+          <motion.div
+            initial={animationsEnabled ? { opacity: 0, y: -6 } : false}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="alert alert-error"
+            role="alert"
+          >
+            <AlertCircle size={16} className="shrink-0" />
+            <div className="flex flex-col gap-0.5">
+              <span className="font-bold">{error}</span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* STAGE: SETUP FORM */}
       {stage === 'setup' && (
-        <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-8 backdrop-blur-md shadow-2xl flex flex-col gap-6 animate-fadeIn">
-          <div className="flex items-center gap-2 text-white font-bold text-lg border-b border-slate-800 pb-3">
-            <BrainCircuit size={18} className="text-emerald-400" />
-            Customize Interview Session
+        <motion.div {...stageProps} className="glass surface-card p-6 sm:p-8 flex flex-col gap-6">
+          <div className="flex items-center gap-2 font-bold text-h2 pb-3" style={{ borderBottom: '1px solid var(--border-default)' }}>
+            <BrainCircuit size={18} style={{ color: 'var(--accent)' }} />
+            {t('interview.customize')}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="flex flex-col gap-2">
-              <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Job Role / Exam</label>
-              <input
-                type="text"
-                required
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                placeholder="e.g. Frontend Engineer, UPSC Aspirant, SBI Clerk"
-                className="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm transition-all"
-              />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="iv-role" className="label">{t('interview.role')}</label>
+              <input id="iv-role" type="text" required value={role} onChange={(e) => setRole(e.target.value)} placeholder="e.g. Frontend Engineer, UPSC Aspirant, SBI Clerk" className="input-field text-sm" />
             </div>
-
-            <div className="flex flex-col gap-2">
-              <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Target Company / Department</label>
-              <input
-                type="text"
-                value={company}
-                onChange={(e) => setCompany(e.target.value)}
-                placeholder="e.g. Google, TCS, SBI, Police Recruitment"
-                className="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm transition-all"
-              />
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="iv-company" className="label">{t('interview.company')}</label>
+              <input id="iv-company" type="text" value={company} onChange={(e) => setCompany(e.target.value)} placeholder="e.g. Google, TCS, SBI, Police Recruitment" className="input-field text-sm" />
             </div>
-
-            <div className="flex flex-col gap-2">
-              <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Key Skills & Experience Areas</label>
-              <input
-                type="text"
-                value={skills}
-                onChange={(e) => setSkills(e.target.value)}
-                placeholder="e.g. React, Python, Data structures, Customer care"
-                className="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm transition-all"
-              />
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="iv-skills" className="label">{t('interview.skills')}</label>
+              <input id="iv-skills" type="text" value={skills} onChange={(e) => setSkills(e.target.value)} placeholder="e.g. React, Python, Data structures, Customer care" className="input-field text-sm" />
             </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col gap-2">
-                <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Experience Level</label>
-                <select
-                  value={experienceLevel}
-                  onChange={(e) => setExperienceLevel(e.target.value)}
-                  className="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm transition-all"
-                >
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="iv-level" className="label">{t('interview.experience')}</label>
+                <select id="iv-level" value={experienceLevel} onChange={(e) => setExperienceLevel(e.target.value)} className="select-field text-sm">
                   <option>Entry Level</option>
                   <option>Mid Level</option>
                   <option>Senior Level</option>
                   <option>Executive</option>
                 </select>
               </div>
-
-              <div className="flex flex-col gap-2">
-                <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Difficulty</label>
-                <select
-                  value={difficulty}
-                  onChange={(e) => setDifficulty(e.target.value)}
-                  className="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-xl p-3 outline-none text-sm transition-all"
-                >
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="iv-difficulty" className="label">{t('interview.difficulty')}</label>
+                <select id="iv-difficulty" value={difficulty} onChange={(e) => setDifficulty(e.target.value)} className="select-field text-sm">
                   <option>Easy</option>
                   <option>Medium</option>
                   <option>Hard</option>
@@ -294,278 +240,264 @@ export default function InterviewPrepPage() {
             </div>
           </div>
 
-          <button
+          <motion.button
+            whileTap={animationsEnabled ? { scale: 0.99 } : undefined}
             onClick={handleStartInterview}
             disabled={loading}
-            className="w-full md:w-auto px-8 py-3 bg-emerald-500 hover:bg-emerald-600 active:scale-[0.99] disabled:opacity-40 disabled:pointer-events-none text-white font-bold text-sm rounded-xl shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2 h-[48px] self-center mt-4"
+            className="btn btn-primary w-full md:w-auto px-8 py-3 text-sm h-12 self-center mt-2"
           >
             {loading ? (
               <>
                 <RefreshCw className="animate-spin" size={16} />
-                <span>Simulating interview setup...</span>
+                <span>{t('interview.simulating')}</span>
               </>
             ) : (
               <>
                 <Sparkles size={16} />
-                <span>Begin Simulation Session</span>
+                <span>{t('interview.begin')}</span>
               </>
             )}
-          </button>
-        </div>
+          </motion.button>
+        </motion.div>
       )}
 
-      {/* STAGE: ACTIVE INTERVIEW QUESTION */}
       {stage === 'question' && (
-        <div className="flex flex-col gap-6 animate-fadeIn">
-          {/* Progress Tracker */}
-          <div className="bg-slate-950/40 border border-slate-800 rounded-2xl p-4 flex items-center justify-between text-xs font-semibold">
-            <span className="text-slate-400">Question {currentIndex + 1} of {questions.length}</span>
-            <div className="flex items-center gap-1.5">
+        <motion.div {...stageProps} className="flex flex-col gap-6">
+          <div className="surface-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-semibold">
+            <span style={{ color: 'var(--text-secondary)' }}>
+              {t('interview.questionXofY', { n: currentIndex + 1, total: questions.length })}
+            </span>
+            <div className="flex items-center gap-1.5 w-full sm:w-40">
               {questions.map((_, i) => (
-                <div 
-                  key={i} 
-                  className={`w-2.5 h-2.5 rounded-full border transition-all ${
-                    i === currentIndex 
-                      ? 'bg-emerald-400 border-emerald-400 shadow-lg shadow-emerald-400/40' 
-                      : i < currentIndex 
-                      ? 'bg-emerald-950 border-emerald-600' 
-                      : 'bg-slate-900 border-slate-800'
-                  }`}
-                />
+                <motion.div
+                  key={i}
+                  className="flex-1 h-1.5 rounded-full overflow-hidden"
+                  style={{ backgroundColor: 'var(--bg-tertiary)' }}
+                >
+                  <motion.div
+                    className="h-full rounded-full"
+                    style={{ backgroundColor: i === currentIndex ? 'var(--accent)' : i < currentIndex ? 'var(--accent-dark)' : 'var(--bg-tertiary)' }}
+                    initial={i <= currentIndex && animationsEnabled ? { width: 0 } : false}
+                    animate={{ width: '100%' }}
+                    transition={{ duration: 0.4, ease: 'easeOut' }}
+                  />
+                </motion.div>
               ))}
             </div>
           </div>
 
-          {/* Question Text block */}
-          <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-8 backdrop-blur-md shadow-2xl flex flex-col gap-6">
+          <div className="glass surface-card p-6 sm:p-8 flex flex-col gap-6">
             <div className="flex items-start gap-4">
-              <span className="flex items-center justify-center w-8 h-8 rounded-full bg-emerald-500/10 text-emerald-400 font-extrabold text-sm border border-emerald-500/20 shrink-0">
+              <span className="flex items-center justify-center w-8 h-8 rounded-full shrink-0 text-sm font-extrabold" style={{ backgroundColor: 'var(--accent-10)', color: 'var(--accent)', border: '1px solid var(--accent-ring)' }}>
                 Q
               </span>
-              <h2 className="text-lg font-bold text-white leading-normal pt-0.5">
+              <h2 className="text-base sm:text-lg font-bold leading-normal pt-0.5" style={{ color: 'var(--text-primary)' }}>
                 {questions[currentIndex]}
               </h2>
             </div>
 
             <div className="flex flex-col gap-2">
-              <div className="flex justify-between items-center text-xs font-semibold text-slate-400">
-                <span>Write Your Response Answer</span>
-                <span className={`${currentAnswer.length > 150 ? 'text-emerald-400' : 'text-slate-500'}`}>
-                  {currentAnswer.length} characters
+              <div className="flex justify-between items-center text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
+                <span>{t('interview.answer')}</span>
+                <span style={{ color: currentAnswer.length > 150 ? 'var(--accent)' : 'var(--text-muted)' }}>
+                  {currentAnswer.length} {t('interview.chars')}
                 </span>
               </div>
               <textarea
                 value={currentAnswer}
                 onChange={(e) => setCurrentAnswer(e.target.value)}
-                placeholder="Type your structured, detailed interview answer response here. Take your time..."
+                placeholder={t('interview.answerPlaceholder')}
                 rows={6}
-                className="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white text-sm rounded-xl p-4 outline-none resize-none transition-all leading-relaxed"
+                className="input-field text-sm p-4 leading-relaxed resize-none"
+                aria-label={t('interview.answer')}
               />
             </div>
 
-            <div className="flex justify-between items-center pt-2 border-t border-slate-800/80">
-              <button
-                onClick={handleRestart}
-                className="px-4 py-2 bg-slate-950 border border-slate-800 hover:border-slate-800 text-slate-400 rounded-lg hover:text-white transition-all text-xs font-semibold"
-              >
-                Quit Session
+            <div className="flex justify-between items-center pt-2 gap-3" style={{ borderTop: '1px solid var(--border-subtle)' }}>
+              <button onClick={handleRestart} className="btn btn-secondary px-4 py-2 text-xs">
+                {t('interview.quit')}
               </button>
-              
               <button
                 onClick={handleEvaluateAnswer}
                 disabled={evaluating || !currentAnswer.trim()}
-                className="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-2"
+                className="btn btn-primary px-6 py-2.5 text-xs"
               >
                 {evaluating ? (
                   <>
                     <RefreshCw className="animate-spin" size={14} />
-                    <span>Evaluating answer...</span>
+                    <span>{t('interview.evaluating')}</span>
                   </>
                 ) : (
                   <>
                     <Send size={12} />
-                    <span>Evaluate & Continue</span>
+                    <span>{t('interview.evaluate')}</span>
                   </>
                 )}
               </button>
             </div>
           </div>
-        </div>
+        </motion.div>
       )}
 
-      {/* STAGE: TURN EVALUATION FEEDBACK */}
       {stage === 'evaluation' && feedbacks[currentIndex] && (
-        <div className="flex flex-col gap-6 animate-fadeIn">
-          {/* Question display */}
-          <div className="bg-slate-950/40 border border-slate-800 rounded-2xl p-6 flex flex-col gap-3">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Question evaluated</span>
-            <h3 className="text-sm font-semibold text-slate-200 leading-normal">{questions[currentIndex]}</h3>
+        <motion.div {...stageProps} className="flex flex-col gap-6">
+          <div className="surface-card rounded-2xl p-6 flex flex-col gap-3">
+            <span className="text-[10px] font-bold uppercase tracking-widest leading-none" style={{ color: 'var(--text-muted)' }}>
+              {t('interview.questionEvaluated')}
+            </span>
+            <h3 className="text-sm font-semibold leading-normal" style={{ color: 'var(--text-primary)' }}>
+              {questions[currentIndex]}
+            </h3>
           </div>
 
-          {/* Evaluation Report block */}
-          <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-8 backdrop-blur-md shadow-2xl flex flex-col gap-6 relative">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-              <span className="text-md font-bold text-white flex items-center gap-2">
-                <ThumbsUp size={16} className="text-emerald-400" />
-                Live Evaluation Feedback
+          <div className="glass surface-card p-6 sm:p-8 flex flex-col gap-6 relative">
+            <div className="flex items-center justify-between gap-3 pb-4 flex-wrap" style={{ borderBottom: '1px solid var(--border-default)' }}>
+              <span className="text-md font-bold flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+                <ThumbsUp size={16} style={{ color: 'var(--accent)' }} />
+                {t('interview.liveFeedback')}
               </span>
-              
-              {/* Score bubble badge */}
-              <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-extrabold rounded-xl px-4 py-2 text-sm">
-                <span>Score:</span>
-                <span className="text-base">{feedbacks[currentIndex].score}</span>
+              <div className="chip badge-success text-sm font-extrabold px-4 py-2">
+                <span>{t('interview.score')}:</span>
+                <span className="text-base tabular-nums">{feedbacks[currentIndex].score}</span>
                 <span className="opacity-60 text-xs">/ 10</span>
               </div>
             </div>
 
-            {/* Rendered feedback Markdown */}
-            <div className="text-slate-200 text-sm leading-relaxed whitespace-pre-wrap font-sans break-words bg-slate-950/40 border border-slate-800 p-6 rounded-2xl select-text">
+            <div
+              className="text-sm leading-relaxed whitespace-pre-wrap break-words p-6 rounded-2xl select-text"
+              style={{ backgroundColor: 'var(--bg-input)', border: '1px solid var(--border-default)', color: 'var(--text-secondary)' }}
+            >
               {feedbacks[currentIndex].content}
             </div>
 
-            <div className="flex justify-between items-center pt-2">
-              <button
-                onClick={handleRestart}
-                className="px-4 py-2 bg-slate-950 border border-slate-800 hover:border-slate-800 text-slate-400 rounded-lg hover:text-white transition-all text-xs font-semibold"
-              >
-                End Session
+            <div className="flex justify-between items-center pt-2 gap-3">
+              <button onClick={handleRestart} className="btn btn-secondary px-4 py-2 text-xs">
+                {t('interview.end')}
               </button>
-
-              <button
-                onClick={handleNext}
-                className="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 active:scale-[0.98] text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-1.5"
-              >
-                <span>{currentIndex < questions.length - 1 ? 'Next Question' : 'Finish Simulation'}</span>
+              <button onClick={handleNext} className="btn btn-primary px-6 py-2.5 text-xs">
+                <span>{currentIndex < questions.length - 1 ? t('interview.next') : t('interview.finish')}</span>
                 <ArrowRight size={12} />
               </button>
             </div>
           </div>
-        </div>
+        </motion.div>
       )}
 
-      {/* STAGE: COMPLETED REPORT SUMMARY */}
       {stage === 'completed' && (
-        <div className="flex flex-col gap-8 animate-fadeIn">
-          {/* Overall performance Score Card */}
+        <motion.div {...stageProps} className="flex flex-col gap-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Score circle gauge */}
-            <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-6 backdrop-blur-md flex flex-col items-center justify-center text-center gap-3 col-span-1">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Average Score</span>
+            <div className="glass surface-card p-6 flex flex-col items-center justify-center text-center gap-3 col-span-1">
+              <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
+                {t('interview.avgScore')}
+              </span>
               <div className="relative w-32 h-32 flex items-center justify-center">
-                <svg className="w-full h-full transform -rotate-90">
-                  <circle
-                    cx="64"
-                    cy="64"
-                    r="56"
-                    className="stroke-slate-800 fill-transparent"
+                <svg className="w-full h-full -rotate-90">
+                  <circle cx="64" cy="64" r="56" fill="transparent" strokeWidth="10" stroke="var(--bg-tertiary)" />
+                  <motion.circle
+                    cx="64" cy="64" r="56"
+                    fill="transparent"
                     strokeWidth="10"
-                  />
-                  <circle
-                    cx="64"
-                    cy="64"
-                    r="56"
-                    className="stroke-emerald-500 fill-transparent"
-                    strokeWidth="10"
-                    strokeDasharray={351.8}
-                    strokeDashoffset={351.8 - (351.8 * getAverageScore()) / 100}
+                    stroke="var(--accent)"
                     strokeLinecap="round"
+                    initial={animationsEnabled ? { strokeDashoffset: 351.8 } : false}
+                    animate={{ strokeDashoffset: 351.8 - (351.8 * getAverageScore()) / 100 }}
+                    transition={{ duration: 1, ease: 'easeOut', delay: 0.2 }}
+                    strokeDasharray={351.8}
                   />
                 </svg>
                 <div className="absolute flex flex-col items-center justify-center">
-                  <span className="text-3xl font-extrabold text-white">{(getAverageScore() / 10).toFixed(1)}</span>
-                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">out of 10</span>
+                  <span className="text-3xl font-extrabold tabular-nums" style={{ color: 'var(--text-primary)' }}>
+                    {(getAverageScore() / 10).toFixed(1)}
+                  </span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                    {t('interview.outOf10')}
+                  </span>
                 </div>
               </div>
-              <p className="text-xs text-slate-400 mt-1.5 px-4">
-                Excellent progression across {questions.length} simulated questions.
+              <p className="text-xs mt-1.5 px-4" style={{ color: 'var(--text-secondary)' }}>
+                {t('interview.excellentProgression', { n: questions.length })}
               </p>
             </div>
 
-            {/* Stats list card */}
-            <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-6 backdrop-blur-md col-span-2 flex flex-col gap-4">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-800 pb-2">Session Parameters</span>
-              
-              <div className="grid grid-cols-2 gap-4 text-xs">
-                <div className="flex flex-col gap-1 bg-slate-950/40 border border-slate-800/80 p-3.5 rounded-xl">
-                  <span className="text-slate-500 font-semibold uppercase tracking-wider text-[9px]">Job Target Role</span>
-                  <span className="text-slate-200 font-bold">{role}</span>
+            <div className="glass surface-card p-6 col-span-2 flex flex-col gap-4">
+              <span className="text-xs font-bold uppercase tracking-widest pb-2" style={{ color: 'var(--text-muted)', borderBottom: '1px solid var(--border-default)' }}>
+                {t('interview.sessionParams')}
+              </span>
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div className="flex flex-col gap-1 p-3.5 rounded-xl" style={{ backgroundColor: 'var(--bg-input)', border: '1px solid var(--border-subtle)' }}>
+                  <span className="text-[9px] font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>{t('interview.role')}</span>
+                  <span className="font-bold" style={{ color: 'var(--text-primary)' }}>{role}</span>
                 </div>
-
-                <div className="flex flex-col gap-1 bg-slate-950/40 border border-slate-800/80 p-3.5 rounded-xl">
-                  <span className="text-slate-500 font-semibold uppercase tracking-wider text-[9px]">Company Environment</span>
-                  <span className="text-slate-200 font-bold">{company || 'General MNC'}</span>
+                <div className="flex flex-col gap-1 p-3.5 rounded-xl" style={{ backgroundColor: 'var(--bg-input)', border: '1px solid var(--border-subtle)' }}>
+                  <span className="text-[9px] font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>{t('interview.company')}</span>
+                  <span className="font-bold" style={{ color: 'var(--text-primary)' }}>{company || 'General MNC'}</span>
                 </div>
-
-                <div className="flex flex-col gap-1 bg-slate-950/40 border border-slate-800/80 p-3.5 rounded-xl">
-                  <span className="text-slate-500 font-semibold uppercase tracking-wider text-[9px]">Difficulty Scale</span>
-                  <span className="text-slate-200 font-bold">{difficulty}</span>
+                <div className="flex flex-col gap-1 p-3.5 rounded-xl" style={{ backgroundColor: 'var(--bg-input)', border: '1px solid var(--border-subtle)' }}>
+                  <span className="text-[9px] font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>{t('interview.difficulty')}</span>
+                  <span className="font-bold" style={{ color: 'var(--text-primary)' }}>{difficulty}</span>
                 </div>
-
-                <div className="flex flex-col gap-1 bg-slate-950/40 border border-slate-800/80 p-3.5 rounded-xl">
-                  <span className="text-slate-500 font-semibold uppercase tracking-wider text-[9px]">Career Level</span>
-                  <span className="text-slate-200 font-bold">{experienceLevel}</span>
+                <div className="flex flex-col gap-1 p-3.5 rounded-xl" style={{ backgroundColor: 'var(--bg-input)', border: '1px solid var(--border-subtle)' }}>
+                  <span className="text-[9px] font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>{t('interview.experience')}</span>
+                  <span className="font-bold" style={{ color: 'var(--text-primary)' }}>{experienceLevel}</span>
                 </div>
               </div>
-
-              <div className="flex items-center gap-2 text-xs font-semibold text-emerald-400 mt-2 bg-emerald-500/5 border border-emerald-500/10 p-3 rounded-xl">
-                <Award size={14} className="shrink-0 animate-pulse" />
-                <span>Simulation results successfully generated and logged in your profile history tab.</span>
+              <div className="alert alert-success text-xs font-semibold mt-1">
+                <Award size={14} className="shrink-0" />
+                <span>{t('interview.logged')}</span>
               </div>
             </div>
           </div>
 
-          {/* Section details breakdown */}
-          <div className="flex flex-col gap-5">
-            <h3 className="text-md font-bold text-white flex items-center gap-2">
-              <CheckCircle2 size={16} className="text-emerald-400" />
-              Question & Feedback Logs
+          <div className="flex flex-col gap-4">
+            <h3 className="text-md font-bold flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+              <CheckCircle2 size={16} style={{ color: 'var(--accent)' }} />
+              {t('interview.logs')}
             </h3>
 
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-4">
               {questions.map((q, idx) => (
-                <div key={idx} className="bg-slate-900/30 border border-slate-800 rounded-2xl overflow-hidden">
-                  {/* Header bar */}
-                  <div className="p-4 bg-slate-950/40 border-b border-slate-800 flex items-center justify-between text-xs">
-                    <span className="font-bold text-slate-400">Question {idx + 1}</span>
-                    <span className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-extrabold px-2.5 py-1 rounded-lg">
-                      Score: {feedbacks[idx]?.score}/10
+                <motion.div
+                  key={idx}
+                  initial={animationsEnabled ? { opacity: 0, y: 12 } : false}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.05 * idx, duration: 0.25 }}
+                  className="surface-card rounded-2xl overflow-hidden"
+                >
+                  <div className="p-4 flex items-center justify-between gap-3 text-xs" style={{ backgroundColor: 'var(--bg-input)', borderBottom: '1px solid var(--border-default)' }}>
+                    <span className="font-bold" style={{ color: 'var(--text-secondary)' }}>
+                      {t('interview.questionXofY', { n: idx + 1, total: questions.length })}
+                    </span>
+                    <span className="chip badge-success font-extrabold">
+                      {t('interview.score')}: {feedbacks[idx]?.score}/10
                     </span>
                   </div>
-
-                  {/* Body question answers feedback */}
-                  <div className="p-6 flex flex-col gap-4 text-xs leading-relaxed">
-                    <div className="flex flex-col gap-1 bg-slate-950/20 p-3 rounded-lg border border-slate-800/50">
-                      <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500">Question Asked</span>
-                      <p className="text-slate-300 font-semibold">{q}</p>
+                  <div className="p-5 flex flex-col gap-4 text-xs leading-relaxed">
+                    <div className="flex flex-col gap-1 p-3 rounded-lg" style={{ backgroundColor: 'var(--bg-input)', border: '1px solid var(--border-subtle)' }}>
+                      <span className="text-[9px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>{t('interview.questionAsked')}</span>
+                      <p className="font-semibold" style={{ color: 'var(--text-primary)' }}>{q}</p>
                     </div>
-
-                    <div className="flex flex-col gap-1 bg-slate-950/20 p-3 rounded-lg border border-slate-800/50">
-                      <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500">Your Response Answer</span>
-                      <p className="text-slate-400 italic break-words">{answers[idx]}</p>
+                    <div className="flex flex-col gap-1 p-3 rounded-lg" style={{ backgroundColor: 'var(--bg-input)', border: '1px solid var(--border-subtle)' }}>
+                      <span className="text-[9px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>{t('interview.yourAnswer')}</span>
+                      <p className="italic break-words" style={{ color: 'var(--text-secondary)' }}>{answers[idx]}</p>
                     </div>
-
-                    <div className="flex flex-col gap-2">
-                      <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500">Recruiter Evaluation</span>
-                      <div className="p-4 bg-slate-950/40 rounded-lg text-slate-200 whitespace-pre-wrap select-text break-words border border-slate-800/60 leading-normal">
+                    <div className="flex flex-col gap-1.5">
+                      <span className="text-[9px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>{t('interview.evaluation')}</span>
+                      <div className="p-4 rounded-lg whitespace-pre-wrap select-text break-words leading-normal" style={{ backgroundColor: 'var(--bg-input)', border: '1px solid var(--border-subtle)', color: 'var(--text-secondary)' }}>
                         {feedbacks[idx]?.content}
                       </div>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
 
-          {/* Action buttons */}
-          <button
-            onClick={handleRestart}
-            className="px-8 py-3.5 bg-emerald-500 hover:bg-emerald-600 active:scale-[0.99] text-white font-bold text-sm rounded-xl shadow-lg shadow-emerald-500/25 transition-all flex items-center gap-2 self-center w-fit"
-          >
+          <button onClick={handleRestart} className="btn btn-primary px-8 py-3.5 text-sm self-center w-fit">
             <RotateCcw size={16} />
-            <span>Restart New Simulation Session</span>
+            <span>{t('interview.restart')}</span>
           </button>
-        </div>
+        </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 }

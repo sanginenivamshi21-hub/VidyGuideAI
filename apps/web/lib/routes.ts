@@ -31,11 +31,11 @@ export const SIDEBAR_ITEMS = [
 ] as const;
 
 export const DASHBOARD_CARDS = [
-  { icon: 'Compass' as const, title: 'Career Guidance', desc: 'Get tailored career recommendations for intermediate, diploma, ITI, or graduates.', href: ROUTES.CAREER, color: 'bg-emerald-500/10 text-emerald-455 border-emerald-500/20 hover:border-emerald-500/40' },
-  { icon: 'Map' as const, title: 'Career Roadmap', desc: 'Visualize your academic and career step milestones chronologically in a scrolling timeline.', href: ROUTES.CAREER_ROADMAP, color: 'bg-purple-500/10 text-purple-455 border-purple-500/20 hover:border-purple-500/40' },
-  { icon: 'FileText' as const, title: 'Resume Builder', desc: 'Build ATS-compatible resumes with role-specific questions and export print-ready PDFs.', href: ROUTES.RESUME_BUILDER, color: 'bg-indigo-500/10 text-indigo-455 border-indigo-500/20 hover:border-indigo-500/40' },
-  { icon: 'ScanSearch' as const, title: 'Resume Review', desc: 'ATS scoring, keyword analysis, grammar check, formatting review, and role matching.', href: ROUTES.RESUME_REVIEW, color: 'bg-pink-500/10 text-pink-455 border-pink-500/20 hover:border-pink-500/40' },
-  { icon: 'Bot' as const, title: 'AI Mentor', desc: 'Chat with your AI career assistant using text or voice. Upload PDFs, images, and documents.', href: ROUTES.MENTOR, color: 'bg-cyan-500/10 text-cyan-455 border-cyan-500/20 hover:border-cyan-500/40' },
-  { icon: 'Languages' as const, title: 'Translator', desc: 'Translate career articles between English and 10+ regional Indian dialects.', href: ROUTES.TRANSLATOR, color: 'bg-orange-500/10 text-orange-455 border-orange-500/20 hover:border-orange-500/40' },
-  { icon: 'Briefcase' as const, title: 'Interview Prep', desc: 'Practice mock technical & behavioral questions for specific Indian companies.', href: ROUTES.INTERVIEW_PREP, color: 'bg-violet-500/10 text-violet-455 border-violet-500/20 hover:border-violet-500/40' },
+  { icon: 'Compass' as const, title: 'Career Guidance', desc: 'Get tailored career recommendations for intermediate, diploma, ITI, or graduates.', href: ROUTES.CAREER, color: 'text-emerald-400' },
+  { icon: 'Map' as const, title: 'Career Roadmap', desc: 'Visualize your academic and career step milestones chronologically in a scrolling timeline.', href: ROUTES.CAREER_ROADMAP, color: 'text-purple-400' },
+  { icon: 'FileText' as const, title: 'Resume Builder', desc: 'Build ATS-compatible resumes with role-specific questions and export print-ready PDFs.', href: ROUTES.RESUME_BUILDER, color: 'text-indigo-400' },
+  { icon: 'ScanSearch' as const, title: 'Resume Review', desc: 'ATS scoring, keyword analysis, grammar check, formatting review, and role matching.', href: ROUTES.RESUME_REVIEW, color: 'text-pink-400' },
+  { icon: 'Bot' as const, title: 'AI Mentor', desc: 'Chat with your AI career assistant using text or voice. Upload PDFs, images, and documents.', href: ROUTES.MENTOR, color: 'text-cyan-400' },
+  { icon: 'Languages' as const, title: 'Translator', desc: 'Translate career articles between English and 10+ regional Indian dialects.', href: ROUTES.TRANSLATOR, color: 'text-orange-400' },
+  { icon: 'Briefcase' as const, title: 'Interview Prep', desc: 'Practice mock technical & behavioral questions for specific Indian companies.', href: ROUTES.INTERVIEW_PREP, color: 'text-violet-400' },
 ] as const;

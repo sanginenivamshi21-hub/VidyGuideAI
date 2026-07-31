@@ -533,7 +533,7 @@ function ResumePreview({ data, zoom = 1 }: Props) {
 
   return (
     <div className="origin-top-left transition-all duration-200" style={{ transform: `scale(${zoom})`, width: zoom < 1 ? `${100 / zoom}%` : '100%', transformOrigin: 'top left' }}>
-      <div className="bg-white shadow-lg" style={{ minHeight: 400, width: '100%', overflow: 'hidden' }}>
+      <div className="bg-white resume-paper shadow-lg" style={{ minHeight: 400, width: '100%', overflow: 'hidden' }}>
         <Template data={data} colors={colors} />
       </div>
     </div>

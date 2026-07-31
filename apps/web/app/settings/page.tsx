@@ -1,22 +1,36 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useSettings, GROQ_MODELS, LANGUAGES, ACCENT_COLORS, applyTheme, applyAccent } from '@/hooks/useSettings';
 import { useRouter } from 'next/navigation';
 import { api, fetchWithAuth } from '@/lib/api';
-import { Palette, Volume2, Bell, Shield, Keyboard, Eye, GripVertical, Sun, Moon, Monitor, Check, Upload, Trash2, Download, LogOut, AlertTriangle } from 'lucide-react';
+import { useI18n, SUPPORTED_LOCALES } from '@/lib/i18n';
+import { useAnimationsEnabled } from '@/hooks/useAnimations';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Palette, Volume2, Bell, Shield, Keyboard, Eye, GripVertical, Sun, Moon, Monitor,
+  Check, Upload, Trash2, Download, LogOut, AlertTriangle, Search, CheckCircle2,
+  KeyRound, Settings,
+} from 'lucide-react';
 import { useAuth, useRequireRegistered } from '@/hooks/useAuth';
+
+type Toast = { message: string; type: 'success' | 'error' } | null;
 
 export default function SettingsPage() {
   const { settings, updateSettings, loading, saving } = useSettings();
   const { isAuthenticated, user } = useAuth();
+  const { t, setLang } = useI18n();
   useRequireRegistered();
   const router = useRouter();
+  const animationsEnabled = useAnimationsEnabled();
   const [password, setPassword] = useState('');
   const [passwordMsg, setPasswordMsg] = useState('');
+  const [passwordType, setPasswordType] = useState<'success' | 'error'>('success');
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [activeTab, setActiveTab] = useState('general');
+  const [searchQuery, setSearchQuery] = useState('');
   const [profilePicture, setProfilePicture] = useState<string>('');
+  const [toast, setToast] = useState<Toast>(null);
   const [subNotifs, setSubNotifs] = useState<Record<string, boolean>>(() => {
     if (typeof window !== 'undefined') {
       const stored = localStorage.getItem('vidyguide_subnotifs');
@@ -24,10 +38,24 @@ export default function SettingsPage() {
     }
     return { resume: true, interview: true, career: true, marketing: false };
   });
+  const wasSaving = useRef(false);
 
   useEffect(() => {
     localStorage.setItem('vidyguide_subnotifs', JSON.stringify(subNotifs));
   }, [subNotifs]);
+
+  useEffect(() => {
+    if (wasSaving.current && !saving) {
+      setToast({ message: t('settings.savedToast'), type: 'success' });
+    }
+    wasSaving.current = saving;
+  }, [saving, t]);
+
+  useEffect(() => {
+    if (!toast) return;
+    const id = setTimeout(() => setToast(null), 2400);
+    return () => clearTimeout(id);
+  }, [toast]);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.speechSynthesis) {
@@ -41,78 +69,121 @@ export default function SettingsPage() {
     if (user?.profilePicture) setProfilePicture(user.profilePicture);
   }, [user]);
 
-  const update = (key: string, value: any) => {
+  const update = useCallback((key: string, value: any) => {
     updateSettings({ [key]: value } as any);
     if (key === 'theme') applyTheme(value);
     if (key === 'accentColor') applyAccent(value);
-  };
+  }, [updateSettings]);
 
   const tabs = [
-    { id: 'general', label: 'General', icon: Eye },
-    { id: 'ai', label: 'AI Model', icon: GripVertical },
-    { id: 'speech', label: 'Speech', icon: Volume2 },
-    { id: 'theme', label: 'Theme', icon: Palette },
-    { id: 'notifications', label: 'Notifications', icon: Bell },
-    { id: 'security', label: 'Security', icon: Shield },
-    { id: 'shortcuts', label: 'Shortcuts', icon: Keyboard },
+    { id: 'general', label: t('settings.tabGeneral'), icon: Eye },
+    { id: 'ai', label: t('settings.tabAi'), icon: GripVertical },
+    { id: 'speech', label: t('settings.tabSpeech'), icon: Volume2 },
+    { id: 'theme', label: t('settings.tabTheme'), icon: Palette },
+    { id: 'notifications', label: t('settings.tabNotifications'), icon: Bell },
+    { id: 'security', label: t('settings.tabSecurity'), icon: Shield },
+    { id: 'shortcuts', label: t('settings.tabShortcuts'), icon: Keyboard },
   ];
 
-  const Section = ({ title, desc, children }: { title: string; desc?: string; children: React.ReactNode }) => (
-    <div className="surface-card p-5">
-      <h3 className="text-h3 mb-1">{title}</h3>
-      {desc && <p className="text-caption mb-4">{desc}</p>}
+  const Section = ({ icon: Icon, title, desc, children }: { icon: any; title: string; desc?: string; children: React.ReactNode }) => (
+    <motion.section
+      initial={animationsEnabled ? { opacity: 0, y: 10 } : false}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.22, ease: 'easeOut' }}
+      className="surface-card p-5 sm:p-6"
+    >
+      <div className="flex items-start gap-3 mb-4">
+        <div className="icon-box shrink-0" style={{ color: 'var(--accent)', backgroundColor: 'var(--accent-10)' }}>
+          <Icon size={16} />
+        </div>
+        <div>
+          <h3 className="text-h3">{title}</h3>
+          {desc && <p className="text-caption mt-0.5">{desc}</p>}
+        </div>
+      </div>
       <div className="space-y-3">{children}</div>
-    </div>
+    </motion.section>
   );
 
-  const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
-    <div className="flex items-center justify-between gap-4">
+  const Field = ({ label, htmlFor, children }: { label: string; htmlFor?: string; children: React.ReactNode }) => (
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 py-1">
       <span className="text-caption font-medium">{label}</span>
-      <div className="w-48">{children}</div>
+      <div className="w-full sm:w-56 shrink-0">{children}</div>
     </div>
   );
 
-  const Select = ({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[] }) => (
-    <select value={value} onChange={e => onChange(e.target.value)} className="input-field text-xs">
+  const Select = ({ value, onChange, options, ariaLabel }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[]; ariaLabel?: string }) => (
+    <select
+      value={value}
+      onChange={e => onChange(e.target.value)}
+      className="select-field text-xs"
+      aria-label={ariaLabel}
+    >
       {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
     </select>
   );
 
-  const Toggle = ({ value, onChange }: { value: boolean; onChange: (v: boolean) => void }) => (
-    <button onClick={() => onChange(!value)} className="relative w-10 h-5 rounded-full transition-colors" style={{ backgroundColor: value ? 'var(--accent)' : 'rgba(51,65,85,0.5)' }}>
-      <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${value ? 'translate-x-5' : 'translate-x-0.5'}`} />
+  const Toggle = ({ value, onChange, label }: { value: boolean; onChange: (v: boolean) => void; label: string }) => (
+    <button
+      role="switch"
+      aria-checked={value}
+      aria-label={label}
+      onClick={() => onChange(!value)}
+      className="toggle"
+    >
+      <span className="toggle-knob" />
     </button>
   );
 
-  const RangeSlider = ({ value, onChange, min, max, step }: { value: number; onChange: (v: number) => void; min: number; max: number; step: number }) => (
-    <div className="flex items-center gap-2">
-      <input type="range" min={min} max={max} step={step} value={value} onChange={e => onChange(parseFloat(e.target.value))} className="flex-1 h-1 rounded-full appearance-none cursor-pointer" style={{ accentColor: 'var(--accent)' }} />
-      <span className="text-xs text-slate-400 w-8 text-right">{value}</span>
+  const RangeSlider = ({ value, onChange, min, max, step, ariaLabel }: { value: number; onChange: (v: number) => void; min: number; max: number; step: number; ariaLabel?: string }) => (
+    <div className="flex items-center gap-3">
+      <input
+        type="range"
+        min={min} max={max} step={step}
+        value={value}
+        onChange={e => onChange(parseFloat(e.target.value))}
+        className="range-field flex-1"
+        aria-label={ariaLabel}
+        aria-valuetext={String(value)}
+      />
+      <span className="text-xs w-10 text-right tabular-nums" style={{ color: 'var(--text-secondary)' }}>{value.toFixed(step < 1 ? 1 : 0)}</span>
     </div>
   );
 
   const handlePasswordUpdate = async () => {
-    if (password.length < 6) { setPasswordMsg('Password must be at least 6 characters.'); return; }
+    if (password.length < 6) {
+      setPasswordType('error');
+      setPasswordMsg(t('settings.pwShort'));
+      return;
+    }
     try {
       const data = await api('/users/profile', {
         method: 'PUT',
         body: { password },
       });
-      setPasswordMsg(data.success ? 'Password updated successfully. All sessions invalidated.' : 'Failed to update password.');
-      if (data.success) setPassword('');
-    } catch { setPasswordMsg('Network error. Please try again.'); }
+      const ok = data.success === true;
+      setPasswordType(ok ? 'success' : 'error');
+      setPasswordMsg(ok ? t('settings.pwUpdated') : t('settings.pwFailed'));
+      if (ok) {
+        setPassword('');
+        setToast({ message: t('settings.pwUpdated'), type: 'success' });
+      }
+    } catch {
+      setPasswordType('error');
+      setPasswordMsg(t('settings.pwNetwork'));
+    }
   };
 
   const handleDeleteAccount = async () => {
-    if (!confirm('Are you sure you want to permanently delete your account?\n\nThis action CANNOT be undone. All your data will be erased.')) return;
-    if (!confirm('This will delete ALL your:\n- Profile & settings\n- Chat conversations\n- Career history\n- Resumes\n- OCR history\n\nAre you absolutely sure?')) return;
+    if (!window.confirm('Are you sure you want to permanently delete your account?\n\nThis action CANNOT be undone. All your data will be erased.')) return;
+    if (!window.confirm('This will delete ALL your:\n- Profile & settings\n- Chat conversations\n- Career history\n- Resumes\n- OCR history\n\nAre you absolutely sure?')) return;
     try {
       const res = await fetchWithAuth('/users/account', { method: 'DELETE' });
       if (res.ok) {
         localStorage.clear();
         router.push('/auth');
       }
-    } catch { setPasswordMsg('Failed to delete account. Please try again.'); }
+    } catch { setPasswordMsg(t('settings.pwNetwork')); }
   };
 
   const handleExportData = async () => {
@@ -124,8 +195,9 @@ export default function SettingsPage() {
         const a = document.createElement('a');
         a.href = url; a.download = 'vidyguide-export.json'; a.click();
         URL.revokeObjectURL(url);
+        setToast({ message: t('common.copied'), type: 'success' });
       }
-    } catch { setPasswordMsg('Export failed. Please try again.'); }
+    } catch { setPasswordMsg(t('settings.pwNetwork')); }
   };
 
   const handleProfilePictureUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -146,6 +218,7 @@ export default function SettingsPage() {
           u.profilePicture = data.profilePicture;
           localStorage.setItem('user', JSON.stringify(u));
         }
+        setToast({ message: t('settings.savedToast'), type: 'success' });
       }
     } catch {}
   };
@@ -163,267 +236,480 @@ export default function SettingsPage() {
     } catch {}
   };
 
+  const handleLanguageChange = (value: string) => {
+    update('language', value);
+    setLang(value);
+  };
+
+  const sectionGroups: { tab: string; sections: { id: string; title: string; keywords: string; render: () => React.ReactNode }[] }[] = useMemo(() => ([
+    {
+      tab: 'general',
+      sections: [
+        {
+          id: 'profile', title: t('settings.secProfile'), keywords: 'avatar photo picture upload image',
+          render: () => (
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div
+                className="w-16 h-16 rounded-full overflow-hidden flex items-center justify-center border-2 shrink-0"
+                style={{ backgroundColor: 'var(--accent-10)', borderColor: 'var(--accent-ring)' }}
+              >
+                {profilePicture ? (
+                  <img src={profilePicture} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-2xl font-bold" style={{ color: 'var(--accent)' }}>
+                    {user?.fullName?.[0] || '?'}
+                  </span>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <label className="btn btn-primary px-3 py-1.5 text-xs cursor-pointer" role="button" tabIndex={0}>
+                  <Upload size={14} /> {t('settings.upload')}
+                  <input type="file" accept="image/*" onChange={handleProfilePictureUpload} className="hidden" aria-label={t('settings.upload')} />
+                </label>
+                {profilePicture && (
+                  <button onClick={handleDeleteProfilePicture} className="btn btn-danger px-3 py-1.5 text-xs">
+                    <Trash2 size={14} /> {t('settings.remove')}
+                  </button>
+                )}
+              </div>
+            </div>
+          ),
+        },
+        {
+          id: 'language', title: t('settings.secLanguage'), keywords: 'ui interface language hindi telugu english भाषा భాష',
+          render: () => (
+            <div>
+              <Field label={t('settings.lblUiLanguage')}>
+                <Select value={settings.language} onChange={handleLanguageChange} options={SUPPORTED_LOCALES} ariaLabel={t('settings.lblUiLanguage')} />
+              </Field>
+              <div className="flex gap-2 mt-3">
+                {SUPPORTED_LOCALES.map(locale => (
+                  <button
+                    key={locale.value}
+                    onClick={() => handleLanguageChange(locale.value)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${settings.language === locale.value ? 'btn-soft' : 'btn-secondary'}`}
+                    style={settings.language === locale.value ? { backgroundColor: 'var(--accent-10)', color: 'var(--accent)', borderColor: 'var(--accent-ring)' } : {}}
+                    aria-pressed={settings.language === locale.value}
+                  >
+                    {locale.native}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ),
+        },
+        {
+          id: 'preferences', title: t('settings.secPreferences'), keywords: 'animation translate chat history resume style privacy',
+          render: () => (
+            <>
+              <Field label={t('settings.lblAutoTranslate')}>
+                <Toggle value={settings.autoTranslate} onChange={v => update('autoTranslate', v)} label={t('settings.lblAutoTranslate')} />
+              </Field>
+              <Field label={t('settings.lblAnimations')}>
+                <Toggle value={settings.animations} onChange={v => update('animations', v)} label={t('settings.lblAnimations')} />
+              </Field>
+              <Field label={t('settings.lblChatHistory')}>
+                <Toggle value={settings.chatHistory} onChange={v => update('chatHistory', v)} label={t('settings.lblChatHistory')} />
+              </Field>
+              <Field label={t('settings.lblResumeStyle')}>
+                <Select value={settings.defaultResumeStyle} onChange={v => update('defaultResumeStyle', v)} options={[
+                  { value: 'professional', label: 'Professional' },
+                  { value: 'modern', label: 'Modern' },
+                  { value: 'creative', label: 'Creative' },
+                ]} ariaLabel={t('settings.lblResumeStyle')} />
+              </Field>
+            </>
+          ),
+        },
+      ],
+    },
+    {
+      tab: 'ai',
+      sections: [
+        {
+          id: 'ai-config', title: t('settings.secAi'), keywords: 'model groq llama temperature tokens ai',
+          render: () => (
+            <>
+              <Field label={t('settings.lblModel')}>
+                <Select value={settings.model} onChange={v => update('model', v)} options={GROQ_MODELS} ariaLabel={t('settings.lblModel')} />
+              </Field>
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-caption font-medium">{t('settings.lblTemperature')}</span>
+                  <span className="text-xs tabular-nums" style={{ color: 'var(--text-secondary)' }}>{settings.temperature.toFixed(1)}</span>
+                </div>
+                <RangeSlider value={settings.temperature} onChange={v => update('temperature', v)} min={0} max={2} step={0.1} ariaLabel={t('settings.lblTemperature')} />
+                <p className="text-caption mt-1" style={{ color: 'var(--text-muted)' }}>{t('settings.hintTemp')}</p>
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-caption font-medium">{t('settings.lblMaxTokens')}</span>
+                  <span className="text-xs tabular-nums" style={{ color: 'var(--text-secondary)' }}>{settings.maxTokens}</span>
+                </div>
+                <RangeSlider value={settings.maxTokens} onChange={v => update('maxTokens', v)} min={256} max={8192} step={256} ariaLabel={t('settings.lblMaxTokens')} />
+                <p className="text-caption mt-1" style={{ color: 'var(--text-muted)' }}>{t('settings.hintTokens')}</p>
+              </div>
+            </>
+          ),
+        },
+      ],
+    },
+    {
+      tab: 'speech',
+      sections: [
+        {
+          id: 'speech', title: t('settings.secSpeech'), keywords: 'voice rate pitch speak audio',
+          render: () => (
+            <>
+              <Field label={t('settings.lblVoice')}>
+                <select
+                  value={settings.voiceName}
+                  onChange={e => update('voiceName', e.target.value)}
+                  className="select-field text-xs"
+                  aria-label={t('settings.lblVoice')}
+                >
+                  <option value="">{t('settings.defaultVoice')}</option>
+                  {voices.map(v => <option key={v.name} value={v.name}>{v.name} ({v.lang})</option>)}
+                </select>
+              </Field>
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-caption font-medium">{t('settings.lblSpeechRate')}</span>
+                  <span className="text-xs tabular-nums" style={{ color: 'var(--text-secondary)' }}>{settings.speechRate.toFixed(1)}x</span>
+                </div>
+                <RangeSlider value={settings.speechRate} onChange={v => update('speechRate', v)} min={0.5} max={2} step={0.1} ariaLabel={t('settings.lblSpeechRate')} />
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-caption font-medium">{t('settings.lblSpeechPitch')}</span>
+                  <span className="text-xs tabular-nums" style={{ color: 'var(--text-secondary)' }}>{settings.speechPitch.toFixed(1)}</span>
+                </div>
+                <RangeSlider value={settings.speechPitch} onChange={v => update('speechPitch', v)} min={0.5} max={2} step={0.1} ariaLabel={t('settings.lblSpeechPitch')} />
+              </div>
+              <Field label={t('settings.lblAutoSpeak')}>
+                <Toggle value={settings.autoSpeak} onChange={v => update('autoSpeak', v)} label={t('settings.lblAutoSpeak')} />
+              </Field>
+            </>
+          ),
+        },
+      ],
+    },
+    {
+      tab: 'theme',
+      sections: [
+        {
+          id: 'theme', title: t('settings.secTheme'), keywords: 'dark light system mode appearance',
+          render: () => (
+            <div className="grid grid-cols-3 gap-3">
+              {[
+                { id: 'dark', label: t('settings.themeDark'), icon: Moon },
+                { id: 'light', label: t('settings.themeLight'), icon: Sun },
+                { id: 'system', label: t('settings.themeSystem'), icon: Monitor },
+              ].map(theme => {
+                const Icon = theme.icon;
+                const isActive = settings.theme === theme.id;
+                return (
+                  <button
+                    key={theme.id}
+                    onClick={() => update('theme', theme.id)}
+                    aria-pressed={isActive}
+                    className="flex flex-col items-center gap-2 p-4 rounded-xl border transition-all hover:-translate-y-0.5"
+                    style={{
+                      borderColor: isActive ? 'var(--accent)' : 'var(--border-default)',
+                      backgroundColor: isActive ? 'var(--accent-10)' : 'var(--bg-input)',
+                      boxShadow: isActive ? '0 0 0 1px var(--accent-ring)' : 'none',
+                    }}
+                  >
+                    <Icon size={20} style={{ color: isActive ? 'var(--accent)' : 'var(--text-secondary)' }} />
+                    <span className="text-xs font-medium" style={{ color: isActive ? 'var(--accent)' : 'var(--text-secondary)' }}>{theme.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          ),
+        },
+        {
+          id: 'accent', title: t('settings.secAccent'), keywords: 'color highlight buttons theme',
+          render: () => (
+            <div className="flex gap-3 flex-wrap">
+              {ACCENT_COLORS.map(c => {
+                const isActive = settings.accentColor === c.value;
+                return (
+                  <button
+                    key={c.value}
+                    onClick={() => update('accentColor', c.value)}
+                    className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${c.class}`}
+                    style={{
+                      boxShadow: isActive ? '0 0 0 3px var(--accent-ring)' : 'none',
+                      transform: isActive ? 'scale(1.12)' : 'scale(1)',
+                    }}
+                    aria-label={c.label}
+                    aria-pressed={isActive}
+                  >
+                    {isActive && <Check size={15} className="text-white" />}
+                  </button>
+                );
+              })}
+            </div>
+          ),
+        },
+      ],
+    },
+    {
+      tab: 'notifications',
+      sections: [
+        {
+          id: 'notifications', title: t('settings.secNotif'), keywords: 'email notification alerts bell',
+          render: () => (
+            <>
+              <Field label={t('settings.lblEmailNotif')}>
+                <Toggle value={settings.notifications} onChange={v => update('notifications', v)} label={t('settings.lblEmailNotif')} />
+              </Field>
+              <div className="divider" />
+              <Field label={t('settings.lblNotifResume')}>
+                <Toggle value={subNotifs.resume} onChange={v => setSubNotifs(prev => ({ ...prev, resume: v }))} label={t('settings.lblNotifResume')} />
+              </Field>
+              <Field label={t('settings.lblNotifInterview')}>
+                <Toggle value={subNotifs.interview} onChange={v => setSubNotifs(prev => ({ ...prev, interview: v }))} label={t('settings.lblNotifInterview')} />
+              </Field>
+              <Field label={t('settings.lblNotifCareer')}>
+                <Toggle value={subNotifs.career} onChange={v => setSubNotifs(prev => ({ ...prev, career: v }))} label={t('settings.lblNotifCareer')} />
+              </Field>
+              <Field label={t('settings.lblNotifMarketing')}>
+                <Toggle value={subNotifs.marketing} onChange={v => setSubNotifs(prev => ({ ...prev, marketing: v }))} label={t('settings.lblNotifMarketing')} />
+              </Field>
+            </>
+          ),
+        },
+      ],
+    },
+    {
+      tab: 'security',
+      sections: [
+        {
+          id: 'password', title: t('settings.secPassword'), keywords: 'change password security login',
+          render: () => (
+            <div className="flex flex-col gap-3">
+              <input
+                type="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') handlePasswordUpdate(); }}
+                placeholder={t('settings.pwPlaceholder')}
+                className="input-field max-w-sm"
+                aria-label={t('settings.pwPlaceholder')}
+              />
+              <div>
+                <button onClick={handlePasswordUpdate} className="btn btn-primary px-4 py-2 text-xs">
+                  <KeyRound size={14} /> {t('settings.pwUpdate')}
+                </button>
+                {passwordMsg && (
+                  <p className={`text-xs mt-2 flex items-center gap-1.5 ${passwordType === 'success' ? 'badge-success' : 'badge-error'} chip`}>
+                    {passwordType === 'success' ? <CheckCircle2 size={12} /> : <AlertTriangle size={12} />}
+                    {passwordMsg}
+                  </p>
+                )}
+              </div>
+            </div>
+          ),
+        },
+        {
+          id: 'account', title: t('settings.secAccount'), keywords: 'export data logout delete account privacy',
+          render: () => (
+            <div className="flex flex-col gap-2">
+              <button onClick={handleExportData} className="btn btn-secondary w-full sm:w-fit justify-start px-3 py-2.5 text-xs">
+                <Download size={14} /> {t('settings.downloadData')}
+              </button>
+              <button
+                onClick={async () => {
+                  await fetchWithAuth('/auth/logout', { method: 'POST' }).catch(() => {});
+                  localStorage.clear();
+                  router.push('/auth');
+                }}
+                className="btn btn-secondary w-full sm:w-fit justify-start px-3 py-2.5 text-xs"
+              >
+                <LogOut size={14} /> {t('settings.logoutEverywhere')}
+              </button>
+              <div className="divider my-1" />
+              <button onClick={handleDeleteAccount} className="btn btn-danger w-full sm:w-fit justify-start px-3 py-2.5 text-xs">
+                <AlertTriangle size={14} /> {t('settings.deleteAccount')}
+              </button>
+            </div>
+          ),
+        },
+      ],
+    },
+    {
+      tab: 'shortcuts',
+      sections: [
+        {
+          id: 'shortcuts', title: t('settings.secShortcuts'), keywords: 'keyboard hotkey ctrl shortcut',
+          render: () => (
+            <div className="space-y-1">
+              {[
+                { keys: 'Ctrl + /', label: t('settings.scToggle') },
+                { keys: 'Ctrl + Enter', label: t('settings.scSend') },
+                { keys: 'Esc', label: t('settings.scStop') },
+                { keys: 'Ctrl + Shift + M', label: t('settings.scMute') },
+                { keys: 'Ctrl + K', label: t('settings.scSearch') },
+                { keys: 'Ctrl + Shift + N', label: t('settings.scNewChat') },
+                { keys: 'Ctrl + ,', label: t('settings.scSettings') },
+                { keys: 'Shift + Enter', label: t('settings.scNewline') },
+              ].map((s, i) => (
+                <div key={i} className="flex items-center justify-between gap-3 py-2 border-b last:border-0" style={{ borderColor: 'var(--border-subtle)' }}>
+                  <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>{s.label}</span>
+                  <kbd className="kbd">{s.keys}</kbd>
+                </div>
+              ))}
+            </div>
+          ),
+        },
+      ],
+    },
+  ]), [settings, subNotifs, password, voices, profilePicture, user, t, animationsEnabled]);
+
+  const searchTerms = searchQuery.trim().toLowerCase();
+
+  const visibleGroups = useMemo(() => {
+    if (!searchTerms) return null;
+    return sectionGroups
+      .map(group => ({
+        tab: group.tab,
+        sections: group.sections.filter(s =>
+          s.title.toLowerCase().includes(searchTerms) ||
+          s.keywords.toLowerCase().includes(searchTerms)
+        ),
+      }))
+      .filter(group => group.sections.length > 0);
+  }, [searchTerms, sectionGroups]);
+
   if (loading) return (
     <div className="flex items-center justify-center h-full">
       <div className="flex items-center gap-2 text-slate-400">
         <div className="w-4 h-4 rounded-full animate-spin" style={{ border: '2px solid var(--accent)', borderTopColor: 'transparent' }} />
-        <span className="text-sm">Loading settings...</span>
+        <span className="text-sm">{t('common.loading')}</span>
       </div>
     </div>
   );
 
-  return (
-    <div className="max-w-4xl mx-auto py-6 px-4">
-      <div className="mb-6">
-        <h1 className="text-xl font-bold text-white">Settings</h1>
-        <p className="text-xs text-slate-500 mt-0.5">Customize your VidyGuideAI experience</p>
-      </div>
+  const renderSection = (s: any) => s.render();
 
-      <div className="flex gap-2 mb-6 overflow-x-auto scrollbar-thin pb-2">
+  return (
+    <div className="max-w-4xl mx-auto py-4 px-1 sm:px-4">
+      <motion.div initial={animationsEnabled ? { opacity: 0, y: -8 } : false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }} className="mb-6">
+        <div className="flex items-center gap-3">
+          <div className="icon-box" style={{ color: 'var(--accent)', backgroundColor: 'var(--accent-10)' }}>
+            <Settings size={16} />
+          </div>
+          <div>
+            <h1 className="text-h1">{t('settings.title')}</h1>
+            <p className="text-caption mt-0.5">{t('settings.subtitle')}</p>
+          </div>
+        </div>
+
+        <div className="relative mt-5">
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            placeholder={t('settings.searchPlaceholder')}
+            className="input-field pl-9"
+            aria-label={t('settings.searchPlaceholder')}
+          />
+        </div>
+      </motion.div>
+
+      <div className="flex gap-2 mb-6 overflow-x-auto scrollbar-thin pb-2 -mx-1 px-1">
         {tabs.map(tab => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
           return (
-            <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors border"
+            <button
+              key={tab.id}
+              onClick={() => { setActiveTab(tab.id); setSearchQuery(''); }}
+              className="relative flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-colors touch-manipulation"
+              aria-pressed={isActive}
               style={{
-                  backgroundColor: isActive ? 'var(--accent-10)' : 'transparent',
-                  color: isActive ? 'var(--accent)' : undefined,
-                  borderColor: isActive ? 'var(--accent-ring)' : 'transparent',
-                }}>
-                <Icon size={14} /> {tab.label}
+                backgroundColor: isActive ? 'var(--accent-10)' : 'transparent',
+                color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
+              }}
+            >
+              <Icon size={14} /> {tab.label}
             </button>
           );
         })}
       </div>
 
-      <div className="space-y-4">
-        {activeTab === 'general' && (
-          <>
-            <Section title="Profile Picture">
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-full overflow-hidden bg-slate-800 flex items-center justify-center border-2" style={{ borderColor: 'var(--accent-ring)' }}>
-                  {profilePicture ? (
-                    <img src={profilePicture} alt="Profile" className="w-full h-full object-cover" />
-                  ) : (
-                    <span className="text-2xl text-slate-500 font-bold">
-                      {user?.fullName?.[0] || '?'}
-                    </span>
-                  )}
-                </div>
-                <div className="flex gap-2">
-                  <label className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white cursor-pointer transition-colors" style={{ backgroundColor: 'var(--accent)' }}>
-                    <Upload size={14} className="inline mr-1" />Upload
-                    <input type="file" accept="image/*" onChange={handleProfilePictureUpload} className="hidden" />
-                  </label>
-                  {profilePicture && (
-                    <button onClick={handleDeleteProfilePicture} className="px-3 py-1.5 rounded-lg text-xs font-semibold text-red-400 bg-red-500/10 hover:bg-red-500/20 transition-colors">
-                      <Trash2 size={14} className="inline mr-1" />Remove
-                    </button>
-                  )}
-                </div>
-              </div>
-            </Section>
-            <Section title="Language" desc="Default language for AI responses">
-              <Field label="UI Language">
-                <Select value={settings.language} onChange={v => update('language', v)} options={LANGUAGES} />
-              </Field>
-            </Section>
-            <Section title="Preferences">
-              <Field label="Auto-translate">
-                <Toggle value={settings.autoTranslate} onChange={v => update('autoTranslate', v)} />
-              </Field>
-              <Field label="Enable animations">
-                <Toggle value={settings.animations} onChange={v => update('animations', v)} />
-              </Field>
-              <Field label="Save chat history">
-                <Toggle value={settings.chatHistory} onChange={v => update('chatHistory', v)} />
-              </Field>
-              <Field label="Default resume style">
-                <Select value={settings.defaultResumeStyle} onChange={v => update('defaultResumeStyle', v)} options={[
-                  { value: 'professional', label: 'Professional' },
-                  { value: 'modern', label: 'Modern' },
-                  { value: 'creative', label: 'Creative' },
-                ]} />
-              </Field>
-            </Section>
-          </>
-        )}
-
-        {activeTab === 'ai' && (
-          <Section title="AI Model Configuration" desc="Select the AI model and adjust response parameters">
-            <Field label="Model">
-              <Select value={settings.model} onChange={v => update('model', v)} options={GROQ_MODELS} />
-            </Field>
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-xs text-slate-400 font-medium">Temperature</span>
-                <span className="text-xs text-slate-500">{settings.temperature.toFixed(1)}</span>
-              </div>
-              <RangeSlider value={settings.temperature} onChange={v => update('temperature', v)} min={0} max={2} step={0.1} />
-              <p className="text-[10px] text-slate-600 mt-1">Lower = precise, higher = creative</p>
-            </div>
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-xs text-slate-400 font-medium">Max tokens</span>
-                <span className="text-xs text-slate-500">{settings.maxTokens}</span>
-              </div>
-              <RangeSlider value={settings.maxTokens} onChange={v => update('maxTokens', v)} min={256} max={8192} step={256} />
-              <p className="text-[10px] text-slate-600 mt-1">Controls response length</p>
-            </div>
-          </Section>
-        )}
-
-        {activeTab === 'speech' && (
-          <Section title="Speech Settings" desc="Configure voice input and output">
-            <Field label="Voice">
-              <select value={settings.voiceName} onChange={e => update('voiceName', e.target.value)} className="w-full bg-slate-800 text-slate-200 text-xs rounded-lg px-3 py-2 outline-none border border-slate-700 transition-colors">
-                <option value="">Default voice</option>
-                {voices.map(v => <option key={v.name} value={v.name}>{v.name} ({v.lang})</option>)}
-              </select>
-            </Field>
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-xs text-slate-400 font-medium">Speech rate</span>
-                <span className="text-xs text-slate-500">{settings.speechRate.toFixed(1)}x</span>
-              </div>
-              <RangeSlider value={settings.speechRate} onChange={v => update('speechRate', v)} min={0.5} max={2} step={0.1} />
-            </div>
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-xs text-slate-400 font-medium">Speech pitch</span>
-                <span className="text-xs text-slate-500">{settings.speechPitch.toFixed(1)}</span>
-              </div>
-              <RangeSlider value={settings.speechPitch} onChange={v => update('speechPitch', v)} min={0.5} max={2} step={0.1} />
-            </div>
-            <Field label="Auto-speak responses">
-              <Toggle value={settings.autoSpeak} onChange={v => update('autoSpeak', v)} />
-            </Field>
-          </Section>
-        )}
-
-        {activeTab === 'theme' && (
-          <>
-            <Section title="Theme" desc="Choose your preferred look">
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {[
-                  { id: 'dark', label: 'Dark', icon: Moon },
-                  { id: 'light', label: 'Light', icon: Sun },
-                  { id: 'system', label: 'System', icon: Monitor },
-                ].map(theme => {
-                  const Icon = theme.icon;
-                  const isActive = settings.theme === theme.id;
-                  return (
-                    <button key={theme.id} onClick={() => update('theme', theme.id)}
-                      className="flex flex-col items-center gap-2 p-4 rounded-xl border transition-all"
-                      style={{
-                        borderColor: isActive ? 'var(--accent)' : 'rgba(51,65,85,0.5)',
-                        backgroundColor: isActive ? 'var(--accent-10)' : 'transparent',
-                        boxShadow: isActive ? `0 0 0 1px var(--accent-ring)` : 'none',
-                      }}>
-                      <Icon size={20} style={{ color: isActive ? 'var(--accent)' : 'rgba(148,163,184,1)' }} />
-                      <span className="text-xs font-medium" style={{ color: isActive ? 'var(--accent)' : 'rgba(148,163,184,1)' }}>{theme.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </Section>
-            <Section title="Accent Color" desc="Change buttons, links, and highlights">
-              <div className="flex gap-3 flex-wrap">
-                {ACCENT_COLORS.map(c => {
-                  const isActive = settings.accentColor === c.value;
-                  return (
-                    <button key={c.value} onClick={() => update('accentColor', c.value)}
-                      className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${c.class}`}
-                      style={{
-                        boxShadow: isActive ? '0 0 0 3px rgba(255,255,255,0.3)' : 'none',
-                        transform: isActive ? 'scale(1.15)' : 'scale(1)',
-                      }}>
-                      {isActive && <Check size={14} className="text-white" />}
-                    </button>
-                  );
-                })}
-              </div>
-            </Section>
-          </>
-        )}
-
-        {activeTab === 'notifications' && (
-          <Section title="Notification Preferences" desc="Choose what notifications you receive">
-            <Field label="Email notifications">
-              <Toggle value={settings.notifications} onChange={v => update('notifications', v)} />
-            </Field>
-            <Field label="Resume ready">
-              <Toggle value={subNotifs.resume} onChange={v => setSubNotifs(prev => ({ ...prev, resume: v }))} />
-            </Field>
-            <Field label="Interview complete">
-              <Toggle value={subNotifs.interview} onChange={v => setSubNotifs(prev => ({ ...prev, interview: v }))} />
-            </Field>
-            <Field label="Career suggestions">
-              <Toggle value={subNotifs.career} onChange={v => setSubNotifs(prev => ({ ...prev, career: v }))} />
-            </Field>
-            <Field label="Marketing updates">
-              <Toggle value={subNotifs.marketing} onChange={v => setSubNotifs(prev => ({ ...prev, marketing: v }))} />
-            </Field>
-          </Section>
-        )}
-
-        {activeTab === 'security' && (
-          <>
-            <Section title="Change Password" desc="Update your account password. This will invalidate all existing sessions.">
-              <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="New password (min 6 chars)" className="input-field" />
-              <button onClick={handlePasswordUpdate} className="px-4 py-1.5 text-white text-xs font-semibold rounded-lg transition-colors" style={{ backgroundColor: 'var(--accent)' }}>Update Password</button>
-              {passwordMsg && <p className="text-xs text-slate-400">{passwordMsg}</p>}
-            </Section>
-            <Section title="Account Management">
-              <button onClick={handleExportData} className="w-full text-left px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-lg transition-colors flex items-center gap-2">
-                <Download size={14} /> Download my data (JSON)
-              </button>
-              <button onClick={() => {
-                fetchWithAuth('/auth/logout', { method: 'POST' }).catch(() => {});
-                localStorage.clear();
-                router.push('/auth');
-              }} className="w-full text-left px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-lg transition-colors flex items-center gap-2">
-                <LogOut size={14} /> Logout everywhere
-              </button>
-              <div className="border-t border-slate-800 pt-3 mt-3">
-                <button onClick={handleDeleteAccount} className="btn-danger w-full text-left px-3 py-2 text-xs flex items-center gap-2">
-                  <AlertTriangle size={14} /> Delete account permanently
+      {visibleGroups ? (
+        visibleGroups.length > 0 ? (
+          <div className="space-y-6">
+            {visibleGroups.map(group => (
+              <div key={group.tab} className="space-y-4">
+                <button
+                  onClick={() => { setActiveTab(group.tab); setSearchQuery(''); }}
+                  className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5"
+                  style={{ color: 'var(--accent)' }}
+                >
+                  {tabs.find(t => t.id === group.tab)?.label}
+                  <span className="chip badge-info">{group.sections.length}</span>
                 </button>
+                {group.sections.map(s => (
+                  <Section key={s.id} icon={Eye} title={s.title}>{renderSection(s)}</Section>
+                ))}
               </div>
-            </Section>
-          </>
-        )}
-
-        {activeTab === 'shortcuts' && (
-          <Section title="Keyboard Shortcuts">
-            <div className="space-y-2">
-              {[
-                { keys: 'Ctrl + /', label: 'Toggle shortcuts dialog' },
-                { keys: 'Ctrl + Enter', label: 'Send message' },
-                { keys: 'Esc', label: 'Stop generation / Close dialog' },
-                { keys: 'Ctrl + Shift + M', label: 'Mute/unmute speech' },
-                { keys: 'Ctrl + K', label: 'Search conversations' },
-                { keys: 'Ctrl + Shift + N', label: 'New chat' },
-                { keys: 'Ctrl + ,', label: 'Open settings' },
-                { keys: 'Shift + Enter', label: 'New line in input' },
-              ].map((s, i) => (
-                <div key={i} className="flex items-center justify-between py-1.5 border-b border-slate-800/30 last:border-0">
-                  <span className="text-xs text-slate-400">{s.label}</span>
-                  <kbd className="px-2 py-0.5 bg-slate-800 border border-slate-700 rounded text-xs text-slate-300 font-mono">{s.keys}</kbd>
-                </div>
-              ))}
-            </div>
-          </Section>
-        )}
-      </div>
-
-      {saving && (
-        <div className="fixed bottom-6 right-6 text-white text-xs font-semibold px-4 py-2 rounded-full shadow-lg flex items-center gap-2 z-50" style={{ backgroundColor: 'var(--accent)' }}>
-          <div className="w-3 h-3 rounded-full animate-spin" style={{ border: '2px solid white', borderTopColor: 'transparent' }} />
-          Saving...
+            ))}
+          </div>
+        ) : (
+          <div className="surface-card p-10 flex flex-col items-center gap-2 text-center">
+            <Search size={24} style={{ color: 'var(--text-muted)' }} />
+            <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>{t('settings.noResults')}</p>
+          </div>
+        )
+      ) : (
+        <div className="space-y-4">
+          {sectionGroups
+            .filter(g => g.tab === activeTab)
+            .flatMap(g => g.sections)
+            .map(s => (
+              <Section key={s.id} icon={(tabs.find(t => t.id === activeTab)?.icon) || Eye} title={s.title}>{renderSection(s)}</Section>
+            ))}
         </div>
       )}
+
+      <AnimatePresence>
+        {saving && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 12 }}
+            className="fixed bottom-6 right-6 z-50 flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-full shadow-lg"
+            style={{ backgroundColor: 'var(--accent)', color: 'var(--on-accent)' }}
+            role="status"
+          >
+            <div className="w-3 h-3 rounded-full animate-spin" style={{ border: '2px solid var(--on-accent)', borderTopColor: 'transparent' }} />
+            {t('common.saving')}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: 16, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 8, scale: 0.96 }}
+            transition={{ duration: 0.2 }}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold shadow-lg toast-enter"
+            style={{ backgroundColor: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--border-default)' }}
+            role="status"
+            aria-live="polite"
+          >
+            {toast.type === 'success' ? <CheckCircle2 size={14} style={{ color: 'var(--success)' }} /> : <AlertTriangle size={14} style={{ color: 'var(--error)' }} />}
+            {toast.message}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

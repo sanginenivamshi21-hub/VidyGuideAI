@@ -1,11 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { useRouter } from 'next/navigation';
-import { User, RefreshCw, Save } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { RefreshCw, Save, User, Map as MapIcon, FileText, Bot, Lock, ShieldCheck } from 'lucide-react';
 import { api, fetchWithAuth } from '@/lib/api';
 import { ROUTES } from '@/lib/routes';
 import { useAuth, useRequireRegistered } from '@/hooks/useAuth';
+import { useI18n } from '@/lib/i18n';
+import { useAnimationsEnabled } from '@/hooks/useAnimations';
 
 interface UserProfile {
   id: number;
@@ -21,10 +24,113 @@ interface Stats {
   mentor_count: number;
 }
 
+const STAT_ITEMS = [
+  { key: 'career_count' as const, icon: MapIcon, tint: 'var(--accent-10)', color: 'var(--accent)', i18nLabel: 'dashboard.statsRoadmaps' },
+  { key: 'resume_count' as const, icon: FileText, tint: 'rgba(99,102,241,0.1)', color: '#818cf8', i18nLabel: 'dashboard.statsResumes' },
+  { key: 'mentor_count' as const, icon: Bot, tint: 'rgba(34,211,238,0.1)', color: '#22d3ee', i18nLabel: 'dashboard.statsMentor' },
+];
+
+function StatBlock({ icon: Icon, value, label, tint, color }: { icon: any; value: number; label: string; tint: string; color: string }) {
+  const animationsEnabled = useAnimationsEnabled();
+  return (
+    <motion.div
+      initial={animationsEnabled ? { opacity: 0, x: -12 } : false}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.25 }}
+      className="surface-card p-4 flex items-center gap-4"
+    >
+      <div className="p-2.5 rounded-lg shrink-0" style={{ backgroundColor: tint, color }}>
+        <Icon size={16} />
+      </div>
+      <div className="flex flex-col min-w-0">
+        <span className="text-[10px] font-bold uppercase tracking-widest leading-none" style={{ color: 'var(--text-muted)' }}>{label}</span>
+        <span className="text-lg font-extrabold mt-1 tabular-nums" style={{ color: 'var(--text-primary)' }}>{value}</span>
+      </div>
+    </motion.div>
+  );
+}
+
+const ProfileForm = memo(function ProfileForm({
+  profile, fullName, setFullName, password, setPassword,
+  confirmPassword, setConfirmPassword, saving, error, message,
+  onSubmit, t,
+}: {
+  profile: UserProfile | null;
+  fullName: string;
+  setFullName: (v: string) => void;
+  password: string;
+  setPassword: (v: string) => void;
+  confirmPassword: string;
+  setConfirmPassword: (v: string) => void;
+  saving: boolean;
+  error: string;
+  message: string;
+  onSubmit: (e: React.FormEvent) => void;
+  t: (k: string) => string;
+}) {
+  return (
+    <form onSubmit={onSubmit} className="flex flex-col gap-4">
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="profile-email" className="label">{t('profile.email')}</label>
+        <input id="profile-email" type="email" disabled value={profile?.email || ''} className="input-field text-xs opacity-60 cursor-not-allowed" />
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="profile-username" className="label">{t('profile.username')}</label>
+        <input id="profile-username" type="text" disabled value={profile?.username || ''} className="input-field text-xs opacity-60 cursor-not-allowed" />
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="profile-fullname" className="label">{t('profile.fullName')}</label>
+        <input
+          id="profile-fullname"
+          type="text"
+          required
+          value={fullName}
+          onChange={(e) => setFullName(e.target.value)}
+          placeholder="Ravi Kumar"
+          className="input-field text-xs"
+        />
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="profile-password" className="label">{t('profile.newPassword')}</label>
+          <input id="profile-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••" className="input-field text-xs" />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="profile-confirm" className="label">{t('profile.confirmPassword')}</label>
+          <input id="profile-confirm" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="••••••" className="input-field text-xs" />
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        disabled={saving}
+        className="btn btn-primary w-full sm:w-fit px-6 py-2.5 text-xs mt-2"
+      >
+        {saving ? (
+          <>
+            <RefreshCw className="animate-spin" size={14} />
+            {t('profile.savingChanges')}
+          </>
+        ) : (
+          <>
+            <Save size={14} />
+            {t('profile.saveChanges')}
+          </>
+        )}
+      </button>
+    </form>
+  );
+});
+
 export default function ProfilePage() {
   const router = useRouter();
   const { user, isGuest, isAuthenticated, loading: authLoading, refreshUser } = useAuth();
   const { loading: reqLoading } = useRequireRegistered();
+  const { t } = useI18n();
+  const animationsEnabled = useAnimationsEnabled();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -69,7 +175,7 @@ export default function ProfilePage() {
     setMessage('');
 
     if (password && password !== confirmPassword) {
-      setError('New passwords do not match.');
+      setError(t('profile.pwMismatch'));
       return;
     }
 
@@ -81,7 +187,7 @@ export default function ProfilePage() {
         body: { fullName, ...(password ? { password } : {}) },
       });
 
-      setMessage('Profile updated successfully!');
+      setMessage(t('profile.updated'));
       setPassword('');
       setConfirmPassword('');
       const userStr = localStorage.getItem('user');
@@ -100,176 +206,108 @@ export default function ProfilePage() {
 
   if (guest) {
     return (
-      <div className="flex flex-col items-center justify-center p-8 text-center max-w-md mx-auto gap-4 min-h-[50vh]">
-        <div className="p-3.5 bg-slate-900 border border-slate-800 text-slate-500 rounded-full text-2xl">
-          🔒
-        </div>
-        <h2 className="text-xl font-bold text-white">Profile is Disabled</h2>
-        <p className="text-xs text-slate-400 leading-relaxed">
-          You are currently signed in as a Guest. Profile settings and user stats dashboards are only available for registered student accounts.
+      <motion.div
+        initial={animationsEnabled ? { opacity: 0, y: 12 } : false}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex flex-col items-center justify-center p-8 text-center max-w-md mx-auto gap-4 min-h-[50vh]"
+      >
+        <div className="p-3.5 surface-card rounded-full text-2xl">🔒</div>
+        <h2 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>{t('profile.disabledTitle')}</h2>
+        <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+          {t('profile.disabledDesc')}
         </p>
         <button
           onClick={() => { router.push(ROUTES.AUTH); }}
-          className="mt-2 px-5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-lg transition-all"
+          className="btn btn-primary mt-2 px-5 py-2 text-xs"
         >
-          Sign In / Register
+          {t('nav.signIn')} / {t('nav.register')}
         </button>
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-8 max-w-4xl mx-auto py-4">
-      {/* Page Header */}
+    <motion.div
+      initial={animationsEnabled ? { opacity: 0, y: 10 } : false}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.25 }}
+      className="flex flex-col gap-6 sm:gap-8 max-w-4xl mx-auto py-4"
+    >
       <div className="flex items-center gap-3">
-        <div className="p-2 bg-yellow-500/10 border border-yellow-500/20 rounded-xl text-yellow-400 text-xl">
-          👤
+        <div className="icon-box" style={{ color: 'var(--accent)', backgroundColor: 'var(--accent-10)' }}>
+          <User size={18} />
         </div>
         <div className="flex flex-col">
-          <h1 className="text-xl font-extrabold text-white tracking-tight">Candidate Profile</h1>
-          <p className="text-slate-500 text-xs">
-            Manage your personal data, password authentication, and track your activity logs.
-          </p>
+          <h1 className="text-h1">{t('profile.title')}</h1>
+          <p className="text-caption mt-0.5">{t('profile.subtitle')}</p>
         </div>
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 animate-pulse">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-1 flex flex-col gap-4">
-            <div className="h-4 bg-slate-800 rounded w-24 mb-2" />
+            <div className="skeleton-shimmer h-4 rounded w-24 mb-2" />
             {[1, 2, 3].map((i) => (
-              <div key={i} className="p-4 bg-slate-800/60 border border-slate-800/80 rounded-xl h-[68px]" />
+              <div key={i} className="skeleton-shimmer surface-card rounded-xl h-[68px]" />
             ))}
           </div>
-          <div className="md:col-span-2 bg-slate-800/40 border border-slate-800/80 rounded-2xl p-6 h-[400px]" />
+          <div className="md:col-span-2 skeleton-shimmer surface-card rounded-2xl p-6 h-[400px]" />
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Stats blocks column */}
-          <div className="md:col-span-1 flex flex-col gap-4">
-            <h3 className="text-sm font-bold text-white uppercase tracking-wider">Activity Stats</h3>
-            
-            <div className="p-4 bg-slate-900/60 border border-slate-800 rounded-xl flex items-center gap-4">
-              <div className="p-2.5 bg-emerald-500/10 text-emerald-400 rounded-lg text-lg">🌱</div>
-              <div className="flex flex-col">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none">Roadmaps</span>
-                <span className="text-lg font-extrabold text-white mt-1">{stats?.career_count || 0}</span>
-              </div>
-            </div>
-
-            <div className="p-4 bg-slate-900/60 border border-slate-800 rounded-xl flex items-center gap-4">
-              <div className="p-2.5 bg-indigo-500/10 text-indigo-400 rounded-lg text-lg">📝</div>
-              <div className="flex flex-col">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none">Resumes</span>
-                <span className="text-lg font-extrabold text-white mt-1">{stats?.resume_count || 0}</span>
-              </div>
-            </div>
-
-            <div className="p-4 bg-slate-900/60 border border-slate-800 rounded-xl flex items-center gap-4">
-              <div className="p-2.5 bg-cyan-500/10 text-cyan-400 rounded-lg text-lg">🤖</div>
-              <div className="flex flex-col">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none">Chats</span>
-                <span className="text-lg font-extrabold text-white mt-1">{stats?.mentor_count || 0}</span>
-              </div>
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="md:col-span-1 flex flex-col gap-3">
+            <h3 className="text-sm font-bold uppercase tracking-wider flex items-center gap-1.5" style={{ color: 'var(--text-primary)' }}>
+              <ShieldCheck size={14} style={{ color: 'var(--accent)' }} />
+              {t('profile.activityStats')}
+            </h3>
+            {STAT_ITEMS.map((s) => (
+              <StatBlock
+                key={s.key}
+                icon={s.icon}
+                value={stats?.[s.key] || 0}
+                label={t(s.i18nLabel)}
+                tint={s.tint}
+                color={s.color}
+              />
+            ))}
           </div>
 
-          {/* Edit details form column */}
-          <div className="md:col-span-2 bg-slate-900/40 border border-slate-800 rounded-2xl p-6 backdrop-blur-md flex flex-col gap-6">
-            <h3 className="text-sm font-bold text-white uppercase tracking-wider border-b border-slate-800 pb-3">
-              Edit Account Parameters
+          <div className="md:col-span-2 surface-card p-6 flex flex-col gap-6">
+            <h3 className="text-sm font-bold uppercase tracking-wider pb-3" style={{ color: 'var(--text-primary)', borderBottom: '1px solid var(--border-default)' }}>
+              {t('profile.editParams')}
             </h3>
 
             {error && (
-              <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-xs rounded-lg font-medium text-center">
-                {error}
+              <div className="alert alert-error" role="alert">
+                <Lock size={14} className="shrink-0" />
+                <span>{error}</span>
               </div>
             )}
 
             {message && (
-              <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs rounded-lg font-medium text-center">
-                {message}
+              <div className="alert alert-success" role="status">
+                <ShieldCheck size={14} className="shrink-0" />
+                <span>{message}</span>
               </div>
             )}
 
-            <form onSubmit={handleUpdate} className="flex flex-col gap-4">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Email Address (readonly)</label>
-                <input
-                  type="email"
-                  disabled
-                  value={profile?.email || ''}
-                  className="w-full bg-slate-950/60 border border-slate-900 text-slate-500 rounded-lg p-2.5 text-xs select-none"
-                />
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Username (readonly)</label>
-                <input
-                  type="text"
-                  disabled
-                  value={profile?.username || ''}
-                  className="w-full bg-slate-950/60 border border-slate-900 text-slate-500 rounded-lg p-2.5 text-xs select-none"
-                />
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Candidate Full Name</label>
-                <input
-                  type="text"
-                  required
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Ravi Kumar"
-                  className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-xs transition-all"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">New Password (optional)</label>
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••"
-                    className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-xs transition-all"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Confirm New Password</label>
-                  <input
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="••••••"
-                    className="w-full bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-emerald-500 text-white rounded-lg p-2.5 outline-none text-xs transition-all"
-                  />
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={saving}
-                className="w-full sm:w-fit py-2.5 px-6 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-lg shadow-lg shadow-emerald-500/25 active:scale-95 transition-all mt-4 flex items-center justify-center gap-1.5"
-              >
-                {saving ? (
-                  <>
-                    <RefreshCw className="animate-spin" size={14} />
-                    Saving Changes...
-                  </>
-                ) : (
-                  <>
-                    <Save size={14} />
-                    Save Profile Changes
-                  </>
-                )}
-              </button>
-            </form>
+            <ProfileForm
+              profile={profile}
+              fullName={fullName}
+              setFullName={setFullName}
+              password={password}
+              setPassword={setPassword}
+              confirmPassword={confirmPassword}
+              setConfirmPassword={setConfirmPassword}
+              saving={saving}
+              error={error}
+              message={message}
+              onSubmit={handleUpdate}
+              t={t}
+            />
           </div>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }

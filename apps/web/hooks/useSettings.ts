@@ -43,7 +43,14 @@ const DEFAULTS: UserSettings = {
 };
 
 export function useSettings() {
-  const [settings, setSettings] = useState<UserSettings>(DEFAULTS);
+  const [settings, setSettings] = useState<UserSettings>(() => {
+    if (typeof window === 'undefined') return DEFAULTS;
+    try {
+      const cached = localStorage.getItem('vidyguide_settings');
+      if (cached) return { ...DEFAULTS, ...JSON.parse(cached) };
+    } catch {}
+    return DEFAULTS;
+  });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const { isAuthenticated } = useAuth();
@@ -113,13 +120,21 @@ export function applyAccent(color: string) {
   localStorage.setItem('vidyguide_accent', color);
 }
 
+export function applyLanguage(lang: string) {
+  if (typeof document === 'undefined') return;
+  document.documentElement.lang = lang;
+  localStorage.setItem('vidyguide_language', lang);
+}
+
 export function initThemeAndAccent() {
   if (typeof document === 'undefined') return;
   const theme = localStorage.getItem('vidyguide_theme') || 'dark';
   const accent = localStorage.getItem('vidyguide_accent') || 'emerald';
   const animations = localStorage.getItem('vidyguide_animations');
+  const language = localStorage.getItem('vidyguide_language');
   applyTheme(theme);
   applyAccent(accent);
+  if (language) applyLanguage(language);
   if (animations !== null) {
     document.documentElement.setAttribute('data-animations', animations);
   }

@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
+import { useI18n } from '@/lib/i18n';
 import { ROUTES } from '@/lib/routes';
 import Logo from '../Logo';
 import { changeTheme, changeAccent } from '../ThemeInit';
@@ -31,32 +32,32 @@ export const useDrawer = () => useContext(DrawerContext);
 
 const NAV_GROUPS = [
   {
-    label: 'Main',
+    labelKey: 'nav.main',
     items: [
-      { icon: Home, label: 'Home', href: ROUTES.HOME, color: 'text-sky-400' },
-      { icon: LayoutDashboard, label: 'Dashboard', href: ROUTES.DASHBOARD, color: 'text-blue-400', auth: true },
-      { icon: Bot, label: 'AI Mentor', href: ROUTES.MENTOR, color: 'text-emerald-400' },
-      { icon: Compass, label: 'Career Guidance', href: ROUTES.CAREER, color: 'text-emerald-400' },
-      { icon: FileText, label: 'Resume Builder', href: ROUTES.RESUME_BUILDER, color: 'text-indigo-400' },
-      { icon: ScanSearch, label: 'Resume Review', href: ROUTES.RESUME_REVIEW, color: 'text-indigo-400' },
-      { icon: Briefcase, label: 'Interview Prep', href: ROUTES.INTERVIEW_PREP, color: 'text-violet-400' },
-      { icon: Languages, label: 'Translator', href: ROUTES.TRANSLATOR, color: 'text-orange-400' },
+      { icon: Home, labelKey: 'nav.home', href: ROUTES.HOME, color: 'text-sky-400' },
+      { icon: LayoutDashboard, labelKey: 'nav.dashboard', href: ROUTES.DASHBOARD, color: 'text-blue-400', auth: true },
+      { icon: Bot, labelKey: 'nav.aiMentor', href: ROUTES.MENTOR, color: 'text-emerald-400' },
+      { icon: Compass, labelKey: 'nav.career', href: ROUTES.CAREER, color: 'text-emerald-400' },
+      { icon: FileText, labelKey: 'nav.resumeBuilder', href: ROUTES.RESUME_BUILDER, color: 'text-indigo-400' },
+      { icon: ScanSearch, labelKey: 'nav.resumeReview', href: ROUTES.RESUME_REVIEW, color: 'text-indigo-400' },
+      { icon: Briefcase, labelKey: 'nav.interviewPrep', href: ROUTES.INTERVIEW_PREP, color: 'text-violet-400' },
+      { icon: Languages, labelKey: 'nav.translator', href: ROUTES.TRANSLATOR, color: 'text-orange-400' },
     ],
   },
   {
-    label: 'Account',
+    labelKey: 'nav.account',
     items: [
-      { icon: Clock, label: 'History', href: ROUTES.HISTORY, color: 'text-teal-400', auth: true },
-      { icon: User, label: 'Profile', href: ROUTES.PROFILE, color: 'text-yellow-400', auth: true },
-      { icon: Settings, label: 'Settings', href: ROUTES.SETTINGS, color: 'text-slate-400', auth: true },
+      { icon: Clock, labelKey: 'nav.history', href: ROUTES.HISTORY, color: 'text-teal-400', auth: true },
+      { icon: User, labelKey: 'nav.profile', href: ROUTES.PROFILE, color: 'text-yellow-400', auth: true },
+      { icon: Settings, labelKey: 'nav.settings', href: ROUTES.SETTINGS, color: 'text-slate-400', auth: true },
     ],
   },
 ];
 
 const THEME_OPTIONS = [
-  { value: 'dark', icon: Moon, label: 'Dark' },
-  { value: 'light', icon: Sun, label: 'Light' },
-  { value: 'system', icon: Monitor, label: 'System' },
+  { value: 'dark', icon: Moon, labelKey: 'settings.themeDark' },
+  { value: 'light', icon: Sun, labelKey: 'settings.themeLight' },
+  { value: 'system', icon: Monitor, labelKey: 'settings.themeSystem' },
 ];
 
 function HamburgerButton({ onClick }: { onClick: () => void }) {
@@ -83,6 +84,7 @@ export default function MobileShell({ children }: { children: React.ReactNode })
   const [currentAccent, setCurrentAccent] = useState('emerald');
   const pathname = usePathname();
   const router = useRouter();
+  const { t } = useI18n();
   const { isAuthenticated, logout, user } = useAuth();
   const drawerRef = useRef<HTMLDivElement>(null);
   const touchStartX = useRef(0);
@@ -144,13 +146,13 @@ export default function MobileShell({ children }: { children: React.ReactNode })
   const getPageTitle = () => {
     for (const group of NAV_GROUPS) {
       for (const item of group.items) {
-        if (item.href === pathname) return item.label;
+        if (item.href === pathname) return t(item.labelKey);
       }
     }
-    if (pathname.startsWith('/career/roadmap')) return 'Career Roadmap';
-    if (pathname.startsWith('/resume/builder')) return 'Resume Builder';
-    if (pathname.startsWith('/resume/review')) return 'Resume Review';
-    if (pathname.startsWith('/auth')) return 'Sign In';
+    if (pathname.startsWith('/career/roadmap')) return t('roadmap.title');
+    if (pathname.startsWith('/resume/builder')) return t('nav.resumeBuilder');
+    if (pathname.startsWith('/resume/review')) return t('nav.resumeReview');
+    if (pathname.startsWith('/auth')) return t('auth.title');
     return 'VidyGuideAI';
   };
 
@@ -165,8 +167,8 @@ export default function MobileShell({ children }: { children: React.ReactNode })
       .filter((item) => !item.auth || isAuthenticated)
       .filter(
         (item) =>
-          item.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          group.label.toLowerCase().includes(searchQuery.toLowerCase()),
+          t(item.labelKey).toLowerCase().includes(searchQuery.toLowerCase()) ||
+          t(group.labelKey).toLowerCase().includes(searchQuery.toLowerCase()),
       ),
   })).filter((group) => group.items.length > 0);
 
@@ -177,7 +179,7 @@ export default function MobileShell({ children }: { children: React.ReactNode })
     if (start < 15 && end - start > 60) open();
   };
 
-  const userName = user?.fullName || user?.username || 'Guest';
+  const userName = user?.fullName || user?.username || t('nav.guest');
   const initials = userName.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase();
 
   return (
@@ -201,7 +203,7 @@ export default function MobileShell({ children }: { children: React.ReactNode })
         {isMentor && (
           <header className="flex items-center justify-between px-3 py-2 shrink-0 z-10" style={{ borderBottom: '1px solid var(--border-default)', backgroundColor: 'var(--bg-primary)' }}>
             <HamburgerButton onClick={open} />
-            <span className="text-xs font-bold" style={{ color: 'var(--text-primary)' }}>AI Mentor</span>
+            <span className="text-xs font-bold" style={{ color: 'var(--text-primary)' }}>{t('nav.aiMentor')}</span>
             <button
               onClick={() => navigateAndClose(ROUTES.MENTOR)}
               className="p-1.5 rounded-lg transition-colors"
@@ -277,7 +279,7 @@ export default function MobileShell({ children }: { children: React.ReactNode })
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="text-sm font-bold truncate" style={{ color: 'var(--text-primary)' }}>{userName}</div>
-                        <div className="text-[10px]" style={{ color: 'var(--text-tertiary)' }}>Free Plan</div>
+                        <div className="text-[10px]" style={{ color: 'var(--text-tertiary)' }}>{t('nav.freePlan')}</div>
                       </div>
                       {streak > 0 && (
                         <div className="flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold" style={{ backgroundColor: 'rgba(249,115,22,0.1)', color: '#fb923c' }}>
@@ -295,8 +297,8 @@ export default function MobileShell({ children }: { children: React.ReactNode })
                         <User size={18} style={{ color: 'var(--text-tertiary)' }} />
                       </div>
                       <div className="flex-1">
-                        <div className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>Guest</div>
-                        <div className="text-[10px]" style={{ color: 'var(--text-tertiary)' }}>Sign in to save progress</div>
+                        <div className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{t('nav.guest')}</div>
+                        <div className="text-[10px]" style={{ color: 'var(--text-tertiary)' }}>{t('nav.signInToSave')}</div>
                       </div>
                     </div>
                   )}
@@ -308,7 +310,7 @@ export default function MobileShell({ children }: { children: React.ReactNode })
                     <input
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Search pages..."
+                      placeholder={t('nav.searchPages')}
                       className="w-full text-xs rounded-xl pl-8 pr-3 py-2.5 outline-none border transition-colors"
                       style={{ backgroundColor: 'var(--bg-tertiary)', borderColor: 'var(--border-default)', color: 'var(--text-primary)' }}
                     />
@@ -317,9 +319,9 @@ export default function MobileShell({ children }: { children: React.ReactNode })
 
                 <div className="flex-1 overflow-y-auto px-2 pb-4 scrollbar-thin">
                   {filteredNav.map((group) => (
-                    <div key={group.label} className="mb-2">
+                    <div key={group.labelKey} className="mb-2">
                       <div className="text-[10px] font-semibold uppercase tracking-wider px-3 py-1.5" style={{ color: 'var(--text-muted)' }}>
-                        {group.label}
+                        {t(group.labelKey)}
                       </div>
                       {group.items.map((item) => {
                         const Icon = item.icon;
@@ -335,7 +337,7 @@ export default function MobileShell({ children }: { children: React.ReactNode })
                             }}
                           >
                             <Icon size={17} className={isActive ? item.color : ''} style={{ color: isActive ? undefined : 'var(--text-muted)' }} />
-                            <span className="flex-1 text-left truncate">{item.label}</span>
+                            <span className="flex-1 text-left truncate">{t(item.labelKey)}</span>
                             {isActive && (
                               <ChevronRight size={14} style={{ color: 'var(--text-tertiary)' }} />
                             )}
@@ -363,7 +365,7 @@ export default function MobileShell({ children }: { children: React.ReactNode })
                           }}
                         >
                           <Icon size={13} />
-                          {opt.label}
+                          {t(opt.labelKey)}
                         </button>
                       );
                     })}
@@ -392,7 +394,7 @@ export default function MobileShell({ children }: { children: React.ReactNode })
                       style={{ color: 'var(--text-secondary)' }}
                     >
                       <LogOut size={16} />
-                      <span>Log Out</span>
+                      <span>{t('nav.logout')}</span>
                     </button>
                   ) : (
                     <button
@@ -401,7 +403,7 @@ export default function MobileShell({ children }: { children: React.ReactNode })
                       style={{ color: 'var(--text-secondary)' }}
                     >
                       <LogOut size={16} />
-                      <span>Sign In</span>
+                      <span>{t('nav.signIn')}</span>
                     </button>
                   )}
                 </div>
