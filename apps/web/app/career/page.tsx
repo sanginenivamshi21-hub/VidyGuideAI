@@ -708,7 +708,7 @@ export default function CareerPage() {
         <div className="flex flex-col gap-8 mt-6 border-t border-slate-800 pt-10">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <h3 className="text-xl font-bold text-white flex items-center gap-2">
-              <span>🌱</span> Your Personalised Guidance
+              <Sparkles size={14} className="inline-block" style={{ color: 'var(--accent)' }} /> Your Personalised Guidance
             </h3>
             <div className="flex items-center gap-2 w-full md:w-auto">
               <button

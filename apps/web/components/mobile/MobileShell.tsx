@@ -185,7 +185,7 @@ export default function MobileShell({ children }: { children: React.ReactNode })
   return (
     <DrawerContext.Provider value={{ isOpen, open, close }}>
       <div
-        className="flex flex-col h-screen overflow-hidden safe-area-top"
+        className="flex flex-col h-dvh overflow-hidden safe-area-top"
         style={{ backgroundColor: 'var(--bg-primary)' }}
         onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
         onTouchEnd={handleSwipeOpen}

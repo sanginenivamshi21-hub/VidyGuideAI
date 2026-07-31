@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
   Compass, Map, FileText, ScanSearch, Bot, Languages, Briefcase,
-  ArrowRight, TrendingUp, AlertCircle, Sparkles,
+  ArrowRight, TrendingUp, AlertCircle, Sparkles, Leaf,
 } from 'lucide-react';
 import { ROUTES, DASHBOARD_CARDS } from '@/lib/routes';
 import { api } from '@/lib/api';
@@ -160,16 +160,15 @@ export default function DashboardPage() {
       />
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-6 relative z-10">
         <div className="flex flex-col gap-1.5">
-          <motion.span
+          <motion.div
             initial={animationsEnabled ? { scale: 0 } : false}
             animate={{ scale: 1 }}
             transition={{ type: 'spring', damping: 14, stiffness: 220, delay: 0.05 }}
-            className="text-2xl sm:text-3xl w-fit"
-            role="img"
-            aria-label="leaf"
+            className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center shrink-0"
+            style={{ backgroundColor: 'var(--accent-10)', border: '1px solid var(--accent-20)' }}
           >
-            🌿
-          </motion.span>
+            <Leaf size={22} style={{ color: 'var(--accent)' }} />
+          </motion.div>
           <motion.h1
             initial={animationsEnabled ? { opacity: 0, y: 8 } : false}
             animate={{ opacity: 1, y: 0 }}

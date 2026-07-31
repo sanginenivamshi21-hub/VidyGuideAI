@@ -2,6 +2,7 @@
 
 import { Menu, SquarePen, Keyboard, PanelLeftClose, PanelLeft } from 'lucide-react';
 import Logo from '@/components/Logo';
+import { useI18n } from '@/lib/i18n';
 
 interface ChatHeaderProps {
   onToggleDrawer: () => void;
@@ -20,23 +21,26 @@ export default function ChatHeader({
   showSidebar,
   hasMessages,
 }: ChatHeaderProps) {
+  const { t } = useI18n();
+
   return (
     <div
       className="flex items-center justify-between px-4 py-2 lg:py-3 shrink-0 safe-area-top z-20"
-      style={{ backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-default)' }}
+      style={{
+        backgroundColor: 'var(--glass-bg-strong)',
+        borderBottom: '1px solid var(--glass-border)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+      }}
     >
       <div className="flex items-center gap-2">
         <button
           onClick={onToggleDrawer}
           className="lg:hidden p-2 -ml-1 rounded-lg transition-colors touch-manipulation"
           style={{ color: 'var(--text-secondary)' }}
-          aria-label="Open conversations"
+          aria-label={t('nav.openConversations')}
         >
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <rect x="2" y="4" width="16" height="1.5" rx="0.75" fill="currentColor" />
-            <rect x="2" y="9.25" width="16" height="1.5" rx="0.75" fill="currentColor" />
-            <rect x="2" y="14.5" width="16" height="1.5" rx="0.75" fill="currentColor" />
-          </svg>
+          <Menu size={19} />
         </button>
         <button
           onClick={onToggleDrawer}
@@ -48,7 +52,7 @@ export default function ChatHeader({
         {onToggleSidebar && (
           <button
             onClick={onToggleSidebar}
-            className="hidden lg:flex p-2 -ml-1 rounded-lg transition-colors"
+            className="hidden lg:flex p-2 -ml-1 rounded-lg transition-colors touch-manipulation"
             style={{ color: 'var(--text-secondary)' }}
             aria-label={showSidebar ? 'Hide sidebar' : 'Show sidebar'}
           >
@@ -57,7 +61,7 @@ export default function ChatHeader({
         )}
         <div className="hidden lg:flex items-center gap-2">
           <Logo size={20} />
-          <span className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>AI Mentor</span>
+          <span className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{t('mentor.title')}</span>
         </div>
       </div>
       <div className="flex items-center gap-1">
@@ -66,7 +70,8 @@ export default function ChatHeader({
             onClick={onNewChat}
             className="hidden lg:block p-2 rounded-lg transition-colors touch-manipulation"
             style={{ color: 'var(--text-secondary)' }}
-            title="New chat"
+            title={t('mentor.newChat')}
+            aria-label={t('mentor.newChat')}
           >
             <SquarePen size={16} />
           </button>
@@ -76,6 +81,7 @@ export default function ChatHeader({
           className="p-2 rounded-lg transition-colors touch-manipulation"
           style={{ color: 'var(--text-secondary)' }}
           title="Keyboard shortcuts"
+          aria-label="Keyboard shortcuts"
         >
           <Keyboard size={16} />
         </button>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { RefreshCw, Lock, Mail, User as UserIcon, ShieldAlert, Send } from 'lucide-react';
+import { RefreshCw, Lock, Mail, User as UserIcon, ShieldAlert, Send , Leaf } from 'lucide-react';
 import { api } from '@/lib/api';
 import { ROUTES } from '@/lib/routes';
 import { useAuth } from '@/hooks/useAuth';
@@ -162,7 +162,12 @@ export default function AuthPage() {
     <div className="min-h-[85vh] flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl flex flex-col gap-6 backdrop-blur-md">
         <div className="text-center flex flex-col gap-2">
-          <span className="text-4xl">🌿</span>
+          <div
+            className="w-16 h-16 rounded-3xl flex items-center justify-center mx-auto"
+            style={{ backgroundColor: 'var(--accent-10)', border: '1px solid var(--accent-20)' }}
+          >
+            <Leaf size={28} style={{ color: 'var(--accent)' }} />
+          </div>
           <h2 className="text-2xl font-extrabold text-white tracking-tight">VidyGuideAI</h2>
           <p className="text-slate-400 text-xs">
             Localized AI Career Counseling for Indian Students
