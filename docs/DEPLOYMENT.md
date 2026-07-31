@@ -30,7 +30,7 @@ cp .env.example .env
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `PORT` | `8000` | API server port |
-| `NEXT_PUBLIC_API_URL` | `http://localhost:8000` | Frontend API base URL |
+| `API_PROXY_TARGET` | `https://vidyguideai-api.onrender.com` | Backend origin proxied by the Next.js `/api/*` rewrite (web service) |
 | `APP_BASE_URL` | `http://localhost:3000` | Base URL for email links |
 | `CLOUDINARY_URL` | - | Cloudinary for file uploads |
 | `REDIS_URL` | - | Redis connection string |

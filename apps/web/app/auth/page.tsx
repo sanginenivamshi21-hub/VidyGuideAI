@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { RefreshCw, Lock, Mail, User as UserIcon, ShieldAlert, Send } from 'lucide-react';
-import { API_BASE, api } from '@/lib/api';
+import { api } from '@/lib/api';
 import { ROUTES } from '@/lib/routes';
 import { useAuth } from '@/hooks/useAuth';
 
