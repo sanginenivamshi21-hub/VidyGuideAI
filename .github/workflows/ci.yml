@@ -93,10 +93,9 @@ jobs:
     - name: Python Type Check (Mypy)
       run: mypy --ignore-missing-imports . 2>/dev/null || true
 
-    - name: Run test suite
-      run: |
-        if [ -d apps/api/tests ]; then cd apps/api && python -m pytest 2>/dev/null || true; else echo "No API tests configured yet."; fi
-        if [ -d tests ]; then python -m pytest 2>/dev/null || true; else echo "No root tests configured yet."; fi
+    - name: Run API unit tests (Jest)
+      working-directory: apps/api
+      run: npx jest --silent
 
     - name: API Health Check
       run: |

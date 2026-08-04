@@ -603,7 +603,7 @@ This project is licensed under the **MIT License**. See [LICENSE](LICENSE) for d
 
 [![GitHub](https://img.shields.io/badge/GitHub-@sanginenivamshi21--hub-181717?style=flat-square&logo=github)](https://github.com/sanginenivamshi21-hub)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Vamshi_Sangineni-0A66C2?style=flat-square&logo=linkedin)](https://linkedin.com/in/vamshi-sangineni)
-[![Email](https://img.shields.io/badge/Email-Contact-D14836?style=flat-square&logo=gmail)](mailto:vamshi@example.com)
+[![Email](https://img.shields.io/badge/Email-Contact-D14836?style=flat-square&logo=gmail)](mailto:sanginenivamshi21@gmail.com)
 
 <sub>Empowering students with AI-driven career guidance — because everyone deserves a mentor.</sub>
 
